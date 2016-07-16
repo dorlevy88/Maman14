@@ -3,3 +3,15 @@
 //
 
 #include "FileReader.h"
+#include <stdio.h>
+
+FILE* getFilePointer(char* filename) {
+
+}
+
+char* readLine(FILE *filePointer) {
+
+}
+
+
+

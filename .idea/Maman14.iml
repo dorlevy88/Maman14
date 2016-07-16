@@ -2,6 +2,13 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileReader.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileWriter.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileReader.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileWriter.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Main.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandOperationTypes.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandGroupTypes.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandAREType.h" isTestSource="false" />
@@ -10,17 +17,12 @@
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandOperationTypes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandGroupTypes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandAdressingTypes.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileReader.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileWriter.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileReader.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileWriter.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Main.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
