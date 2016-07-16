@@ -2,7 +2,7 @@
 // Created by Or Zamir on 7/16/16.
 //
 
-#include "FirstTrasitions.h"
+#include "FirstTransitions.h"
 
 
 
@@ -10,7 +10,7 @@ void RunFirstTransition() {
     //1. int ic = 0, dc = 0;
     //2. Read line
     //3. check is symbol exists in the first field
-    //4. Rise isLabelExists flag - if it  exists
+    //4. Rise isLabelExists flag - if it exists
     //5. if it is data storage order? (.data or .string) if not go to step 8
         //6. if there is a symbol add it to the symbols table with the value of dc counter (if it exists in the table throw error)
         //7. identify the data type and store it in memory
