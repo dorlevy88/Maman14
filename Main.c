@@ -4,6 +4,8 @@
 
 #include "Main.h"
 #include "Utilities/FileReader.h"
+#include "Transitions/FirstTransition.h"
+#include "Transitions/SecondTransition.h"
 
 
 int main(int argc, char **argv) {
@@ -20,8 +22,11 @@ int main(int argc, char **argv) {
     //8.    write .ob [.ext] [.ent] files for each one of the original files
 
     for (int i = 0; i < argc; ++i) {
+
+        struct AssemblyStructure assemblyStructure = {};
         FILE* f = getFilePointer(argv[i]);
 
-
+        RunFirstTransition(f, assemblyStructure);
+        RunSecondTransition(f, assemblyStructure);
     }
 }

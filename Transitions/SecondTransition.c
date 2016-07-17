@@ -2,11 +2,12 @@
 // Created by Or Zamir on 7/16/16.
 //
 
+#include <stdio.h>
 #include "SecondTransition.h"
 
 
 
-void RunSecondTransition() {
+void RunSecondTransition(FILE* file, struct AssemblyStructure *assemblyStructure) {
 
     //1. ic = 0
     //2. read line if done go to step 11

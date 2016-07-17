@@ -3,10 +3,10 @@
 //
 
 #include "FirstTransition.h"
+#include "../DataStructures/AssemblyStructure.h"
 
 
-
-void RunFirstTransition() {
+void RunFirstTransition(FILE* file, struct AssemblyStructure *assemblyStructure) {
     //1. int ic = 0, dc = 0;
     //2. Read line
     //3. check is symbol exists in the first field
