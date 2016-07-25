@@ -2,10 +2,11 @@
 // Created by Or Zamir on 7/16/16.
 //
 
-#include "Main.h"
+#include "DataStructures/AssemblyStructure.h"
 #include "Utilities/FileReader.h"
 #include "Transitions/FirstTransition.h"
 #include "Transitions/SecondTransition.h"
+#include "Main.h"
 
 
 int main(int argc, char **argv) {
@@ -23,7 +24,7 @@ int main(int argc, char **argv) {
 
     for (int i = 0; i < argc; ++i) {
 
-        struct AssemblyStructure assemblyStructure = {};
+        AssemblyStructure assemblyStructure;
         FILE* f = getFilePointer(argv[i]);
 
         RunFirstTransition(f, assemblyStructure);

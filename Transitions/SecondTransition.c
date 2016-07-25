@@ -3,11 +3,12 @@
 //
 
 #include <stdio.h>
+#include "../DataStructures/AssemblyStructure.h"
 #include "SecondTransition.h"
 
 
 
-void RunSecondTransition(FILE* file, struct AssemblyStructure *assemblyStructure) {
+void RunSecondTransition(FILE* file, AssemblyStructure assemblyStructure) {
 
     //1. ic = 0
     //2. read line if done go to step 11

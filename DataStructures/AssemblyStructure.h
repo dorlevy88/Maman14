@@ -8,4 +8,16 @@
 #endif //MAMAN14_ASSEMBLYSTRUCTURE_H
 
 
-struct AssemblyStructure;
+typedef struct AssemblyStructure {
+
+    int ic;
+    int dc;
+
+    struct AssemblyByte** codeArray;
+    struct AssemblyByte** dataArray;
+
+    struct SymbolsTable* symbolsTable;
+    struct SymbolsTable* externSymbolsTable;
+} AssemblyStructure;
+
+AssemblyStructure* InitAssemblyStructure();

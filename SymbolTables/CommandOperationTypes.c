@@ -9,6 +9,6 @@
 //page 15
 
 struct operation {
-    extern enum GroupType groupType; //number of operands
+//    extern enum GroupType groupType; //number of operands
     int opCode;
 };

@@ -10,4 +10,4 @@
 #endif //MAMAN14_FIRSTTRASITIONS_H
 
 
-void RunFirstTransition(FILE* file, struct AssemblyStructure *assemblyStructure);
+void RunFirstTransition(FILE* file, AssemblyStructure assemblyStructure);

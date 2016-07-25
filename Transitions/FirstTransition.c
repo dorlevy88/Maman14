@@ -2,11 +2,12 @@
 // Created by Or Zamir on 7/16/16.
 //
 
-#include "FirstTransition.h"
+#include <stdio.h>
 #include "../DataStructures/AssemblyStructure.h"
+#include "FirstTransition.h"
 
 
-void RunFirstTransition(FILE* file, struct AssemblyStructure *assemblyStructure) {
+void RunFirstTransition(FILE* file, AssemblyStructure assemblyStructure) {
     //1. int ic = 0, dc = 0;
     //2. Read line
     //3. check is symbol exists in the first field

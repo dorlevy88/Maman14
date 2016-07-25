@@ -7,4 +7,4 @@
 
 #endif //MAMAN14_SECONDTRANSITION_H
 
-void RunSecondTransition(FILE* file, struct AssemblyStructure *assemblyStructure);
+void RunSecondTransition(FILE* file, AssemblyStructure assemblyStructure);
