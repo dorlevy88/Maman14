@@ -2,7 +2,7 @@
 // Created by Or Zamir on 7/16/16.
 //
 
-#include <stdio.h>
+#include "../Utilities/FileReader.h"
 #include "../DataStructures/AssemblyStructure.h"
 #include "FirstTransition.h"
 
@@ -26,4 +26,13 @@ void RunFirstTransition(FILE* file, AssemblyStructure assemblyStructure) {
     //13.1 You can produce the order code here
     //14. Add to ic the value of ic + the calculated L value (ic += L)
     //15. go back to step 2
+
+    char line[80];
+
+    assemblyStructure.ic = 0;
+    assemblyStructure.dc = 0;
+    while readLine(file)
+    char* line = readLine(file);
+
+
 }

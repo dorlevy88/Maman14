@@ -22,10 +22,10 @@ int main(int argc, char **argv) {
     //7.    build .ext .ent
     //8.    write .ob [.ext] [.ent] files for each one of the original files
 
-    for (int i = 0; i < argc; ++i) {
+    for (int fileCounter = 0; fileCounter < argc; ++fileCounter) {
 
         AssemblyStructure assemblyStructure;
-        FILE* f = getFilePointer(argv[i]);
+        FILE* f = getFilePointer(argv[fileCounter]);
 
         RunFirstTransition(f, assemblyStructure);
         RunSecondTransition(f, assemblyStructure);
