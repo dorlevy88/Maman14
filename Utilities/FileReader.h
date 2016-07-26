@@ -10,6 +10,6 @@
 #endif //MAMAN14_FILEREADER_H
 
 
-FILE* getFilePointer(char* filename);
+char*** getFileContent(char* filename);
 
 char* readLine(FILE *filePointer);

@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 const int MAX_FILE_LINES = 1000;
 const int MAX_LINE_SIZE =  100;
 const int NUM_OF_LINE_ELEMENTS = 4;
@@ -19,54 +18,29 @@ char** parseLine(char* rawLine) {
     // Get first string
     char* string = strtok(rawLine, " ,");
 
-//    while (string != NULL) {
-//        switch (counter) {
-//            case 0: //Only LABEL could be found
-//                if (strchr(string, ':') != NULL) {
-//                    //found Label
-//                    parsedLine[counter] = string;
-//                }
-//                else {
-//                    parsedLine[counter] = NULL;
-//                }
-//                break;
-//            case 1: //Command or .data
-//            case 2:
-//            case 3:
-//                parsedLine[counter] = string;
-//                break;
-//        }
-//
-//        string = strtok(NULL, " ,");
-//        counter++;
-//    }
-
     for (int i=0; i < NUM_OF_LINE_ELEMENTS; i++) {
         if (string != NULL) {
-            if (i==0) {
+            if (i==0) { //Handle label position
                 if (strchr(string, ':') != NULL) {
                     //found Label
                     parsedLine[i] = string;
                 }
-                else {
+                else { //No Label
                     parsedLine[i] = NULL;
                 }
-            }
+            } //Handle Rest of the cases (1,2,3)
             else {
                 parsedLine[i] = string;
             }
         }
-        else {
+        else { // Fills Rest of array with NULLs
             parsedLine[i]= NULL;
         }
 
         string = strtok(NULL, " ,");
     }
 
-
-
-
-
+    return parsedLine;
 }
 
 char*** getFileContent(char* filename) {
@@ -75,7 +49,7 @@ char*** getFileContent(char* filename) {
     char** parsedFile[MAX_FILE_LINES];
     int lineCounter = 0;
 
-    fr = fopen (filename, "rt"); // Open the file for reading
+    fr = fopen (filename, "r"); // Open the file for reading
     if (fr == NULL)
     {
         printf("File %s does not exist", filename);
@@ -85,6 +59,7 @@ char*** getFileContent(char* filename) {
 //TODO:        if (sizeof(parsedFile) >= MAX_FILE_LINES) {
 //            printf("Not enough memory to hold your program. Exisiting!");
 //        }
+        printf("%s", line);
         char** parsedLine = parseLine(line);
         parsedFile[lineCounter] = parsedLine;
         lineCounter++;

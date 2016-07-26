@@ -31,8 +31,8 @@ void RunFirstTransition(FILE* file, AssemblyStructure assemblyStructure) {
 
     assemblyStructure.ic = 0;
     assemblyStructure.dc = 0;
-    while readLine(file)
-    char* line = readLine(file);
+    //while readLine(file)
+    //char* line = readLine(file);
 
 
 }
