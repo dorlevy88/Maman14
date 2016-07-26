@@ -9,8 +9,9 @@
 #include "Main.h"
 
 
-int main(int argc, char **argv) {
 
+
+int main(int argc, char **argv) {
     //1. read .as files
     //2. iterate on each one of the files
     //3.0   create data array & code array (represent memory layout) : arrays type is bit12[]
@@ -25,9 +26,9 @@ int main(int argc, char **argv) {
     for (int fileCounter = 0; fileCounter < argc; ++fileCounter) {
 
         AssemblyStructure assemblyStructure;
-        FILE* f = getFilePointer(argv[fileCounter]);
+        char*** f = getFileContent(argv[fileCounter]);
 
-        RunFirstTransition(f, assemblyStructure);
-        RunSecondTransition(f, assemblyStructure);
+        //RunFirstTransition(f, assemblyStructure);
+        //RunSecondTransition(f, assemblyStructure);
     }
 }
