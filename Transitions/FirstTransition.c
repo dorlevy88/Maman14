@@ -2,14 +2,14 @@
 // Created by Or Zamir on 7/16/16.
 //
 
-#include "../Utilities/FileReader.h"
+
 #include "../DataStructures/AssemblyStructure.h"
 #include "FirstTransition.h"
 
 
 void RunFirstTransition(FILE* file, AssemblyStructure assemblyStructure) {
     //1. int ic = 0, dc = 0;
-    //2. Read line
+    //2. Read word
     //3. check is symbol exists in the first field
     //4. Rise isLabelExists flag - if it exists
     //5. if it is data storage order? (.data or .string) if not go to step 8
@@ -32,7 +32,7 @@ void RunFirstTransition(FILE* file, AssemblyStructure assemblyStructure) {
     assemblyStructure.ic = 0;
     assemblyStructure.dc = 0;
     //while readLine(file)
-    //char* line = readLine(file);
+    //char* word = readLine(file);
 
 
 }

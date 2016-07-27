@@ -3,12 +3,10 @@
 //
 
 #include "DataStructures/AssemblyStructure.h"
-#include "Utilities/FileReader.h"
 #include "Transitions/FirstTransition.h"
 #include "Transitions/SecondTransition.h"
 #include "Main.h"
-
-
+#include "Utilities/FileHandlers.h"
 
 
 int main(int argc, char **argv) {
@@ -23,12 +21,19 @@ int main(int argc, char **argv) {
     //7.    build .ext .ent
     //8.    write .ob [.ext] [.ent] files for each one of the original files
 
-    for (int fileCounter = 0; fileCounter < argc; ++fileCounter) {
+    for (int fileCounter = 1; fileCounter < argc; ++fileCounter) {
 
         AssemblyStructure assemblyStructure;
-        char*** f = getFileContent(argv[fileCounter]);
+        FileContent fileContent = getFileContent(argv[fileCounter]);
 
-        //RunFirstTransition(f, assemblyStructure);
+        for (int i=0; i < fileContent.numRows; i++){
+            for (int j=0; j < 4; j++){
+                printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent.line[i].word[j]);
+            }
+            printf("\n");
+        }
+
+        //RunFirstTransition(fileContent, assemblyStructure);
         //RunSecondTransition(f, assemblyStructure);
     }
 }

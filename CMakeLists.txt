@@ -14,13 +14,9 @@ set(SOURCE_FILES
     SymbolTables/CommandGroupTypes.h
     SymbolTables/CommandOperationTypes.c
     SymbolTables/CommandOperationTypes.h
-    Utilities/FileReader.c
-    Utilities/FileReader.h
-    Utilities/FileWriter.c
-    Utilities/FileWriter.h
-    Transitions/SecondTransition.c
+        Transitions/SecondTransition.c
     Transitions/SecondTransition.h
     Transitions/FirstTransition.c
-    Transitions/FirstTransition.h Main.c Main.h DataStructures/AssemblyStructure.c DataStructures/AssemblyStructure.h DataStructures/AssemblyByte.c DataStructures/AssemblyByte.h DataStructures/SymbolsTable.c DataStructures/SymbolsTable.h)
+    Transitions/FirstTransition.h Main.c Main.h DataStructures/AssemblyStructure.c DataStructures/AssemblyStructure.h DataStructures/AssemblyByte.c DataStructures/AssemblyByte.h DataStructures/SymbolsTable.c DataStructures/SymbolsTable.h Utilities/FileHandlers.c Utilities/FileHandlers.h)
 
 add_executable(Maman14 ${SOURCE_FILES})

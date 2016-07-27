@@ -11,7 +11,7 @@
 void RunSecondTransition(FILE* file, AssemblyStructure assemblyStructure) {
 
     //1. ic = 0
-    //2. read line if done go to step 11
+    //2. read word if done go to step 11
     //3. if the first field is a symbol skip it
     //4. is it imaginary order go to step 2 else continue
     //5. is it .extern or .entry (if not go to step 7)
