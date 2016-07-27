@@ -3,6 +3,7 @@
 //
 
 #include <stdio.h>
+#include "../Utilities/FileHandlers.h"
 
 #ifndef MAMAN14_FIRSTTRASITIONS_H
 #define MAMAN14_FIRSTTRASITIONS_H
@@ -10,4 +11,4 @@
 #endif //MAMAN14_FIRSTTRASITIONS_H
 
 
-void RunFirstTransition(FILE* file, AssemblyStructure assemblyStructure);
+void RunFirstTransition(FileContent fileContent, AssemblyStructure assemblyStructure);

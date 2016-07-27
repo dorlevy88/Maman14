@@ -6,7 +6,6 @@
 #include "Transitions/FirstTransition.h"
 #include "Transitions/SecondTransition.h"
 #include "Main.h"
-#include "Utilities/FileHandlers.h"
 
 
 int main(int argc, char **argv) {
@@ -33,7 +32,7 @@ int main(int argc, char **argv) {
             printf("\n");
         }
 
-        //RunFirstTransition(fileContent, assemblyStructure);
+        RunFirstTransition(fileContent, assemblyStructure);
         //RunSecondTransition(f, assemblyStructure);
     }
 }
