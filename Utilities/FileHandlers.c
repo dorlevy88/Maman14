@@ -5,43 +5,144 @@
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "FileHandlers.h"
 
-//Creates the following array structure - [Label, Command, To, From], NULL if not exist
-//FileLine parseLine(char* rawLine) {
-//    FileLine parsedLine;
-//
-//    // Get first string
-//    char* string = strtok(rawLine, " ,\n");
-//
-//    for (int i=0; i < NUM_OF_LINE_ELEMENTS; i++) {
-//        if (string != NULL) {
-//            if (i==0) { //Handle label position
-//                if (strchr(string, ':') != NULL) {
-//                    //found Label
-//                    parsedLine.word[i] = string;
-//                }
-//                else { //No Label
-//                    parsedLine.word[i] = NULL;
-//                }
-//            } //Handle Rest of the cases (1,2,3)
-//            else {
-//                parsedLine.word[i] = string;
-//            }
-//        }
-//        else { // Fills Rest of array with NULLs
-//            parsedLine.word[i]= NULL;
-//        }
-//
-//        string = strtok(NULL, " ,\n");
-//    }
-//
-//    return parsedLine;
-//}
+#define MIN_NUM_SIZE -16384
+#define MAX_NUM_SIZE 16384
 
-//#define ALLOWED_ACTION_NAMES = ["mov", "cmp"]
+bool isLabelValid(char* label){
+    //TODO: check if starts with char
+    //Check if only numbers and chars
+    //Check up to 30 chars (not including ':'
+}
 
-ActionTypes checkActionName(char* action) {
+
+bool checkStringIsInt(char* string){
+    if (strlen(string) == 0){ //Check string is not empty
+        return false;
+    }
+    char* ptr;
+    intmax_t num = strtoimax(string, &ptr, 10);
+    if (num < MIN_NUM_SIZE || num > MAX_NUM_SIZE) {
+        //TODO: num bigger than 15 bits
+        return false;
+    }
+    if (strlen(ptr) != 0) {
+        //TODO: not a number
+        return false;
+    }
+    return true;
+}
+
+OperandAddressingType getOperandType(char* operand){
+    if (operand[0] == '#'){ //check direct addressing
+        if (checkStringIsInt(++operand)) { //Miyadi
+            //string is number
+            return NUMBER;
+        }
+        else {
+            // not a number syntax error
+        }
+    }
+    else if () { //Yashir
+        isLabelValid(isLabelValid);
+    }
+}
+
+void checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
+    char* firstOperand = strtok(rawOperandsString, " ,"); //get first operand - split by comma and/or space
+    char* secondOperand = strtok(NULL, " ,"); //get second operand - split by comma and/or space
+    if (strtok(NULL, " ,") != NULL){
+        //TODO: stderr for syntax error - too many operands
+        parsedLine.hasSyntaxError = true;
+        return;
+    }
+}
+
+void checkOneOperand(){
+    //TODO:
+}
+
+void checkNoOperand(){
+    //TODO:
+}
+
+void validateActionAndOperands(char* rawOperandsString, FileLine parsedLine) {
+    if (strcmp(parsedLine.action, "mov") == 0) {
+        parsedLine.actionType = MOV;
+        checkTwoOperands(rawOperandsString, parsedLine);
+        //TODO: check operands types validity
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+    else if (strcmp(parsedLine.action, "mov") == 0){
+
+    }
+
+
+
+
+    if (parsedLine.hasSyntaxError){
+        return;
+    }
+
+
     const char* ALLOWED_ACTION_NAMES[] = {"mov", "cmp"};
     for (int i = 0; i < sizeof(ALLOWED_ACTION_NAMES); ++i) {
         if (strcmp(ALLOWED_ACTION_NAMES[i], action) == 0) {
@@ -52,31 +153,36 @@ ActionTypes checkActionName(char* action) {
 
 FileLine lineValidator(char* rawLine, int lineCounter) {
     FileLine parsedLine;
+    parsedLine.lineNum = lineCounter;
 
     char* string = strtok(rawLine, " "); //Get first string
 
-    //Handle empty lines or comment line
+    //Handle empty lines
     if (string == NULL){
         parsedLine.isEmptyOrComment = true;
         return parsedLine;
-    }
+    }//Handle Comment Lines
     else if (strlen(string) >= 1 && string[0] == ';'){
         parsedLine.isEmptyOrComment = true;
         return parsedLine;
     }
-    parsedLine.lineNum = lineCounter;
 
     //Handle labels
-    if (string[strlen(string) - 1] == ':') {
-        //TODO: check label size
-        //more checks?
+    size_t strSize = strlen(string);
+    if (string[strSize - 1] == ':') { //Label Found
+        isLabelValid(string);
         
-        parsedLine.label = string;      //get the label
-        string = strtok(NULL, " ");  //get next string
+        strcpy(parsedLine.label, string);      //get the label
+        char* action = strtok(NULL, " "); //Get action string
+
     }
-    
-    //Handle actions
-    for
+    strcpy(parsedLine.action, string);      //get the action
+
+    char* rawOperandsString = strstr(rawLine, parsedLine.action) + strlen(parsedLine.action);
+
+    validateActionAndOperands(rawOperandsString, parsedLine);
+
+
 
 
     return parsedLine;

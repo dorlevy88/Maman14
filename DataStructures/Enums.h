@@ -38,10 +38,10 @@ typedef enum LineType {
 } LineType;
 
 typedef enum OperandAddressingType {
-    Number = 0,
-    Direct = 1,
-    Dynamic = 2,
-    Register = 3
+    NUMBER = 0, //Miyadi
+    DIRECT = 1, //Yashir
+    DYNAMIC = 2, //Miyadi Dinami
+    REGISTER = 3 //Oger Yashir
 } OperandAddressingType;
 
 
