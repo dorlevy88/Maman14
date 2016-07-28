@@ -42,6 +42,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assemblyStruc
         if (strcmp(fileContent.line[i].word[1], ".data")  == 0 ||  //Handle Data Storage Symbols
             strcmp(fileContent.line[i].word[1], ".string")  == 0){
             //TODO:Steps 6 ,7 and 7.1
+
             continue;
         }
         else if (strcmp(fileContent.line[i].word[1], ".extern")  == 0 || //Handle External Symbols

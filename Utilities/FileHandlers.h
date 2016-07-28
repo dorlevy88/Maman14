@@ -2,10 +2,11 @@
 // Created by Dor Levy on 7/26/16.
 //
 
+#include <stdbool.h>
+#include "../DataStructures/Enums.h"
+
 #ifndef MAMAN14_FILEHANDLERS_H
 #define MAMAN14_FILEHANDLERS_H
-
-#endif //MAMAN14_FILEHANDLERS_H
 
 
 #define NUM_OF_LINE_ELEMENTS 4
@@ -14,7 +15,20 @@
 
 typedef struct FileLine {
 
-    char* word[NUM_OF_LINE_ELEMENTS];
+    char* originalLine;
+    int lineNum;
+    LineType lineType;
+    bool hasSyntaxError;
+    bool isEmptyOrComment;
+
+    char* label;
+    ActionTypes action;
+
+    char* data;
+    char* srcOperand;
+    OperandAddressingType srcOperandType;
+    char* destOperand;
+    OperandAddressingType destOperandType;
 
 } FileLine;
 
@@ -22,8 +36,12 @@ typedef struct FileLine {
 typedef struct FileContent {
 
     FileLine line[MAX_FILE_LINES];
-    int numRows;
+    int size;
+    bool hasError;
 
 } FileContent;
 
 FileContent getFileContent(char* filename);
+
+
+#endif //MAMAN14_FILEHANDLERS_H

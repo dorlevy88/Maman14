@@ -5,13 +5,13 @@
       <sourceFolder url="file://$MODULE_DIR$/Utilities/FileHandlers.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Utilities/FileHandlers.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Main.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyByte.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyByte.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyByte.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandOperationTypes.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandGroupTypes.c" isTestSource="false" />
@@ -21,10 +21,10 @@
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandOperationTypes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandGroupTypes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandAdressingTypes.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Main.h" isTestSource="false" />
     </content>
@@ -204,6 +204,7 @@
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers" />
           <root url="file:///Library/Developer/CommandLineTools/usr/include" />
           <root url="file:///Library/Developer/CommandLineTools/usr/lib/clang/7.3.0/include" />
+          <root url="file:///Library/Frameworks/Mono.framework/Headers" />
           <root url="file:///Library/Frameworks/iTunesLibrary.framework/Headers" />
           <root url="file:///usr/include" />
         </CLASSES>
@@ -380,6 +381,7 @@
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers" />
           <root url="file:///Library/Developer/CommandLineTools/usr/include" />
           <root url="file:///Library/Developer/CommandLineTools/usr/lib/clang/7.3.0/include" />
+          <root url="file:///Library/Frameworks/Mono.framework/Headers" />
           <root url="file:///Library/Frameworks/iTunesLibrary.framework/Headers" />
           <root url="file:///usr/include" />
         </SOURCES>

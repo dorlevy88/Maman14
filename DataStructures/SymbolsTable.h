@@ -2,9 +2,26 @@
 // Created by Or Zamir on 7/17/16.
 //
 
+#include <stdbool.h>
+
 #ifndef MAMAN14_SYMBOLSTABLE_H
 #define MAMAN14_SYMBOLSTABLE_H
 
-#endif //MAMAN14_SYMBOLSTABLE_H
+typedef struct SymbolRecord {
+    char* label;
+    int address;
+    bool isExternal;
+    bool isCommand;
+} SymbolRecord;
 
-struct SymbolsTable;
+typedef struct SymbolsTable {
+    SymbolRecord* record;
+    int size;
+} SymbolsTable;
+
+
+bool isLabelExistInTable(SymbolsTable table, char* label);
+
+SymbolRecord getSymbolRecord(SymbolsTable table, char* label);
+
+#endif //MAMAN14_SYMBOLSTABLE_H
