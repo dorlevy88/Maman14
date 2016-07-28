@@ -48,7 +48,10 @@ FileContent getFileContent(char* filename) {
     fr = fopen (filename, "r"); // Open the file for reading
     if (fr == NULL)
     {
+        //TODO: send an error to the stderr and continue to the next file
         printf("File %s does not exist", filename);
+        fileContent.numRows = 0;
+        return fileContent;
     }
     while(fgets(line, sizeof(line), fr) != NULL)   //get a word.  done if NULL
     {

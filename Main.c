@@ -24,13 +24,23 @@ int main(int argc, char **argv) {
 
         AssemblyStructure assemblyStructure;
         FileContent fileContent = getFileContent(argv[fileCounter]);
-
-        for (int i=0; i < fileContent.numRows; i++){
+        if (fileContent.numRows == 0) { //Something went wrong with the file loading
+            continue;
+        }
+        for (int i=0; i < fileContent.numRows; i++) {
             for (int j=0; j < 4; j++){
                 printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent.line[i].word[j]);
             }
             printf("\n");
         }
+
+        //TODO: Check file validity
+        //On Error in file validity (or any error) we need to print into stderr and not stdout
+        //If one of the files has error we need to move print error and move to the next file
+
+        //NOTE: between the label and the order we need to have at least one space
+        //NOTE: if a number is bigger than 15 bits --> Error
+        //NOTE: Choose for each line if it's empty\comment\guide(data)\order(code) sentence
 
         RunFirstTransition(fileContent, assemblyStructure);
         //RunSecondTransition(f, assemblyStructure);
