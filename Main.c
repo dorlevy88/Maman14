@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
         //NOTE:Valid label starts with a characther and only has chars and numbers and max length is 30
         //NOTE: between the label and the order we need to have at least one space
         //NOTE: if a number is bigger than 15 bits --> Error
-        //NOTE: Choose for each line if it's empty\comment\guide(data)\order(code) sentence
+        //NOTE: Choose for each line if it's empty\comment\guide(data)\command(code) sentence
 
         RunFirstTransition(fileContent, assemblyStructure);
         //RunSecondTransition(f, assemblyStructure);

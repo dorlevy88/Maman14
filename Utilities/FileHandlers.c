@@ -39,23 +39,44 @@
 //    return parsedLine;
 //}
 
+//#define ALLOWED_ACTION_NAMES = ["mov", "cmp"]
 
-FileLine lineValidator(char* rawLine, int lineCounter){
+ActionTypes checkActionName(char* action) {
+    const char* ALLOWED_ACTION_NAMES[] = {"mov", "cmp"};
+    for (int i = 0; i < sizeof(ALLOWED_ACTION_NAMES); ++i) {
+        if (strcmp(ALLOWED_ACTION_NAMES[i], action) == 0) {
+            
+        }
+    }
+}
+
+FileLine lineValidator(char* rawLine, int lineCounter) {
     FileLine parsedLine;
 
     char* string = strtok(rawLine, " "); //Get first string
 
+    //Handle empty lines or comment line
     if (string == NULL){
         parsedLine.isEmptyOrComment = true;
         return parsedLine;
     }
-    else if (string[0] == ';'){
+    else if (strlen(string) >= 1 && string[0] == ';'){
         parsedLine.isEmptyOrComment = true;
         return parsedLine;
     }
     parsedLine.lineNum = lineCounter;
-    if (strcmp(string[strlen(string) - 1], ":") == )
 
+    //Handle labels
+    if (string[strlen(string) - 1] == ':') {
+        //TODO: check label size
+        //more checks?
+        
+        parsedLine.label = string;      //get the label
+        string = strtok(NULL, " ");  //get next string
+    }
+    
+    //Handle actions
+    for
 
 
     return parsedLine;
