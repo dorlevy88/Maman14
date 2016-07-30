@@ -24,4 +24,6 @@ int isLabelExistsInTable(SymbolsTable table, char* label);
 
 SymbolRecord getSymbolRecord(SymbolsTable table, char* label);
 
+bool CheckAndAddLabelToTable(SymbolsTable table, char* label, int address, bool isExternal, bool isCommand);
+
 #endif //MAMAN14_SYMBOLSTABLE_H

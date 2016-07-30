@@ -19,3 +19,19 @@ SymbolRecord getSymbolRecord(SymbolsTable table, char* label) {
     //TODO:Implement getSymbolRecord
     return NULL;
 }
+
+
+bool CheckAndAddLabelToTable(SymbolsTable table, char* label, int address, bool isExternal, bool isCommand) {
+    int labelPos = isLabelExistsInTable(table, label);
+    if(labelPos != -1) {
+        return false;
+    }
+    SymbolRecord rec = {
+            label: label,
+            address: address,
+            isExternal: isExternal,
+            isCommand: isCommand
+    };
+    table.record[++table.size] = rec;
+    return true;
+}
