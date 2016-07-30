@@ -1,14 +1,12 @@
 //
 // Created by Or Zamir on 7/17/16.
 //
-
-#include "AssemblyByte.h"
-
 #ifndef MAMAN14_ASSEMBLYSTRUCTURE_H
 #define MAMAN14_ASSEMBLYSTRUCTURE_H
 
-#endif //MAMAN14_ASSEMBLYSTRUCTURE_H
 
+#include "AssemblyByte.h"
+#include "SymbolsTable.h"
 
 typedef struct AssemblyStructure {
 
@@ -18,8 +16,13 @@ typedef struct AssemblyStructure {
     AssemblyByte* codeArray;
     AssemblyByte* dataArray;
 
-    struct SymbolsTable* symbolsTable;
-    struct SymbolsTable* externSymbolsTable;
+    SymbolsTable symbolsTable;
+    SymbolsTable externSymbolsTable;
+    SymbolsTable entrySymbolsTable;
 } AssemblyStructure;
 
-AssemblyStructure* InitAssemblyStructure();
+
+//AssemblyStructure InitAssemblyStructure();
+
+
+#endif //MAMAN14_ASSEMBLYSTRUCTURE_H

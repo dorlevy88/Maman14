@@ -11,4 +11,4 @@
 #endif //MAMAN14_FIRSTTRASITIONS_H
 
 
-void RunFirstTransition(FileContent fileContent, AssemblyStructure assemblyStructure);
+void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly);

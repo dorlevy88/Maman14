@@ -52,7 +52,7 @@ Operand getOperand(char* operand){
     }
     else if (operand[0] == 'r' && strlen(operand) == 2 && operand[1] >= '0' && operand[1] <= '7') { //Oger
         oper.addressingType = REGISTER;
-        
+
         return oper;
     }
     else if (operand[0] != '[' && operand[0] != ']' &&

@@ -7,9 +7,10 @@
 #include <memory.h>
 #include "../DataStructures/AssemblyStructure.h"
 #include "FirstTransition.h"
+#include "../DataStructures/SymbolsTable.h"
 
 
-void RunFirstTransition(FileContent fileContent, AssemblyStructure assemblyStructure) {
+void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
     //1. int ic = 0, dc = 0;
     //2. Read line
     //3. check is symbol exists in the first field
@@ -29,24 +30,44 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assemblyStruc
     //14. Add to ic the value of ic + the calculated L value (ic += L)
     //15. go back to step 2
 
-    assemblyStructure.ic = 0;
-    assemblyStructure.dc = 0;
+    assembly.ic = 0;
+    assembly.dc = 0;
 
-    for (int i=0; i < fileContent.numRows; i++){ //For every line in file
+    for (int i=0; i < fileContent.size; i++){ //For every line in file
+        FileLine line = fileContent.line[i];
         bool isLabelExists = false;
-        if (fileContent.line[i].word[0] != NULL) { //If Label Exists for line
+
+        if (line.label != NULL) { //If Label Exists for line
             isLabelExists = true;
         }
 
-        //Handle Symbols and data
-        if (strcmp(fileContent.line[i].word[1], ".data")  == 0 ||  //Handle Data Storage Symbols
-            strcmp(fileContent.line[i].word[1], ".string")  == 0){
+        if (line.actionType == DATA || line.actionType == STRING) {  //Handle Data Storage Symbols
             //TODO:Steps 6 ,7 and 7.1
+            int labelPos = isLabelExistsInTable(assembly.symbolsTable, line.label);
+            if(labelPos != -1) {
+                //TODO: error label exists in table
+            }
+            SymbolRecord rec = {
+                    label: line.label,
+                    address: assembly.dc,
+                    isExternal: false,
+                    isCommand: false
+            };
+            assembly.symbolsTable.record[assembly.symbolsTable.size++] = rec;
 
+            int calcDataSize = 0;
+            if (line.actionType == DATA ) {
+                calcDataSize = sizeof(line.firstOperValue.data);
+                //TODO: add data to assembly.dataArray
+            }
+            else {
+                calcDataSize = sizeof(line.firstOperValue.string);
+                //TODO: add string to assembly.dataArray
+            }
+            assembly.dc += calcDataSize;
             continue;
         }
-        else if (strcmp(fileContent.line[i].word[1], ".extern")  == 0 || //Handle External Symbols
-            strcmp(fileContent.line[i].word[1], ".entry")  == 0){
+        else if (line.actionType == EXTERN || line.actionType == ENTRY) { //Handle External Symbols
             //TODO:Steps 9, 9.1, 10
             continue;
         }

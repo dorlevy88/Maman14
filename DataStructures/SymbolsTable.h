@@ -20,7 +20,7 @@ typedef struct SymbolsTable {
 } SymbolsTable;
 
 
-bool isLabelExistInTable(SymbolsTable table, char* label);
+int isLabelExistsInTable(SymbolsTable table, char* label);
 
 SymbolRecord getSymbolRecord(SymbolsTable table, char* label);
 

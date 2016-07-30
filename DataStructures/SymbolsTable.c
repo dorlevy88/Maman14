@@ -6,10 +6,13 @@
 #include <stddef.h>
 #include "SymbolsTable.h"
 
-
-bool isLabelExistInTable(SymbolsTable table, char* label) {
+/// Returns the index of the symbol, if not exists returns -1
+/// \param table
+/// \param label
+/// \return
+int isLabelExistsInTable(SymbolsTable table, char* label) {
     //TODO:Implement isLabelExistInTable
-    return true;
+    return -1;
 }
 
 SymbolRecord getSymbolRecord(SymbolsTable table, char* label) {
