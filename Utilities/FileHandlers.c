@@ -16,10 +16,16 @@ bool isLabelValid(char* label){
     //TODO: check if starts with char
     //Check if only numbers and chars
     //Check up to 30 chars (not including ':'
+    if (strlen(label) > 0){//
+
+    }
+    else{
+        return false;
+    }
 }
 
 
-int getInFromString(char *string){
+int getIntFromString(char *string){
     if (strlen(string) == 0){ //Check string is not empty
         return INVALID_NUM_TOKEN;
     }
@@ -39,7 +45,7 @@ int getInFromString(char *string){
 Operand getOperand(char* operand){
     Operand oper;
     if (operand[0] == '#'){ //check direct addressing
-        int num = getInFromString(++operand);
+        int num = getIntFromString(++operand);
         if (num != INVALID_NUM_TOKEN) { //Miyadi
             //string is number
             oper.addressingType = NUMBER;

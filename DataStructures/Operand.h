@@ -13,14 +13,14 @@ typedef struct Operand {
 
     //in case of command
     RegisterType registerType;  //register addressing
-    int value;                  //number addressing
-    char* label;                //direct\dynamic addressing
-    int maxNum;                 //dynamic addressing max position
-    int minNum;                 //dynamic addressing min position
+    int value;                  //number addressing - #3 -> 3
+    char* label;                //direct\dynamic addressing - X[1-6] -> X
+    int maxNum;                 //dynamic addressing max position - X[1-6] -> 6
+    int minNum;                 //dynamic addressing min position - X[1-6] -> 1
 
     //in case of .data\.string
-    int* data;
-    char* string;
+    int* data; // could be multiple int in case of .data
+    char* string; // only one string in case of .string
 
     //in case .entry\.extern
     char* entryOrExtern;
