@@ -5,7 +5,7 @@
 #define MAMAN14_ASSEMBLYSTRUCTURE_H
 
 
-#include "AssemblyByte.h"
+#include "AssemblyBytes.h"
 #include "SymbolsTable.h"
 
 typedef struct AssemblyStructure {
@@ -13,16 +13,11 @@ typedef struct AssemblyStructure {
     int ic;
     int dc;
 
-    AssemblyByte* codeArray;
-    AssemblyByte* dataArray;
+    AssemblyBytes codeArray;
+    AssemblyBytes dataArray;
 
     SymbolsTable symbolsTable;
-    SymbolsTable externSymbolsTable;
-    SymbolsTable entrySymbolsTable;
 } AssemblyStructure;
-
-
-//AssemblyStructure InitAssemblyStructure();
 
 
 #endif //MAMAN14_ASSEMBLYSTRUCTURE_H

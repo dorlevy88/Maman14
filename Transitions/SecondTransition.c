@@ -6,14 +6,12 @@
 #include "../DataStructures/AssemblyStructure.h"
 #include "SecondTransition.h"
 
-
-
-void RunSecondTransition(FILE* file, AssemblyStructure assemblyStructure) {
+void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
 
     //1. ic = 0
     //2. read word if done go to step 11
-    //3. if the first field is a symbol skip it
-    //4. is it imaginary order go to step 2 else continue
+    //3. ignore label on the beginning of line
+    //4. is it .data/.string go to step 2 else continue
     //5. is it .extern or .entry (if not go to step 7)
     //6. identify the order
         //6.1. act accordingly
@@ -29,4 +27,34 @@ void RunSecondTransition(FILE* file, AssemblyStructure assemblyStructure) {
     //11.2 size of the data
     //11.3 extern symbols table
     //11.4 symbols table with entry points marks
+
+    int tmpIc = assembly.ic;
+    assembly.ic = 100;
+
+    for (int i=0; i < fileContent.size; i++) { //For every line in file
+        FileLine line = fileContent.line[i];
+
+        //Step: 4
+        if (line.actionType == DATA || line.actionType == STRING) {
+            continue;
+        }
+
+        //Step: 5
+        if (line.actionType == EXTERN || line.actionType == ENTRY) {
+            if (line.actionType == ENTRY) {
+                if (SetLabelAddressInTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, assembly.ic) == false) {
+                    //TODO: error label does not exists
+                }
+            }
+            continue;
+        }
+
+        //Tra
+
+    }
+
+    if (assembly.ic != tmpIc) {
+        //BUG: something went wrong with the calculation
+    }
+    //Done and ready to save!
 }

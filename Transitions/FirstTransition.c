@@ -7,7 +7,7 @@
 #include <memory.h>
 #include "../DataStructures/AssemblyStructure.h"
 #include "FirstTransition.h"
-#include "../DataStructures/SymbolsTable.h"
+#include "../DataStructures/Command.h"
 
 
 void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
@@ -23,14 +23,14 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         //9. is it .extern order
         //9.1 add it to the EXTERN symbols table with no value
         //10. return to step 2
-    //11. if there is a symbol add it to the symbols table with the value of ic counter (if it exists in the table throw error)
+    //11. if there is a label add it to the symbols table with the value of ic counter (if it exists in the table throw error)
     //12. search the commands table if not exists throw unknown command code error
     //13. Check command operand type and calculate the command memory size (L)
     //13.1 You can produce the order code here
     //14. Add to ic the value of ic + the calculated L value (ic += L)
     //15. go back to step 2
 
-    assembly.ic = 0;
+    assembly.ic = 100;
     assembly.dc = 0;
 
     for (int i=0; i < fileContent.size; i++){ //For every line in file
@@ -41,43 +41,51 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
             isLabelExists = true;
         }
 
-        if (line.actionType == DATA || line.actionType == STRING) {  //Handle Data Storage Symbols
-            //TODO:Steps 6 ,7 and 7.1
-            int labelPos = isLabelExistsInTable(assembly.symbolsTable, line.label);
-            if(labelPos != -1) {
+        //Handle Data Storage Symbols
+        if (line.actionType == DATA || line.actionType == STRING) {
+            //Steps 6 ,7 and 7.1
+            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false) == false) {
                 //TODO: error label exists in table
             }
-            SymbolRecord rec = {
-                    label: line.label,
-                    address: assembly.dc,
-                    isExternal: false,
-                    isCommand: false
-            };
-            assembly.symbolsTable.record[assembly.symbolsTable.size++] = rec;
 
+            //Push into data array
             int calcDataSize = 0;
             if (line.actionType == DATA ) {
-                calcDataSize = sizeof(line.firstOperValue.data);
-                //TODO: add data to assembly.dataArray
+                calcDataSize = line.firstOperValue.dataSize;
+                PushBytesFromIntArray(assembly.dataArray, line.firstOperValue.data, line.firstOperValue.dataSize);
             }
             else {
                 calcDataSize = sizeof(line.firstOperValue.string);
-                //TODO: add string to assembly.dataArray
+                PushBytesFromString(assembly.dataArray, line.firstOperValue.string);
             }
             assembly.dc += calcDataSize;
             continue;
         }
-        else if (line.actionType == EXTERN || line.actionType == ENTRY) { //Handle External Symbols
-            //TODO:Steps 9, 9.1, 10
+
+        //Handle External Symbols
+        if (line.actionType == EXTERN || line.actionType == ENTRY) {
+            //Steps 9, 9.1, 10
+            if (line.actionType == EXTERN) {
+                AddNewLabelToTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, -1, true, false);
+                //TODO: Should we send error if label exists in table?
+            }
             continue;
         }
-        else if (isLabelExists){ //Handle Code Storage Symbols
-            //TODO: Step 11
+
+        //Handle Command labels
+        if (isLabelExists){
+            //Step 11
+            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true) == false) {
+                //TODO: error label exists in table
+            }
         }
-        //TODO: Handle command - Step 12
-        //TODO: Handle Command Addressing Types - Step 13
-        //TODO: Handle Order Code - Step 13.1
-        //TODO: Handle IC and DC Counters - Step 14
+
+        //Steps 12, 13, 13.1, 14
+        //handle Command size
+        int calcCommandSize = getCommandSize(line.actionType,
+                                             line.firstOperValue.addressingType, line.secondOperValue.addressingType);
+        //Step 14
+        assembly.ic += calcCommandSize;
     }
 
 

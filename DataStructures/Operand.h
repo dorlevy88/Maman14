@@ -20,6 +20,7 @@ typedef struct Operand {
 
     //in case of .data\.string
     int* data; // could be multiple int in case of .data
+    int dataSize;
     char* string; // only one string in case of .string
 
     //in case .entry\.extern

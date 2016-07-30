@@ -11,6 +11,6 @@ set(SOURCE_FILES
         Transitions/SecondTransition.c
     Transitions/SecondTransition.h
     Transitions/FirstTransition.c
-    Transitions/FirstTransition.h Main.c Main.h DataStructures/AssemblyStructure.h DataStructures/AssemblyByte.h DataStructures/SymbolsTable.h Utilities/FileHandlers.c Utilities/FileHandlers.h DataStructures/SymbolsTable.c DataStructures/Enums.c DataStructures/Enums.h DataStructures/Operand.h Utilities/Logger.c Utilities/Logger.h)
+    Transitions/FirstTransition.h Main.c Main.h DataStructures/AssemblyStructure.h DataStructures/AssemblyByte.h DataStructures/SymbolsTable.h Utilities/FileHandlers.c Utilities/FileHandlers.h DataStructures/SymbolsTable.c DataStructures/Enums.c DataStructures/Enums.h DataStructures/Operand.h Utilities/Logger.c Utilities/Logger.h DataStructures/AssemblyBytes.c)
 
 add_executable(Maman14 ${SOURCE_FILES})
