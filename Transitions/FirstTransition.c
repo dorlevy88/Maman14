@@ -7,6 +7,7 @@
 #include <memory.h>
 #include "../DataStructures/AssemblyStructure.h"
 #include "FirstTransition.h"
+#include "../DataStructures/Command.h"
 
 
 void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
@@ -47,14 +48,15 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
                 //TODO: error label exists in table
             }
 
+            //Push into data array
             int calcDataSize = 0;
             if (line.actionType == DATA ) {
-                calcDataSize = sizeof(line.firstOperValue.data);
-                //TODO: add data to assembly.dataArray
+                calcDataSize = line.firstOperValue.dataSize;
+                PushBytesFromIntArray(assembly.dataArray, line.firstOperValue.data, line.firstOperValue.dataSize);
             }
             else {
                 calcDataSize = sizeof(line.firstOperValue.string);
-                //TODO: add string to assembly.dataArray
+                PushBytesFromString(assembly.dataArray, line.firstOperValue.string);
             }
             assembly.dc += calcDataSize;
             continue;
@@ -64,7 +66,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         if (line.actionType == EXTERN || line.actionType == ENTRY) {
             //Steps 9, 9.1, 10
             if (line.actionType == EXTERN) {
-                AddNewLabelToTable(assembly.symbolsTable, line.label, -1, true, false);
+                AddNewLabelToTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, -1, true, false);
                 //TODO: Should we send error if label exists in table?
             }
             continue;
@@ -79,16 +81,11 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         }
 
         //Steps 12, 13, 13.1, 14
-
-        //handle Command
-        int calcCommandSize = 0;
-        //TODO: Handle Command Code
-        //TODO: Handle Command Addressing Types - Step 13
-        //TODO: DO NOT (!!!!) add to Code Array just to the counters - Step 13.1
-
+        //handle Command size
+        int calcCommandSize = getCommandSize(line.actionType,
+                                             line.firstOperValue.addressingType, line.secondOperValue.addressingType);
         //Step 14
         assembly.ic += calcCommandSize;
-
     }
 
 

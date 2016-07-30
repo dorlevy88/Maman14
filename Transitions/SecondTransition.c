@@ -29,7 +29,6 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
     //11.4 symbols table with entry points marks
 
     int tmpIc = assembly.ic;
-    int tmpDc = assembly.dc;
     assembly.ic = 100;
 
     for (int i=0; i < fileContent.size; i++) { //For every line in file
@@ -54,8 +53,8 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
 
     }
 
-
-    assembly.ic = tmpIc;
-    assembly.dc = tmpDc;
+    if (assembly.ic != tmpIc) {
+        //BUG: something went wrong with the calculation
+    }
     //Done and ready to save!
 }
