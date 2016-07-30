@@ -12,7 +12,7 @@ typedef struct Operand {
     OperandAddressingType addressingType;
 
     //in case of command
-    RegisterType registerType;  //register addressing
+    int registerNum;  //register addressing
     int value;                  //number addressing - #3 -> 3
     char* label;                //direct\dynamic addressing - X[1-6] -> X
     int maxNum;                 //dynamic addressing max position - X[1-6] -> 6
@@ -24,6 +24,10 @@ typedef struct Operand {
 
     //in case .entry\.extern
     char* entryOrExtern;
+
+    //error handling
+    bool hasError;
+    char* err;
 
 } Operand;
 
