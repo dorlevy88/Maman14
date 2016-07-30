@@ -43,7 +43,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         //Handle Data Storage Symbols
         if (line.actionType == DATA || line.actionType == STRING) {
             //Steps 6 ,7 and 7.1
-            if (CheckAndAddLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false) == false) {
+            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false) == false) {
                 //TODO: error label exists in table
             }
 
@@ -64,7 +64,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         if (line.actionType == EXTERN || line.actionType == ENTRY) {
             //Steps 9, 9.1, 10
             if (line.actionType == EXTERN) {
-                CheckAndAddLabelToTable(assembly.externSymbolsTable, line.label, -1, false, false);
+                AddNewLabelToTable(assembly.symbolsTable, line.label, -1, true, false);
                 //TODO: Should we send error if label exists in table?
             }
             continue;
@@ -73,7 +73,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         //Handle Command labels
         if (isLabelExists){
             //Step 11
-            if (CheckAndAddLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true) == false) {
+            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true) == false) {
                 //TODO: error label exists in table
             }
         }
@@ -84,8 +84,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         int calcCommandSize = 0;
         //TODO: Handle Command Code
         //TODO: Handle Command Addressing Types - Step 13
-        //TODO: add to Code Array - Step 13.1
-
+        //TODO: DO NOT (!!!!) add to Code Array just to the counters - Step 13.1
 
         //Step 14
         assembly.ic += calcCommandSize;

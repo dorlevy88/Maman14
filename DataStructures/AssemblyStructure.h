@@ -17,8 +17,6 @@ typedef struct AssemblyStructure {
     AssemblyByte* dataArray;
 
     SymbolsTable symbolsTable;
-    SymbolsTable externSymbolsTable;
-    SymbolsTable entrySymbolsTable;
 } AssemblyStructure;
 
 
