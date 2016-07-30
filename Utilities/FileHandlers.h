@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include "../DataStructures/Enums.h"
+#include "../DataStructures/OperandValue.h"
 
 
 #define NUM_OF_LINE_ELEMENTS 4
@@ -26,11 +27,13 @@ typedef struct FileLine {
     char* action;
     ActionTypes actionType;
 
-    char* data;
-    char* srcOperand;
-    OperandAddressingType srcOperandType;
-    char* destOperand;
-    OperandAddressingType destOperandType;
+    char* firstOperand;
+    OperandAddressingType firstOperType;
+    OperandValue firstOperValue;
+
+    char* secondOperand;
+    OperandAddressingType secondOperType;
+    OperandValue secondOperValue;
 
 } FileLine;
 

@@ -44,5 +44,15 @@ typedef enum OperandAddressingType {
     REGISTER = 3 //Oger Yashir
 } OperandAddressingType;
 
+typedef enum RegisterType {
+    r0,
+    r1,
+    r2,
+    r3,
+    r4,
+    r5,
+    r6,
+    r7
+} RegisterType;
 
 #endif //MAMAN14_ENUMS_H
