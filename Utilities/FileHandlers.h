@@ -7,10 +7,8 @@
 
 #include <stdbool.h>
 #include "../DataStructures/Enums.h"
-#include "../DataStructures/OperandValue.h"
+#include "../DataStructures/Operand.h"
 
-
-#define NUM_OF_LINE_ELEMENTS 4
 #define MAX_FILE_LINES 1000
 #define MAX_LINE_SIZE 100
 
@@ -28,12 +26,10 @@ typedef struct FileLine {
     ActionTypes actionType;
 
     char* firstOperand;
-    OperandAddressingType firstOperType;
-    OperandValue firstOperValue;
+    Operand firstOperValue;
 
     char* secondOperand;
-    OperandAddressingType secondOperType;
-    OperandValue secondOperValue;
+    Operand secondOperValue;
 
 } FileLine;
 

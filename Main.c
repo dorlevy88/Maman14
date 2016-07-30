@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
         }
         for (int i=0; i < fileContent.size; i++) {
             for (int j=0; j < 4; j++){
-                printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent.line[i].word[j]);
+                printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent.line[i].originalLine);
             }
             printf("\n");
         }

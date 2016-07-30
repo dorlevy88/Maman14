@@ -35,18 +35,33 @@ bool checkStringIsInt(char* string){
     return true;
 }
 
-OperandAddressingType getOperandType(char* operand){
+Operand getOperand(char* operand){
+    Operand oper;
     if (operand[0] == '#'){ //check direct addressing
         if (checkStringIsInt(++operand)) { //Miyadi
             //string is number
-            return NUMBER;
+            oper.addressingType = NUMBER;
+            return oper;
         }
         else {
             // not a number syntax error
         }
     }
-    else if () { //Yashir
-        isLabelValid(isLabelValid);
+    else if (operand[0] == 'r' && strlen(operand) == 2 && operand[1] >= '0' && operand[1] <= '7') { //Oger
+        oper.addressingType = REGISTER;
+        return oper;
+    }
+    else if (operand[0] != '[' && operand[0] != ']' &&
+            strchr(operand, '[') != NULL && strchr(operand, ']') != NULL) { //Dinami Yashir
+        oper.addressingType = DYNAMIC;
+        return oper;
+    }
+    else if (isLabelValid(operand)) { //Yeshir
+        oper.addressingType = DIRECT;
+        return oper;
+    }
+    else {
+        //TODO: Syntax error
     }
 }
 
@@ -68,9 +83,17 @@ void checkNoOperand(){
     //TODO:
 }
 
+void checkDataOperand() {
+    //TODO:
+}
+
+void checkStringOperand() {
+    //TODO:
+}
+
 void validateActionAndOperands(char* rawOperandsString, FileLine parsedLine) {
     if (strcmp(parsedLine.action, "mov") == 0) {
-        parsedLine.actionType = MOV;
+        parsedLine.actionType =;
         checkTwoOperands(rawOperandsString, parsedLine);
         //TODO: check operands types validity
     }

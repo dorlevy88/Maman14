@@ -10,7 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/OperandValue.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Operand.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyByte.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.h" isTestSource="false" />

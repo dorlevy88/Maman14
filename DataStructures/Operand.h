@@ -2,12 +2,14 @@
 // Created by Or Zamir on 7/30/16.
 //
 
-#ifndef MAMAN14_OPERANDVALUE_H
-#define MAMAN14_OPERANDVALUE_H
+#ifndef MAMAN14_OPERAND_H
+#define MAMAN14_OPERAND_H
 
 #include "Enums.h"
 
-typedef struct OperandValue {
+typedef struct Operand {
+
+    OperandAddressingType addressingType;
 
     //in case of command
     RegisterType registerType;  //register addressing
@@ -23,8 +25,8 @@ typedef struct OperandValue {
     //in case .entry\.extern
     char* entryOrExtern;
 
-} OperandValue;
+} Operand;
 
 
 
-#endif //MAMAN14_OPERANDVALUE_H
+#endif //MAMAN14_OPERAND_H
