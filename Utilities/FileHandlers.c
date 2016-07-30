@@ -10,6 +10,7 @@
 
 #define MIN_NUM_SIZE -16384
 #define MAX_NUM_SIZE 16384
+#define INVALID_NUM_TOKEN -999999
 
 bool isLabelValid(char* label){
     //TODO: check if starts with char
@@ -18,37 +19,40 @@ bool isLabelValid(char* label){
 }
 
 
-bool checkStringIsInt(char* string){
+int getInFromString(char *string){
     if (strlen(string) == 0){ //Check string is not empty
-        return false;
+        return INVALID_NUM_TOKEN;
     }
     char* ptr;
     intmax_t num = strtoimax(string, &ptr, 10);
     if (num < MIN_NUM_SIZE || num > MAX_NUM_SIZE) {
         //TODO: num bigger than 15 bits
-        return false;
+        return INVALID_NUM_TOKEN;
     }
     if (strlen(ptr) != 0) {
         //TODO: not a number
-        return false;
+        return INVALID_NUM_TOKEN;
     }
-    return true;
+    return (int)num;
 }
 
 Operand getOperand(char* operand){
     Operand oper;
     if (operand[0] == '#'){ //check direct addressing
-        if (checkStringIsInt(++operand)) { //Miyadi
+        int num = getInFromString(++operand);
+        if (num != INVALID_NUM_TOKEN) { //Miyadi
             //string is number
             oper.addressingType = NUMBER;
+            oper.value = num;
             return oper;
         }
         else {
-            // not a number syntax error
+            //TODO: not a number syntax error
         }
     }
     else if (operand[0] == 'r' && strlen(operand) == 2 && operand[1] >= '0' && operand[1] <= '7') { //Oger
         oper.addressingType = REGISTER;
+        
         return oper;
     }
     else if (operand[0] != '[' && operand[0] != ']' &&
