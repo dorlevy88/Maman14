@@ -17,9 +17,9 @@ int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddre
                 sizeInIc++; //if both register addressing -> share a byte
             }
             else {
-                sizeInIc += 2; //source _ destination address bytes
+                sizeInIc += 2; //source _ destination address array
             }
-            //TODO: Add 3 bytes at most
+            //TODO: Add 3 array at most
             break;
         case NOT:
         case CLR:
@@ -44,7 +44,6 @@ int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddre
 }
 
 int buildBinaryCommand(FileLine cmdLine) {
-    //TODO: Write command byte:
     // 101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b)
     int binCmd = 0;
 
@@ -85,7 +84,7 @@ int buildBinaryCommand(FileLine cmdLine) {
 }
 
 int convertCompliment2(int num) {
-    //TODO: convert
+    return ((~num) + 1);
 }
 
 int getBitRangefromInt(int num, int minBit, int maxBit) {

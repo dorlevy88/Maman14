@@ -49,6 +49,8 @@ bool SetLabelAddressInTable(SymbolsTable table, char* label, int address, int by
     }
 
     table.records[labelPos].address = address;
-    table.records[labelPos].byteCodeForDynamic = byteCodeForDynamic;
+    if (byteCodeForDynamic != DYNAMIC_ADDRESSING_NOT_AVAILABLE)
+        table.records[labelPos].byteCodeForDynamic = byteCodeForDynamic;
+
     return true;
 }

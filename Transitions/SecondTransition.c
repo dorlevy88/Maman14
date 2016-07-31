@@ -43,7 +43,8 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
         //Step: 5
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
-                if (SetLabelAddressInTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, assembly.ic, ) == false) {
+                if (SetLabelAddressInTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, assembly.ic,
+                                           DYNAMIC_ADDRESSING_NOT_AVAILABLE) == false) {
                     //TODO: error label does not exists
                 }
             }
@@ -52,7 +53,8 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
         else{
             // 101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b)
             int binCmd = buildBinaryCommand(line);
-            PushByteFromInt(assembly.codeArray, binCmd);
+            bool isMemAllocOk = PushByteFromInt(assembly.codeArray, binCmd);
+
             assembly.ic++;
             // 0000000000000-00 (data 13b - E,R,A (2b))
             int binData = 0;
@@ -64,16 +66,20 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
                         binData = buildBinaryData(line.secondOperValue, assembly.symbolsTable);
                         firstBinData <<= 6;
                         firstBinData |= binData;
-                        PushByteFromInt(assembly.codeArray, firstBinData);
+                        isMemAllocOk &= PushByteFromInt(assembly.codeArray, firstBinData);
                         assembly.ic++;
                     }
                     else {
-                        PushByteFromInt(assembly.codeArray, binData);
+                        isMemAllocOk |= PushByteFromInt(assembly.codeArray, binData);
                         binData = buildBinaryData(line.secondOperValue, assembly.symbolsTable);
-                        PushByteFromInt(assembly.codeArray, binData);
+                        isMemAllocOk &= PushByteFromInt(assembly.codeArray, binData);
                         assembly.ic += 2;
                     }
                 }
+            }
+
+            if(isMemAllocOk == false){
+                //TODO: Throw an error size of array exceeded
             }
         }
 

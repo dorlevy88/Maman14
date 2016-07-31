@@ -7,6 +7,7 @@ set(SOURCE_FILES
         DataStructures/Command.c
         DataStructures/Command.h
         DataStructures/AssemblyStructure.h
+        DataStructures/AssemblyStructure.c
         DataStructures/AssemblyBytes.h
         DataStructures/AssemblyBytes.c
         DataStructures/SymbolsTable.h
@@ -14,8 +15,6 @@ set(SOURCE_FILES
         DataStructures/Enums.c
         DataStructures/Enums.h
         DataStructures/Operand.h
-        SymbolTables/CommandAREType.c
-        SymbolTables/CommandAREType.h
         Transitions/SecondTransition.c
         Transitions/SecondTransition.h
         Transitions/FirstTransition.c
@@ -25,6 +24,6 @@ set(SOURCE_FILES
         Utilities/FileHandlers.c
         Utilities/FileHandlers.h
         Utilities/Logger.c
-        Utilities/Logger.h )
+        Utilities/Logger.h Output/OutputFiles.c Output/OutputFiles.h)
 
 add_executable(Maman14 ${SOURCE_FILES})

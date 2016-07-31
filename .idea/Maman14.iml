@@ -11,18 +11,19 @@
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandAREType.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/SymbolTables/CommandAREType.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Output/OutputFiles.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Output/OutputFiles.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Main.h" isTestSource="false" />
     </content>

@@ -5,14 +5,31 @@
 #include "AssemblyBytes.h"
 
 
-void PushByteFromInt(AssemblyBytes bytes, int byte) {
-    //TODO: add data to assembly.dataArray
+bool PushByteFromInt(AssemblyBytes bytes, int byte) {
+    if(bytes.size == MAX_ASSEMBLY_BYTES) {
+        return false;
+    }
+    bytes.array[++bytes.size] = byte;
+    return true;
 }
 
-void PushBytesFromIntArray(AssemblyBytes bytes, int* array, int arraySize) {
-    //TODO: add data to assembly.dataArray
+bool PushBytesFromIntArray(AssemblyBytes bytes, int* array, int arraySize) {
+    for (int i = 0; i < arraySize; ++i) {
+        if(PushByteFromInt(bytes, array[i]) == false) {
+            return false;
+        }
+    }
+    return true;
 }
 
-void PushBytesFromString(AssemblyBytes bytes, char* string) {
-    //TODO: add string to assembly.dataArray
+bool PushBytesFromString(AssemblyBytes bytes, char* string) {
+    for (int i = 0; i < strlen(string); ++i) {
+        if(PushByteFromInt(bytes, (int)string[i]) == false) {
+            return false;
+        }
+    }
+    if (PushByteFromInt(bytes, (int)'\0')) {
+        return false;
+    }
+    return true;
 }

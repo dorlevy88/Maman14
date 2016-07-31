@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 #define LABEL_NOT_EXISTS -1
+#define DYNAMIC_ADDRESSING_NOT_AVAILABLE -999999
 
 typedef struct SymbolRecord {
     char* label;

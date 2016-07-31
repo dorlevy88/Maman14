@@ -59,15 +59,20 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
             //Push into data array
             int calcDataSize = 0;
             int firstByte = 0;
+            bool isMemAllocOk = true;
             if (line.actionType == DATA ) {
                 calcDataSize = line.firstOperValue.dataSize;
                 firstByte = line.firstOperValue.data[0];
-                PushBytesFromIntArray(assembly.dataArray, line.firstOperValue.data, line.firstOperValue.dataSize);
+                isMemAllocOk &= PushBytesFromIntArray(assembly.dataArray, line.firstOperValue.data, line.firstOperValue.dataSize);
             }
             else {
                 calcDataSize = sizeof(line.firstOperValue.string);
                 firstByte = line.firstOperValue.string[0];
-                PushBytesFromString(assembly.dataArray, line.firstOperValue.string);
+                isMemAllocOk &= PushBytesFromString(assembly.dataArray, line.firstOperValue.string);
+            }
+
+            if(isMemAllocOk == false) {
+                //TODO: Throw an error size of array exceeded
             }
 
             if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false, firstByte) == false) {

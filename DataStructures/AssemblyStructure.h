@@ -17,7 +17,9 @@ typedef struct AssemblyStructure {
     AssemblyBytes dataArray;
 
     SymbolsTable symbolsTable;
+
 } AssemblyStructure;
 
+AssemblyStructure* InitAssemblyStructure();
 
 #endif //MAMAN14_ASSEMBLYSTRUCTURE_H

@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
 
     for (int fileCounter = 1; fileCounter < argc; ++fileCounter) {
 
-        AssemblyStructure assemblyStructure;
         FileContent fileContent = getFileContent(argv[fileCounter]);
         if (fileContent.hasError) { //Something went wrong with the file loading
             continue;
@@ -38,12 +37,16 @@ int main(int argc, char **argv) {
         //On Error in file validity (or any error) we need to print into stderr and not stdout
         //If one of the files has error we need to move print error and move to the next file
 
-        //NOTE:Valid label starts with a characther and only has chars and numbers and max length is 30
+        //NOTE:Valid label starts with a character and only has chars and numbers and max length is 30
         //NOTE: between the label and the order we need to have at least one space
         //NOTE: if a number is bigger than 15 bits --> Error
         //NOTE: Choose for each line if it's empty\comment\guide(data)\command(code) sentence
 
-        RunFirstTransition(fileContent, assemblyStructure);
-        //RunSecondTransition(f, assemblyStructure);
+        AssemblyStructure* assemblyStructure = InitAssemblyStructure();
+        RunFirstTransition(fileContent, *assemblyStructure);
+        RunSecondTransition(fileContent, *assemblyStructure);
+
+        //TODO: Translate Assembly Structure to special * base
+        //TODO: Save Files: .ob .ent. ext
     }
 }
