@@ -8,7 +8,6 @@
 #include <memory.h>
 #include "SymbolsTable.h"
 
-#define LABEL_NOT_EXISTS -1
 #define NEW_CHUNK_SIZE 10
 
 /// Returns the index of the symbol, if not exists returns -1
@@ -24,38 +23,32 @@ int isLabelExistsInTable(SymbolsTable table, char* label) {
     return LABEL_NOT_EXISTS;
 }
 
-SymbolRecord getSymbolRecord(SymbolsTable table, char* label) {
-    //TODO:Implement getSymbolRecord
-    return NULL;
-}
-
-
-bool AddNewLabelToTable(SymbolsTable table, char *label, int address, bool isExternal, bool isCommand) {
+bool AddNewLabelToTable(SymbolsTable table, char *label, int address, bool isExternal, bool isCommand, int byteCodeForDynamic) {
     int labelPos = isLabelExistsInTable(table, label);
     if(labelPos != LABEL_NOT_EXISTS) {
         return false;
     }
     if (table.recordSize == table.size) { //Allocate additional space to the array
-        table.records = (SymbolRecord *) malloc((table.size + NEW_CHUNK_SIZE) * sizeof(SymbolRecord));
+        table.records = (SymbolRecord *) realloc(table.records, table.size + (NEW_CHUNK_SIZE * sizeof(SymbolRecord)));
         table.size += NEW_CHUNK_SIZE;
     }
     table.recordSize++;
-    table.records[table.recordSize] = {
-            label: label,
-            address: address,
-            isExternal: isExternal,
-            isCommand: isCommand
-    };
-
+    SymbolRecord record = table.records[table.recordSize];
+    record.label = label;
+    record.address = address;
+    record.isExternal = isExternal;
+    record.isCommand = isCommand;
+    record.byteCodeForDynamic = byteCodeForDynamic;
     return true;
 }
 
-bool SetLabelAddressInTable(SymbolsTable table, char* label, int address) {
+bool SetLabelAddressInTable(SymbolsTable table, char* label, int address, int byteCodeForDynamic) {
     int labelPos = isLabelExistsInTable(table, label);
     if (labelPos == LABEL_NOT_EXISTS) {
         return false;
     }
 
     table.records[labelPos].address = address;
+    table.records[labelPos].byteCodeForDynamic = byteCodeForDynamic;
     return true;
 }

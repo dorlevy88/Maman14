@@ -13,6 +13,8 @@ typedef struct AssemblyBytes {
 } AssemblyBytes;
 
 
+void PushByteFromInt(AssemblyBytes bytes, int byte);
+
 void PushBytesFromIntArray(AssemblyBytes bytes, int* array, int arraySize);
 
 void PushBytesFromString(AssemblyBytes bytes, char* string);

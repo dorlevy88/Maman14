@@ -44,5 +44,11 @@ typedef enum OperandAddressingType {
     REGISTER = 3 //Oger Yashir
 } OperandAddressingType;
 
+typedef enum CommandAREType {
+    Absolute = 0,       //A
+    Relocatable = 2,    //R
+    External = 1        //E
+} CommandAREType;
+
 
 #endif //MAMAN14_ENUMS_H

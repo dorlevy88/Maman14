@@ -1,12 +1,17 @@
 //
 // Created by Dor Levy on 7/10/16.
 //
-
-#include "../Utilities/FileHandlers.h"
-
 #ifndef MAMAN14_COMMAND_H
 #define MAMAN14_COMMAND_H
 
+#include "../Utilities/FileHandlers.h"
+#include "SymbolsTable.h"
+
+
 int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddressingType second);
+
+int buildBinaryCommand(FileLine cmdLine);
+
+int buildBinaryData(Operand operand, SymbolsTable table);
 
 #endif //MAMAN14_COMMAND_H

@@ -4,6 +4,11 @@
 
 #include "AssemblyBytes.h"
 
+
+void PushByteFromInt(AssemblyBytes bytes, int byte) {
+    //TODO: add data to assembly.dataArray
+}
+
 void PushBytesFromIntArray(AssemblyBytes bytes, int* array, int arraySize) {
     //TODO: add data to assembly.dataArray
 }

@@ -9,6 +9,17 @@
 #include "FirstTransition.h"
 #include "../DataStructures/Command.h"
 
+#define MAX_CPU_MEMORY 1000
+
+void UpdateSymbolsTableDataAddresses(SymbolsTable table, int ic) {
+    for (int i = 0; i < table.recordSize; ++i) {
+        SymbolRecord record = table.records[i];
+        if (record.isCommand == false && record.isExternal == false) { //update only .data\.string types
+            record.address += ic;
+        }
+    }
+}
+
 
 void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
     //1. int ic = 0, dc = 0;
@@ -44,30 +55,34 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         //Handle Data Storage Symbols
         if (line.actionType == DATA || line.actionType == STRING) {
             //Steps 6 ,7 and 7.1
-            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false) == false) {  //TODO: how to add dc + end of ic?
-                //TODO: error label exists in table
-            }
 
             //Push into data array
             int calcDataSize = 0;
+            int firstByte = 0;
             if (line.actionType == DATA ) {
                 calcDataSize = line.firstOperValue.dataSize;
+                firstByte = line.firstOperValue.data[0];
                 PushBytesFromIntArray(assembly.dataArray, line.firstOperValue.data, line.firstOperValue.dataSize);
             }
             else {
                 calcDataSize = sizeof(line.firstOperValue.string);
+                firstByte = line.firstOperValue.string[0];
                 PushBytesFromString(assembly.dataArray, line.firstOperValue.string);
+            }
+
+            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false, firstByte) == false) {
+                //TODO: error label exists in table
             }
             assembly.dc += calcDataSize;
         }
         //Handle External Symbols
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (isLabelExists) {
-                //TODO: Throw a warning label in .entry or extern
+                //TODO: Throw a warning: label on .entry or extern is not allowed
             }
             //Steps 9, 9.1, 10
             if (line.actionType == EXTERN) {
-                AddNewLabelToTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, 0, true, false);
+                AddNewLabelToTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, 0, true, false, 0);
                 //TODO: Should we send error if label exists in table?
             }
         }
@@ -76,7 +91,9 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
             //Handle Command labels
             if (isLabelExists) {
                 //Step 11
-                if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true) == false) {
+                int binCommandForDynamicAddressing = buildBinaryCommand(line);
+                if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true,
+                                       binCommandForDynamicAddressing) == false) {
                     //TODO: error label exists in table
                 }
             }
@@ -91,5 +108,9 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         }
     }
 
+    if (assembly.ic + assembly.dc >= MAX_CPU_MEMORY) {
+        //TODO: Throw error program is larger than CPU memory
+    }
 
+    UpdateSymbolsTableDataAddresses(assembly.symbolsTable, assembly.ic);
 }

@@ -290,7 +290,7 @@ void validateActionAndOperands(char* rawOperandsString, FileLine parsedLine) {
     const char* ALLOWED_ACTION_NAMES[] = {"mov", "cmp"};
     for (int i = 0; i < sizeof(ALLOWED_ACTION_NAMES); ++i) {
         if (strcmp(ALLOWED_ACTION_NAMES[i], action) == 0) {
-            
+
         }
     }
 }

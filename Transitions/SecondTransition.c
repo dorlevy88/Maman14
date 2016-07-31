@@ -4,7 +4,9 @@
 
 #include <stdio.h>
 #include "../DataStructures/AssemblyStructure.h"
+#include "../DataStructures/Command.h"
 #include "SecondTransition.h"
+
 
 void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
 
@@ -41,17 +43,38 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
         //Step: 5
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
-                if (SetLabelAddressInTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, assembly.ic) == false) {
+                if (SetLabelAddressInTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, assembly.ic, ) == false) {
                     //TODO: error label does not exists
                 }
             }
         }
         //handle command
         else{
-            //TODO: Write command byte:
             // 101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b)
-            //TODO: Write operands (check for symbols in table)
+            int binCmd = buildBinaryCommand(line);
+            PushByteFromInt(assembly.codeArray, binCmd);
+            assembly.ic++;
             // 0000000000000-00 (data 13b - E,R,A (2b))
+            int binData = 0;
+            if (line.numOfCommandOprands >= 1) {
+                binData = buildBinaryData(line.firstOperValue, assembly.symbolsTable);
+                if (line.numOfCommandOprands == 2) {
+                    if (line.secondOperValue.addressingType == REGISTER){
+                        int firstBinData = binData;
+                        binData = buildBinaryData(line.secondOperValue, assembly.symbolsTable);
+                        firstBinData <<= 6;
+                        firstBinData |= binData;
+                        PushByteFromInt(assembly.codeArray, firstBinData);
+                        assembly.ic++;
+                    }
+                    else {
+                        PushByteFromInt(assembly.codeArray, binData);
+                        binData = buildBinaryData(line.secondOperValue, assembly.symbolsTable);
+                        PushByteFromInt(assembly.codeArray, binData);
+                        assembly.ic += 2;
+                    }
+                }
+            }
         }
 
     }
@@ -59,5 +82,6 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
     if (assembly.ic != tmpIc) {
         //BUG: something went wrong with the algorithm
     }
+
     //Done and ready to save!
 }
