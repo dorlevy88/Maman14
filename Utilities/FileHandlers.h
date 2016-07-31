@@ -24,6 +24,7 @@ typedef struct FileLine {
     char* label;
     char* action;
     ActionTypes actionType;
+    int numOfCommandOprands;
 
     char* firstOperand;
     Operand firstOperValue;

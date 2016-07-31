@@ -186,17 +186,22 @@ void checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
         parsedLine.hasSyntaxError = true;
         return;
     }
+    parsedLine.numOfCommandOprands = 2;
     parsedLine.firstOperValue = firstOperand;
     parsedLine.secondOperValue = secondOperand;
     return;
 }
 
-void checkOneOperand(){
+void checkOneOperand(char* rawOperandsString, FileLine parsedLine){
     //TODO:
+
+    parsedLine.numOfCommandOprands = 1;
 }
 
-void checkNoOperand(){
+void checkNoOperand(char* rawOperandsString, FileLine parsedLine){
     //TODO:
+
+    parsedLine.numOfCommandOprands = 0;
 }
 
 void checkDataOperand() {

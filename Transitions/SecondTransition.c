@@ -13,7 +13,7 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
     //3. ignore label on the beginning of line
     //4. is it .data/.string go to step 2 else continue
     //5. is it .extern or .entry (if not go to step 7)
-    //6. identify the order
+        //6. identify the order
         //6.1. act accordingly
         //6.2 if it's .entry order add the entry symbols and return to step 2
     //7. estimate the operands look at the command table and switch to the correct command code
@@ -36,25 +36,28 @@ void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly) {
 
         //Step: 4
         if (line.actionType == DATA || line.actionType == STRING) {
-            continue;
+            //do nothing
         }
-
         //Step: 5
-        if (line.actionType == EXTERN || line.actionType == ENTRY) {
+        else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
                 if (SetLabelAddressInTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, assembly.ic) == false) {
                     //TODO: error label does not exists
                 }
             }
-            continue;
         }
-
-        //Tra
+        //handle command
+        else{
+            //TODO: Write command byte:
+            // 101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b)
+            //TODO: Write operands (check for symbols in table)
+            // 0000000000000-00 (data 13b - E,R,A (2b))
+        }
 
     }
 
     if (assembly.ic != tmpIc) {
-        //BUG: something went wrong with the calculation
+        //BUG: something went wrong with the algorithm
     }
     //Done and ready to save!
 }

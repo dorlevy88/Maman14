@@ -27,6 +27,7 @@ int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddre
         case DEC:
         case JMP:
         case BNE:
+        case RED:
         case PRN:
         case JSR:
             sizeInIc += 2; //command byte + adresss
@@ -39,5 +40,5 @@ int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddre
             //BUG in the algorithm should not go here
             break;
     }
-
+    return sizeInIc;
 }

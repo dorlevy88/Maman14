@@ -44,7 +44,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
         //Handle Data Storage Symbols
         if (line.actionType == DATA || line.actionType == STRING) {
             //Steps 6 ,7 and 7.1
-            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false) == false) {
+            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false) == false) {  //TODO: how to add dc + end of ic?
                 //TODO: error label exists in table
             }
 
@@ -59,33 +59,36 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
                 PushBytesFromString(assembly.dataArray, line.firstOperValue.string);
             }
             assembly.dc += calcDataSize;
-            continue;
         }
-
         //Handle External Symbols
-        if (line.actionType == EXTERN || line.actionType == ENTRY) {
+        else if (line.actionType == EXTERN || line.actionType == ENTRY) {
+            if (isLabelExists) {
+                //TODO: Throw a warning label in .entry or extern
+            }
             //Steps 9, 9.1, 10
             if (line.actionType == EXTERN) {
-                AddNewLabelToTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, -1, true, false);
+                AddNewLabelToTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, 0, true, false);
                 //TODO: Should we send error if label exists in table?
             }
-            continue;
         }
+        else {// handle command line
 
-        //Handle Command labels
-        if (isLabelExists){
-            //Step 11
-            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true) == false) {
-                //TODO: error label exists in table
+            //Handle Command labels
+            if (isLabelExists) {
+                //Step 11
+                if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true) == false) {
+                    //TODO: error label exists in table
+                }
             }
-        }
 
-        //Steps 12, 13, 13.1, 14
-        //handle Command size
-        int calcCommandSize = getCommandSize(line.actionType,
-                                             line.firstOperValue.addressingType, line.secondOperValue.addressingType);
-        //Step 14
-        assembly.ic += calcCommandSize;
+            //Steps 12, 13, 13.1, 14
+            //handle Command size
+            int calcCommandSize = getCommandSize(line.actionType,
+                                                 line.firstOperValue.addressingType,
+                                                 line.secondOperValue.addressingType);
+            //Step 14
+            assembly.ic += calcCommandSize;
+        }
     }
 
 
