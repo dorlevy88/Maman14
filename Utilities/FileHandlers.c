@@ -23,7 +23,7 @@ bool isLabelValid(char* label){
             for (int i = 1; i < strlen(label); i++) {
                 printf("i = %d\n", i);
                 if ((!(isalpha(label[i])) && !(isdigit(label[i]))) ||  // All chars are digits or letters
-                        i == MAX_LABEL_SIZE) {  //Size of Label is less than MAX_LABEL_SIZE (30)
+                    i == MAX_LABEL_SIZE) {  //Size of Label is less than MAX_LABEL_SIZE (30)
                     return false;
                 }
             }
@@ -169,7 +169,6 @@ void checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
         return;
     }
     if (strtok(NULL, " ,") != NULL){
-        //TODO: stderr for syntax error - too many operands
         PrintSyntaxError("Expected two operands, received more", parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
         return;
@@ -188,19 +187,43 @@ void checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
     }
     parsedLine.numOfCommandOprands = 2;
     parsedLine.firstOperValue = firstOperand;
+    parsedLine.firstOperand = firstRawOperand;
     parsedLine.secondOperValue = secondOperand;
+    parsedLine.secondOperand = secondRawOperand;
     return;
 }
 
 void checkOneOperand(char* rawOperandsString, FileLine parsedLine){
-    //TODO:
-
+    char* firstRawOperand = strtok(rawOperandsString, " ,"); //get first operand - split by comma and/or space
+    if (strtok(NULL, " ,") != NULL){ //Operand 2 is not empty
+        parsedLine.hasSyntaxError = true;
+        PrintSyntaxError("Expected One operand - Received more", parsedLine.lineNum);
+        return;
+    }
+    else if (firstRawOperand == NULL){ //Operand 1 is empty
+        parsedLine.hasSyntaxError = true;
+        PrintSyntaxError("Expected One operand - Received None", parsedLine.lineNum);
+        return;
+    }
+    Operand firstOperand = getOperand(firstRawOperand);
+    if (firstOperand.hasError){
+        PrintSyntaxError(firstOperand.err, parsedLine.lineNum);
+        parsedLine.hasSyntaxError = true;
+        return;
+    }
     parsedLine.numOfCommandOprands = 1;
+    parsedLine.firstOperand = firstRawOperand;
+    parsedLine.firstOperValue = firstOperand;
+    return;
 }
 
 void checkNoOperand(char* rawOperandsString, FileLine parsedLine){
-    //TODO:
-
+    char* firstRawOperand = strtok(rawOperandsString, " ,");
+    if (firstRawOperand != NULL){ //Operand 1 is not empty
+        parsedLine.hasSyntaxError = true;
+        PrintSyntaxError("Expected no operand - Received more", parsedLine.lineNum);
+        return;
+    }
     parsedLine.numOfCommandOprands = 0;
 }
 
@@ -211,87 +234,94 @@ void checkDataOperand() {
 void checkStringOperand() {
     //TODO:
 }
+void checkExternOperand() {
+    //TODO:
+}
+
+void checkEntryOperand() {
+    //TODO:
+}
 
 void validateActionAndOperands(char* rawOperandsString, FileLine parsedLine) {
     if (strcmp(parsedLine.action, "mov") == 0) {
-        parsedLine.actionType =;
+        parsedLine.actionType = MOV;
         checkTwoOperands(rawOperandsString, parsedLine);
-        //TODO: check operands types validity
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "cmp") == 0){
+        parsedLine.actionType = CMP;
+        checkTwoOperands(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "add") == 0){
+        parsedLine.actionType = ADD;
+        checkTwoOperands(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "sub") == 0){
+        parsedLine.actionType = SUB;
+        checkTwoOperands(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "lea") == 0){
+        parsedLine.actionType = LEA;
+        checkTwoOperands(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "clr") == 0){
+        parsedLine.actionType = CLR;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "not") == 0){
+        parsedLine.actionType = NOT;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "inc") == 0){
+        parsedLine.actionType = INC;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "dec") == 0){
+        parsedLine.actionType = DEC;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "jmp") == 0){
+        parsedLine.actionType = JMP;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "bne") == 0){
+        parsedLine.actionType = BNE;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "red") == 0){
+        parsedLine.actionType = RED;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "prn") == 0){
+        parsedLine.actionType = PRN;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "jsr") == 0){
+        parsedLine.actionType = JSR;
+        checkOneOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "rts") == 0){
+        parsedLine.actionType = RTS;
+        checkNoOperand(rawOperandsString ,parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, "stop") == 0){
+        parsedLine.actionType = STOP;
+        checkNoOperand(rawOperandsString ,parsedLine);
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, ".data") == 0){
+        checkDataOperand();
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, ".string") == 0){
+        checkStringOperand();
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, ".entry") == 0){
+        checkEntryOperand();
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
+    else if (strcmp(parsedLine.action, ".extern") == 0){
+        checkExternOperand();
     }
-    else if (strcmp(parsedLine.action, "mov") == 0){
-
-    }
-
-
-
 
     if (parsedLine.hasSyntaxError){
         return;
-    }
-
-
-    const char* ALLOWED_ACTION_NAMES[] = {"mov", "cmp"};
-    for (int i = 0; i < sizeof(ALLOWED_ACTION_NAMES); ++i) {
-        if (strcmp(ALLOWED_ACTION_NAMES[i], action) == 0) {
-
-        }
     }
 }
 
