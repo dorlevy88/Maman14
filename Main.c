@@ -21,7 +21,6 @@ int main(int argc, char **argv) {
     //8.    write .ob [.ext] [.ent] files for each one of the original files
 
     for (int fileCounter = 1; fileCounter < argc; ++fileCounter) {
-
         FileContent fileContent = getFileContent(argv[fileCounter]);
         if (fileContent.hasError) { //Something went wrong with the file loading
             continue;

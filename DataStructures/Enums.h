@@ -7,6 +7,7 @@
 
 
 typedef enum ActionTypes {
+    UNKNOWN_ACTION = -1,
     MOV = 0,
     CMP = 1,
     ADD = 2,
@@ -33,11 +34,13 @@ typedef enum ActionTypes {
 } ActionTypes;
 
 typedef enum LineType {
+    UNKNOWN_LINE_TYPE = -1,
     Data = 0,
     Code = 1
 } LineType;
 
 typedef enum OperandAddressingType {
+    UNKNOWN_OPERAND_ADDRESSING_TYPE = -1,
     NUMBER = 0, //Miyadi
     DIRECT = 1, //Yashir
     DYNAMIC = 2, //Miyadi Dinami
@@ -45,6 +48,7 @@ typedef enum OperandAddressingType {
 } OperandAddressingType;
 
 typedef enum CommandAREType {
+    UNKNOWN_COMMAND_ARE_TYPE = -1,
     Absolute = 0,       //A
     Relocatable = 2,    //R
     External = 1        //E

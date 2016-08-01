@@ -53,7 +53,7 @@ int getIntFromString(char *string){
 }
 
 Operand getOperand(char* operand) {
-    Operand oper;
+    Operand oper = { .hasError = false, .registerNum = -1 };
 
     //check direct addressing
     if (operand[0] == '#') {
@@ -158,71 +158,72 @@ Operand getOperand(char* operand) {
     }
 }
 
-void checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
+FileLine checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
     char* firstRawOperand = strtok(rawOperandsString, " ,\t"); //get first operand - split by comma and/or space
     char* secondRawOperand = strtok(NULL, " ,\t"); //get second operand - split by comma and/or space
-    if (secondRawOperand != NULL){
+    if (secondRawOperand == NULL){
         PrintSyntaxError("Expected two operands, received one", parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
-        return;
+        return parsedLine;
     }
     if (strtok(NULL, " ,\t") != NULL){
         PrintSyntaxError("Expected two operands, received more", parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
-        return;
+        return parsedLine;
     }
     Operand firstOperand = getOperand(firstRawOperand);
     Operand secondOperand = getOperand(secondRawOperand);
     if (firstOperand.hasError){
         PrintSyntaxError(firstOperand.err, parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
-        return;
+        return parsedLine;
     }
     else if (secondOperand.hasError){
         PrintSyntaxError(secondOperand.err, parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
-        return;
+        return parsedLine;
     }
     parsedLine.numOfCommandOprands = 2;
     parsedLine.firstOperValue = firstOperand;
     parsedLine.firstOperand = firstRawOperand;
     parsedLine.secondOperValue = secondOperand;
     parsedLine.secondOperand = secondRawOperand;
-    return;
+    return parsedLine;
 }
 
-void checkOneOperand(char* rawOperandsString, FileLine parsedLine){
+FileLine checkOneOperand(char* rawOperandsString, FileLine parsedLine){
     char* firstRawOperand = strtok(rawOperandsString, " ,\t"); //get first operand - split by comma and/or space
     if (strtok(NULL, " ,\t") != NULL){ //Operand 2 is not empty
         parsedLine.hasSyntaxError = true;
         PrintSyntaxError("Expected One operand - Received more", parsedLine.lineNum);
-        return;
+        return parsedLine;
     }
     else if (firstRawOperand == NULL){ //Operand 1 is empty
         parsedLine.hasSyntaxError = true;
         PrintSyntaxError("Expected One operand - Received None", parsedLine.lineNum);
-        return;
+        return parsedLine;
     }
     Operand firstOperand = getOperand(firstRawOperand);
     if (firstOperand.hasError){
         PrintSyntaxError(firstOperand.err, parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
-        return;
+        return parsedLine;
     }
     parsedLine.numOfCommandOprands = 1;
     parsedLine.firstOperand = firstRawOperand;
     parsedLine.firstOperValue = firstOperand;
-    return;
+    return parsedLine;
 }
 
-void checkNoOperand(char* rawOperandsString, FileLine parsedLine){
+FileLine checkNoOperand(char* rawOperandsString, FileLine parsedLine){
     char* firstRawOperand = strtok(rawOperandsString, " ,\t");
     if (firstRawOperand != NULL){ //Operand 1 is not empty
         parsedLine.hasSyntaxError = true;
         PrintSyntaxError("Expected no operand - Received more", parsedLine.lineNum);
-        return;
+        return parsedLine;
     }
     parsedLine.numOfCommandOprands = 0;
+    return parsedLine;
 }
 
 void checkDataOperand() {
@@ -240,70 +241,70 @@ void checkEntryOperand() {
     //TODO:
 }
 
-void validateActionAndOperands(char* rawOperandsString, FileLine parsedLine) {
+FileLine validateActionAndOperands(char* rawOperandsString, FileLine parsedLine) {
     if (strcmp(parsedLine.action, "mov") == 0) {
         parsedLine.actionType = MOV;
-        checkTwoOperands(rawOperandsString, parsedLine);
+        parsedLine = checkTwoOperands(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "cmp") == 0){
         parsedLine.actionType = CMP;
-        checkTwoOperands(rawOperandsString, parsedLine);
+        parsedLine = checkTwoOperands(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "add") == 0){
         parsedLine.actionType = ADD;
-        checkTwoOperands(rawOperandsString, parsedLine);
+        parsedLine = checkTwoOperands(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "sub") == 0){
         parsedLine.actionType = SUB;
-        checkTwoOperands(rawOperandsString, parsedLine);
+        parsedLine = checkTwoOperands(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "lea") == 0){
         parsedLine.actionType = LEA;
-        checkTwoOperands(rawOperandsString, parsedLine);
+        parsedLine = checkTwoOperands(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "clr") == 0){
         parsedLine.actionType = CLR;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "not") == 0){
         parsedLine.actionType = NOT;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "inc") == 0){
         parsedLine.actionType = INC;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "dec") == 0){
         parsedLine.actionType = DEC;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "jmp") == 0){
         parsedLine.actionType = JMP;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "bne") == 0){
         parsedLine.actionType = BNE;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "red") == 0){
         parsedLine.actionType = RED;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "prn") == 0){
         parsedLine.actionType = PRN;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "jsr") == 0){
         parsedLine.actionType = JSR;
-        checkOneOperand(rawOperandsString, parsedLine);
+        parsedLine = checkOneOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(parsedLine.action, "rts") == 0){
         parsedLine.actionType = RTS;
-        checkNoOperand(rawOperandsString ,parsedLine);
+        parsedLine = checkNoOperand(rawOperandsString ,parsedLine);
     }
     else if (strcmp(parsedLine.action, "stop") == 0){
         parsedLine.actionType = STOP;
-        checkNoOperand(rawOperandsString ,parsedLine);
+        parsedLine = checkNoOperand(rawOperandsString ,parsedLine);
     }
     else if (strcmp(parsedLine.action, ".data") == 0){
         checkDataOperand();
@@ -317,17 +318,18 @@ void validateActionAndOperands(char* rawOperandsString, FileLine parsedLine) {
     else if (strcmp(parsedLine.action, ".extern") == 0){
         checkExternOperand();
     }
-
-    if (parsedLine.hasSyntaxError){
-        return;
+    else { //Command is not known
+        parsedLine.hasSyntaxError = true;
+        return parsedLine;
     }
+    return parsedLine;
 }
 
 FileLine lineValidator(char* rawLine, int lineCounter) {
-    FileLine parsedLine;
-    parsedLine.lineNum = lineCounter;
+    //TODO: How to create new parsedLine every Iteration
+    FileLine parsedLine = { .lineNum = lineCounter , .actionType = UNKNOWN_ACTION, .lineType = UNKNOWN_LINE_TYPE };
 
-    char* string = strtok(rawLine, " \t"); //Get first string
+    char* string = strtok(rawLine, " \t\n"); //Get first string
 
     //Handle empty lines
     if (string == NULL){
@@ -347,25 +349,24 @@ FileLine lineValidator(char* rawLine, int lineCounter) {
             PrintSyntaxError(errMsg ,parsedLine.lineNum);
             parsedLine.hasSyntaxError = true;
         }
-        char parsedLabel[30];
-        memcpy(parsedLabel, string, strSize);  //get the label
+        char* parsedLabel = (char*) malloc(strSize - 1);
+        memcpy(parsedLabel, string, strSize - 1);  //get the label
 
         if (isLabelValid(parsedLabel)){
-            char* validParsedLabel = parsedLabel;
-            parsedLine.label = validParsedLabel;
+            parsedLine.label = parsedLabel;
         }
         else {
             parsedLine.hasSyntaxError = true;
         }
 
-        char* action = strtok(NULL, " \t"); //Get action string
+        string = strtok(NULL, " \t\n"); //Get action string
 
     }
-    strcpy(parsedLine.action, string);      //get the action
+    parsedLine.action = string;      //get the action
 
-    char* rawOperandsString = strstr(rawLine, parsedLine.action) + strlen(parsedLine.action);
+    char* rawOperandsString = strtok(NULL, "\n"); // get remaining of line
 
-    validateActionAndOperands(rawOperandsString, parsedLine);
+    parsedLine = validateActionAndOperands(rawOperandsString, parsedLine);
 
     return parsedLine;
 }
@@ -391,13 +392,13 @@ FileContent getFileContent(char* filename) {
         lineCopy = (char *) malloc(sizeof(line));
         strcpy(lineCopy, line);
         FileLine parsedLine = lineValidator(lineCopy, lineCounter++);
+        parsedLine.originalLine = lineCopy;
         if (parsedLine.hasSyntaxError) {
             fileContent.hasError = true;
             return fileContent;
         }
         if (parsedLine.isEmptyOrComment == false) {
             fileContent.line[arrayIndex++] = parsedLine;
-
         }
     }
     fileContent.size = arrayIndex;
