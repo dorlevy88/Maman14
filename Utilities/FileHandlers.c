@@ -21,7 +21,6 @@ bool isLabelValid(char* label){
     if (strlen(label) > 0){ //check label is not empty
         if (isalpha(label[0])){ // Check first char is letter
             for (int i = 1; i < strlen(label); i++) {
-                printf("i = %d\n", i);
                 if ((!(isalpha(label[i])) && !(isdigit(label[i]))) ||  // All chars are digits or letters
                     i == MAX_LABEL_SIZE) {  //Size of Label is less than MAX_LABEL_SIZE (30)
                     return false;
@@ -146,7 +145,6 @@ Operand getOperand(char* operand) {
         }
     }
 
-
     //Yashir
     if (isLabelValid(operand)) {
         oper.addressingType = DIRECT;
@@ -161,14 +159,14 @@ Operand getOperand(char* operand) {
 }
 
 void checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
-    char* firstRawOperand = strtok(rawOperandsString, " ,"); //get first operand - split by comma and/or space
-    char* secondRawOperand = strtok(NULL, " ,"); //get second operand - split by comma and/or space
+    char* firstRawOperand = strtok(rawOperandsString, " ,\t"); //get first operand - split by comma and/or space
+    char* secondRawOperand = strtok(NULL, " ,\t"); //get second operand - split by comma and/or space
     if (secondRawOperand != NULL){
         PrintSyntaxError("Expected two operands, received one", parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
         return;
     }
-    if (strtok(NULL, " ,") != NULL){
+    if (strtok(NULL, " ,\t") != NULL){
         PrintSyntaxError("Expected two operands, received more", parsedLine.lineNum);
         parsedLine.hasSyntaxError = true;
         return;
@@ -194,8 +192,8 @@ void checkTwoOperands(char* rawOperandsString, FileLine parsedLine){
 }
 
 void checkOneOperand(char* rawOperandsString, FileLine parsedLine){
-    char* firstRawOperand = strtok(rawOperandsString, " ,"); //get first operand - split by comma and/or space
-    if (strtok(NULL, " ,") != NULL){ //Operand 2 is not empty
+    char* firstRawOperand = strtok(rawOperandsString, " ,\t"); //get first operand - split by comma and/or space
+    if (strtok(NULL, " ,\t") != NULL){ //Operand 2 is not empty
         parsedLine.hasSyntaxError = true;
         PrintSyntaxError("Expected One operand - Received more", parsedLine.lineNum);
         return;
@@ -218,7 +216,7 @@ void checkOneOperand(char* rawOperandsString, FileLine parsedLine){
 }
 
 void checkNoOperand(char* rawOperandsString, FileLine parsedLine){
-    char* firstRawOperand = strtok(rawOperandsString, " ,");
+    char* firstRawOperand = strtok(rawOperandsString, " ,\t");
     if (firstRawOperand != NULL){ //Operand 1 is not empty
         parsedLine.hasSyntaxError = true;
         PrintSyntaxError("Expected no operand - Received more", parsedLine.lineNum);
@@ -329,7 +327,7 @@ FileLine lineValidator(char* rawLine, int lineCounter) {
     FileLine parsedLine;
     parsedLine.lineNum = lineCounter;
 
-    char* string = strtok(rawLine, " "); //Get first string
+    char* string = strtok(rawLine, " \t"); //Get first string
 
     //Handle empty lines
     if (string == NULL){
@@ -353,10 +351,14 @@ FileLine lineValidator(char* rawLine, int lineCounter) {
         memcpy(parsedLabel, string, strSize);  //get the label
 
         if (isLabelValid(parsedLabel)){
-            parsedLine.label = parsedLabel;
+            char* validParsedLabel = parsedLabel;
+            parsedLine.label = validParsedLabel;
+        }
+        else {
+            parsedLine.hasSyntaxError = true;
         }
 
-        char* action = strtok(NULL, " "); //Get action string
+        char* action = strtok(NULL, " \t"); //Get action string
 
     }
     strcpy(parsedLine.action, string);      //get the action
