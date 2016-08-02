@@ -15,7 +15,6 @@
 #define MAX_NUM_SIZE 16384
 #define INVALID_NUM_TOKEN -999999
 #define MAX_DYNAMIC_OPERAND 13 //max exact number
-#define MAX_DYNAMIC_OPERAND_SIZE 2 //can be actually up to the number 13
 
 bool isLabelValid(char* label){
     if (strlen(label) > 0){ //check label is not empty
@@ -74,7 +73,7 @@ Operand getOperand(char* operand) {
     if (operand[0] == 'r' && strlen(operand) == 2) {
         if (operand[1] >= '0' && operand[1] <= '7') {
             oper.addressingType = REGISTER;
-            oper.registerNum = operand[0];
+            oper.registerNum = (int)operand[1] - '0';
             return oper;
         }
         else {
@@ -89,56 +88,41 @@ Operand getOperand(char* operand) {
         oper.addressingType = DYNAMIC;
         if (closeBracketLocationString > openBracketLocationString && operand[0] != '[' &&
             strchr(operand, '[') - operand <= MAX_LABEL_SIZE &&
-            operand[strlen(operand - 1)] == ']') { //Check '[' before ']', '[' not in first char, ']' is at the end, Label size is less then max size
-            char label[MAX_LABEL_SIZE];
+            operand[strlen(operand) - 1] == ']') { //Check '[' before ']', '[' not in first char, ']' is at the end, Label size is less then max size
+            char* label = (char*)malloc(strchr(operand, '[') - operand);
             memcpy(label, operand, strchr(operand, '[') - operand); // copy label - everything before '['
             if (!isLabelValid(label)) {
                 oper.hasError = true;
                 oper.err = strcat("Label is not valid - ", label);
             }
-            char *copiedLabel = label;
-            oper.label = copiedLabel;
+            oper.label = label;
             // get min number
-            char minNum[MAX_DYNAMIC_OPERAND_SIZE];
-            long minDashLocation = strchr(openBracketLocationString, '-') - openBracketLocationString; //get the char num where - exists
-            if (strlen(openBracketLocationString + 1) - minDashLocation - 1 <=
-                MAX_DYNAMIC_OPERAND_SIZE) { //check length of number is smaller equal than 2
-                strncpy(minNum, openBracketLocationString + 1, minDashLocation - 1);
-                int numToCheck = getIntFromString(minNum);
-                if (numToCheck != INVALID_NUM_TOKEN ||
-                    numToCheck > MAX_DYNAMIC_OPERAND) { //Can't be more than the num 13
-                    oper.minNum = numToCheck;
-                }
-                else {
-                    oper.err = "Operand num is out of bound";
-                    oper.hasError = true;
-                    return oper;
-                }
+            // char minNum[MAX_DYNAMIC_OPERAND_SIZE];
+            size_t minDashLocation = strchr(openBracketLocationString, '-') - openBracketLocationString; //get the char num where - exists
+            char* minNum = (char*)malloc(minDashLocation - 1);
+            strncpy(minNum, openBracketLocationString + 1, minDashLocation - 1);
+            int numToCheck = getIntFromString(minNum);
+            if (numToCheck != INVALID_NUM_TOKEN ||
+                numToCheck > MAX_DYNAMIC_OPERAND) { //Can't be more than the num 13
+                oper.minNum = numToCheck;
             }
             else {
-                oper.err = "error in operand";
+                oper.err = "Operand num is out of bound";
                 oper.hasError = true;
                 return oper;
             }
             // get max number
-            char maxNum[MAX_DYNAMIC_OPERAND_SIZE];
             char *maxDashLocationString = strchr(openBracketLocationString, '-');
-            if (strlen(maxDashLocationString + 1) - strlen(maxDashLocationString) - 1 <= MAX_DYNAMIC_OPERAND_SIZE) { //check length of number is smaller equal than 2
-                strncpy(maxNum, maxDashLocationString + 1, strlen(maxDashLocationString) - 2);
-                int numToCheckMax = getIntFromString(maxNum);
-                if (numToCheckMax != INVALID_NUM_TOKEN ||
-                    numToCheckMax > MAX_DYNAMIC_OPERAND) { //Can't be more than the num 13
-                    oper.maxNum = numToCheckMax;
-                    return oper;
-                }
-                else {
-                    oper.err = "Operand num is out of bound";
-                    oper.hasError = true;
-                    return oper;
-                }
+            char* maxNum = (char*)malloc(strlen(maxDashLocationString) - 2);
+            strncpy(maxNum, maxDashLocationString + 1, strlen(maxDashLocationString) - 2);
+            int numToCheckMax = getIntFromString(maxNum);
+            if (numToCheckMax != INVALID_NUM_TOKEN ||
+                numToCheckMax > MAX_DYNAMIC_OPERAND) { //Can't be more than the num 13
+                oper.maxNum = numToCheckMax;
+                return oper;
             }
             else {
-                oper.err = "error in operand";
+                oper.err = "Operand num is out of bound";
                 oper.hasError = true;
                 return oper;
             }
@@ -325,8 +309,9 @@ FileLine validateActionAndOperands(char* rawOperandsString, FileLine parsedLine)
     return parsedLine;
 }
 
-FileLine lineValidator(char* rawLine, int lineCounter) {
-    //TODO: How to create new parsedLine every Iteration
+FileLine lineValidator(char* rawLineIn, int lineCounter) {
+    char* rawLine = (char*)malloc(strlen(rawLineIn));
+    strcpy(rawLine, rawLineIn);
     FileLine parsedLine = { .lineNum = lineCounter , .actionType = UNKNOWN_ACTION, .lineType = UNKNOWN_LINE_TYPE };
 
     char* string = strtok(rawLine, " \t\n"); //Get first string
@@ -374,15 +359,14 @@ FileLine lineValidator(char* rawLine, int lineCounter) {
 FileContent getFileContent(char* filename) {
     FILE * fr;
     char line[MAX_LINE_SIZE];
-    FileContent fileContent;
+    FileContent fileContent = { .size = 0, .hasError = false };
     int lineCounter = 1;
     int arrayIndex = 0;
 
     fr = fopen (filename, "r"); // Open the file for reading
     if (fr == NULL)
     {
-        //TODO: send an error to the stderr and continue to the next file
-        printf("File %s does not exist", filename);
+        fprintf(stderr, "File %s does not exist", filename);
         fileContent.hasError = true;
         return fileContent;
     }
@@ -395,7 +379,6 @@ FileContent getFileContent(char* filename) {
         parsedLine.originalLine = lineCopy;
         if (parsedLine.hasSyntaxError) {
             fileContent.hasError = true;
-            return fileContent;
         }
         if (parsedLine.isEmptyOrComment == false) {
             fileContent.line[arrayIndex++] = parsedLine;

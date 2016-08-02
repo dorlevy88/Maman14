@@ -10,7 +10,7 @@
 #include "../DataStructures/Operand.h"
 
 #define MAX_FILE_LINES 1000
-#define MAX_LINE_SIZE 100
+#define MAX_LINE_SIZE 80
 
 
 typedef struct FileLine {
@@ -19,6 +19,7 @@ typedef struct FileLine {
     int lineNum;
     LineType lineType;
     bool hasSyntaxError;
+    char* errStr;
     bool isEmptyOrComment;
 
     char* label;
