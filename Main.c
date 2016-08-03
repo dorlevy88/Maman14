@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
         if(RunFirstTransition(fileContent, assemblyStructure) == false) {
             continue;
         }
-        if (RunSecondTransition(fileContent, assemblyStructure) == false)) {
+        if (RunSecondTransition(fileContent, assemblyStructure) == false) {
             continue;
         }
 
