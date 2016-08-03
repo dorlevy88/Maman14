@@ -21,7 +21,7 @@ void UpdateSymbolsTableDataAddresses(SymbolsTable table, int ic) {
 }
 
 
-void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
+void RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
     //1. int ic = 0, dc = 0;
     //2. Read line
     //3. check is symbol exists in the first field
@@ -41,11 +41,13 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
     //14. Add to ic the value of ic + the calculated L value (ic += L)
     //15. go back to step 2
 
-    assembly.ic = 100;
-    assembly.dc = 0;
+    assembly->ic = 100;
+    assembly->dc = 0;
 
-    for (int i=0; i < fileContent.size; i++){ //For every line in file
-        FileLine line = fileContent.line[i];
+    for (int i=0; i < fileContent->size; i++){ //For every line in file
+        FileLine line = fileContent->line[i];
+
+
         bool isLabelExists = false;
 
         if (line.label != NULL) { //If Label Exists for line
@@ -61,24 +63,24 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
             int firstByte = 0;
             bool isMemAllocOk = true;
             if (line.actionType == DATA ) {
-                calcDataSize = line.firstOperValue.dataSize;
-                firstByte = line.firstOperValue.data[0];
-                isMemAllocOk &= PushBytesFromIntArray(assembly.dataArray, line.firstOperValue.data, line.firstOperValue.dataSize);
+                calcDataSize = line.firstOperValue->dataSize;
+                firstByte = line.firstOperValue->data[0];
+                isMemAllocOk &= PushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data, line.firstOperValue->dataSize);
             }
             else {
-                calcDataSize = sizeof(line.firstOperValue.string);
-                firstByte = line.firstOperValue.string[0];
-                isMemAllocOk &= PushBytesFromString(assembly.dataArray, line.firstOperValue.string);
+                calcDataSize = sizeof(line.firstOperValue->string);
+                firstByte = line.firstOperValue->string[0];
+                isMemAllocOk &= PushBytesFromString(assembly->dataArray, line.firstOperValue->string);
             }
 
             if(isMemAllocOk == false) {
                 //TODO: Throw an error size of array exceeded
             }
 
-            if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.dc, false, false, firstByte) == false) {
+            if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, firstByte) == false) {
                 //TODO: error label exists in table
             }
-            assembly.dc += calcDataSize;
+            assembly->dc += calcDataSize;
         }
         //Handle External Symbols
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
@@ -87,7 +89,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
             }
             //Steps 9, 9.1, 10
             if (line.actionType == EXTERN) {
-                AddNewLabelToTable(assembly.symbolsTable, line.firstOperValue.entryOrExtern, 0, true, false, 0);
+                AddNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false, 0);
                 //TODO: Should we send error if label exists in table?
             }
         }
@@ -97,7 +99,7 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
             if (isLabelExists) {
                 //Step 11
                 int binCommandForDynamicAddressing = buildBinaryCommand(line);
-                if (AddNewLabelToTable(assembly.symbolsTable, line.label, assembly.ic, false, true,
+                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true,
                                        binCommandForDynamicAddressing) == false) {
                     //TODO: error label exists in table
                 }
@@ -106,16 +108,16 @@ void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly) {
             //Steps 12, 13, 13.1, 14
             //handle Command size
             int calcCommandSize = getCommandSize(line.actionType,
-                                                 line.firstOperValue.addressingType,
-                                                 line.secondOperValue.addressingType);
+                                                 line.firstOperValue->addressingType,
+                                                 line.secondOperValue->addressingType);
             //Step 14
-            assembly.ic += calcCommandSize;
+            assembly->ic += calcCommandSize;
         }
     }
 
-    if (assembly.ic + assembly.dc >= MAX_CPU_MEMORY) {
+    if (assembly->ic + assembly->dc >= MAX_CPU_MEMORY) {
         //TODO: Throw error program is larger than CPU memory
     }
 
-    UpdateSymbolsTableDataAddresses(assembly.symbolsTable, assembly.ic);
+    UpdateSymbolsTableDataAddresses(assembly->symbolsTable, assembly->ic);
 }

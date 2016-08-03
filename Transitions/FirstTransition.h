@@ -8,7 +8,7 @@
 #include "../Utilities/FileHandlers.h"
 
 
-void RunFirstTransition(FileContent fileContent, AssemblyStructure assembly);
+void RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly);
 
 
 #endif //MAMAN14_FIRSTTRASITIONS_H

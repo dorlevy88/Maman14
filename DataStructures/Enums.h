@@ -33,12 +33,6 @@ typedef enum ActionTypes {
 
 } ActionTypes;
 
-typedef enum LineType {
-    UNKNOWN_LINE_TYPE = -1,
-    Data = 0,
-    Code = 1
-} LineType;
-
 typedef enum OperandAddressingType {
     UNKNOWN_OPERAND_ADDRESSING_TYPE = -1,
     NUMBER = 0, //Miyadi

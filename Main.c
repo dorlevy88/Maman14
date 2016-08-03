@@ -2,6 +2,7 @@
 // Created by Or Zamir on 7/16/16.
 //
 
+#include <stdlib.h>
 #include "DataStructures/AssemblyStructure.h"
 #include "Transitions/FirstTransition.h"
 #include "Transitions/SecondTransition.h"
@@ -21,13 +22,14 @@ int main(int argc, char **argv) {
     //8.    write .ob [.ext] [.ent] files for each one of the original files
 
     for (int fileCounter = 1; fileCounter < argc; ++fileCounter) {
-        FileContent fileContent = getFileContent(argv[fileCounter]);
-        if (fileContent.hasError) { //Something went wrong with the file loading
+
+        FileContent* fileContent = (FileContent*)malloc(sizeof(FileContent));
+        if (getFileContent(argv[fileCounter], fileContent) == false) { //Error in the file
             continue;
         }
-        for (int i=0; i < fileContent.size; i++) {
+        for (int i=0; i < fileContent->size; i++) {
             for (int j=0; j < 4; j++){
-                printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent.line[i].originalLine);
+                printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent->line[i].originalLine);
             }
             printf("\n");
         }
@@ -42,8 +44,8 @@ int main(int argc, char **argv) {
         //NOTE: Choose for each line if it's empty\comment\guide(data)\command(code) sentence
 
         AssemblyStructure* assemblyStructure = InitAssemblyStructure();
-        RunFirstTransition(fileContent, *assemblyStructure);
-        RunSecondTransition(fileContent, *assemblyStructure);
+        RunFirstTransition(fileContent, assemblyStructure);
+        //RunSecondTransition(fileContent, *assemblyStructure);
 
         //TODO: Translate Assembly Structure to special * base
         //TODO: Save Files: .ob .ent. ext
