@@ -13,10 +13,10 @@ typedef struct AssemblyStructure {
     int ic;
     int dc;
 
-    AssemblyBytes codeArray;
-    AssemblyBytes dataArray;
+    AssemblyBytes* codeArray;
+    AssemblyBytes* dataArray;
 
-    SymbolsTable symbolsTable;
+    SymbolsTable* symbolsTable;
 
 } AssemblyStructure;
 
