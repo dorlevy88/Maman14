@@ -264,6 +264,9 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     if (strcmp(action, "mov") == 0) {
         parsedLine->actionType = MOV;
         errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->secondOperValue->addressingType == NUMBER ||
+                parsedLine->secondOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: mov command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "cmp") == 0){
         parsedLine->actionType = CMP;
@@ -272,42 +275,76 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     else if (strcmp(action, "add") == 0){
         parsedLine->actionType = ADD;
         errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->secondOperValue->addressingType == NUMBER ||
+                               parsedLine->secondOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: add command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "sub") == 0){
         parsedLine->actionType = SUB;
         errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->secondOperValue->addressingType == NUMBER ||
+                               parsedLine->secondOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: sub command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "lea") == 0){
         parsedLine->actionType = LEA;
         errStr = checkTwoOperands(rawOperandsString, parsedLine);
+
+        if (errStr == NULL && parsedLine->firstOperValue->addressingType != DIRECT)
+            errStr = "Illegal Source Operand Addressing on: lea command, allowed addressing type is DIRECT(1).";
+
+        if (errStr == NULL && (parsedLine->secondOperValue->addressingType == NUMBER ||
+                               parsedLine->secondOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: lea command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "clr") == 0){
         parsedLine->actionType = CLR;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: clr command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "not") == 0){
         parsedLine->actionType = NOT;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: not command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "inc") == 0){
         parsedLine->actionType = INC;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: inc command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "dec") == 0){
         parsedLine->actionType = DEC;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: dec command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "jmp") == 0){
         parsedLine->actionType = JMP;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: jmp command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "bne") == 0){
         parsedLine->actionType = BNE;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: bne command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "red") == 0){
         parsedLine->actionType = RED;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: red command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "prn") == 0){
         parsedLine->actionType = PRN;
@@ -316,6 +353,9 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     else if (strcmp(action, "jsr") == 0){
         parsedLine->actionType = JSR;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
+        if (errStr == NULL && (parsedLine->firstOperValue->addressingType == NUMBER ||
+                               parsedLine->firstOperValue->addressingType == DYNAMIC))
+            errStr = "Illegal Destination Operand Addressing on: jsr command, allowed addressing types are DIRECT(1), REGISTER(3).";
     }
     else if (strcmp(action, "rts") == 0){
         parsedLine->actionType = RTS;
