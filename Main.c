@@ -44,8 +44,12 @@ int main(int argc, char **argv) {
         //NOTE: Choose for each line if it's empty\comment\guide(data)\command(code) sentence
 
         AssemblyStructure* assemblyStructure = InitAssemblyStructure();
-        RunFirstTransition(fileContent, assemblyStructure);
-        //RunSecondTransition(fileContent, *assemblyStructure);
+        if(RunFirstTransition(fileContent, assemblyStructure) == false) {
+            continue;
+        }
+        if (RunSecondTransition(fileContent, assemblyStructure) == false)) {
+            continue;
+        }
 
         //TODO: Translate Assembly Structure to special * base
         //TODO: Save Files: .ob .ent. ext

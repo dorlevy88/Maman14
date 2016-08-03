@@ -1,19 +1,15 @@
 //
 // Created by Or Zamir on 7/16/16.
 //
-
-
-#include <stdbool.h>
-#include <memory.h>
-#include "../DataStructures/AssemblyStructure.h"
 #include "FirstTransition.h"
-#include "../DataStructures/Command.h"
+#include "../Utilities/Logger.h"
+#include "CompilerErrors.h"
 
 #define MAX_CPU_MEMORY 1000
 
-void UpdateSymbolsTableDataAddresses(SymbolsTable table, int ic) {
-    for (int i = 0; i < table.recordSize; ++i) {
-        SymbolRecord record = table.records[i];
+void UpdateSymbolsTableDataAddresses(SymbolsTable* table, int ic) {
+    for (int i = 0; i < table->recordSize; ++i) {
+        SymbolRecord record = table->records[i];
         if (record.isCommand == false && record.isExternal == false) { //update only .data\.string types
             record.address += ic;
         }
@@ -21,7 +17,7 @@ void UpdateSymbolsTableDataAddresses(SymbolsTable table, int ic) {
 }
 
 
-void RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
+bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
     //1. int ic = 0, dc = 0;
     //2. Read line
     //3. check is symbol exists in the first field
@@ -74,18 +70,20 @@ void RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
             }
 
             if(isMemAllocOk == false) {
-                //TODO: Throw an error size of array exceeded
+                PrintCompileError(ERR_RAM_OVERFLOW, "Data Array", line.lineNumber);
+                return false;
             }
 
             if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, firstByte) == false) {
-                //TODO: error label exists in table
+                PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
+                return false;
             }
             assembly->dc += calcDataSize;
         }
         //Handle External Symbols
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (isLabelExists) {
-                //TODO: Throw a warning: label on .entry or extern is not allowed
+                PrintCompileWarning(WARN_LABEL_IN_BAD_LOCATION, line.label, line.lineNumber);
             }
             //Steps 9, 9.1, 10
             if (line.actionType == EXTERN) {
@@ -101,7 +99,8 @@ void RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
                 int binCommandForDynamicAddressing = buildBinaryCommand(line);
                 if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true,
                                        binCommandForDynamicAddressing) == false) {
-                    //TODO: error label exists in table
+                    PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
+                    return false;
                 }
             }
 
@@ -120,4 +119,5 @@ void RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
     }
 
     UpdateSymbolsTableDataAddresses(assembly->symbolsTable, assembly->ic);
+    return true;
 }

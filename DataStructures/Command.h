@@ -12,6 +12,6 @@ int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddre
 
 int buildBinaryCommand(FileLine cmdLine);
 
-int buildBinaryData(Operand operand, SymbolsTable table);
+int buildBinaryData(Operand* operand, SymbolsTable* table);
 
 #endif //MAMAN14_COMMAND_H

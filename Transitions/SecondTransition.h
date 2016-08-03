@@ -5,8 +5,11 @@
 #ifndef MAMAN14_SECONDTRANSITION_H
 #define MAMAN14_SECONDTRANSITION_H
 
+#include <stdio.h>
 #include "../Utilities/FileHandlers.h"
+#include "../DataStructures/AssemblyStructure.h"
+#include "../DataStructures/Command.h"
 
-void RunSecondTransition(FileContent fileContent, AssemblyStructure assembly);
+bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly);
 
 #endif //MAMAN14_SECONDTRANSITION_H

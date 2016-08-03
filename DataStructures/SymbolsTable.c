@@ -14,26 +14,26 @@
 /// \param table
 /// \param label
 /// \return
-int isLabelExistsInTable(SymbolsTable table, char* label) {
-    for (int i = 0; i < table.recordSize; ++i) {
-        if (strcmp(label, table.records[i].label)) {
+int isLabelExistsInTable(SymbolsTable* table, char* label) {
+    for (int i = 0; i < table->recordSize; ++i) {
+        if (strcmp(label, table->records[i].label)) {
             return i;
         }
     }
     return LABEL_NOT_EXISTS;
 }
 
-bool AddNewLabelToTable(SymbolsTable table, char *label, int address, bool isExternal, bool isCommand, int byteCodeForDynamic) {
+bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, int byteCodeForDynamic) {
     int labelPos = isLabelExistsInTable(table, label);
     if(labelPos != LABEL_NOT_EXISTS) {
         return false;
     }
-    if (table.recordSize == table.size) { //Allocate additional space to the array
-        table.records = (SymbolRecord *) realloc(table.records, table.size + (NEW_CHUNK_SIZE * sizeof(SymbolRecord)));
-        table.size += NEW_CHUNK_SIZE;
+    if (table->recordSize == table->size) { //Allocate additional space to the array
+        table->records = (SymbolRecord *) realloc(table->records, table->size + (NEW_CHUNK_SIZE * sizeof(SymbolRecord)));
+        table->size += NEW_CHUNK_SIZE;
     }
-    table.recordSize++;
-    SymbolRecord record = table.records[table.recordSize];
+    table->recordSize++;
+    SymbolRecord record = table->records[table->recordSize];
     record.label = label;
     record.address = address;
     record.isExternal = isExternal;
@@ -42,15 +42,15 @@ bool AddNewLabelToTable(SymbolsTable table, char *label, int address, bool isExt
     return true;
 }
 
-bool SetLabelAddressInTable(SymbolsTable table, char* label, int address, int byteCodeForDynamic) {
+bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int byteCodeForDynamic) {
     int labelPos = isLabelExistsInTable(table, label);
     if (labelPos == LABEL_NOT_EXISTS) {
         return false;
     }
 
-    table.records[labelPos].address = address;
+    table->records[labelPos].address = address;
     if (byteCodeForDynamic != DYNAMIC_ADDRESSING_NOT_AVAILABLE)
-        table.records[labelPos].byteCodeForDynamic = byteCodeForDynamic;
+        table->records[labelPos].byteCodeForDynamic = byteCodeForDynamic;
 
     return true;
 }

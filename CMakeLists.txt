@@ -24,6 +24,6 @@ set(SOURCE_FILES
         Utilities/FileHandlers.c
         Utilities/FileHandlers.h
         Utilities/Logger.c
-        Utilities/Logger.h Output/OutputFiles.c Output/OutputFiles.h)
+        Utilities/Logger.h Output/OutputFiles.c Output/OutputFiles.h Transitions/CompilerErrors.h)
 
 add_executable(Maman14 ${SOURCE_FILES})

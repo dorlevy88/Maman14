@@ -18,10 +18,10 @@ typedef struct AssemblyBytes {
 } AssemblyBytes;
 
 
-bool PushByteFromInt(AssemblyBytes bytes, int byte);
+bool PushByteFromInt(AssemblyBytes* bytes, int byte);
 
-bool PushBytesFromIntArray(AssemblyBytes bytes, int* array, int arraySize);
+bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize);
 
-bool PushBytesFromString(AssemblyBytes bytes, char* string);
+bool PushBytesFromString(AssemblyBytes* bytes, char* string);
 
 #endif //MAMAN14_ASSEMBLYBYTE_H

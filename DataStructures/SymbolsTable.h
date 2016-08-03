@@ -24,10 +24,10 @@ typedef struct SymbolsTable {
 } SymbolsTable;
 
 
-int isLabelExistsInTable(SymbolsTable table, char* label);
+int isLabelExistsInTable(SymbolsTable* table, char* label);
 
-bool AddNewLabelToTable(SymbolsTable table, char *label, int address, bool isExternal, bool isCommand, int byteCodeForDynamic);
+bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, int byteCodeForDynamic);
 
-bool SetLabelAddressInTable(SymbolsTable table, char* label, int address, int byteCodeForDynamic);
+bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int byteCodeForDynamic);
 
 #endif //MAMAN14_SYMBOLSTABLE_H

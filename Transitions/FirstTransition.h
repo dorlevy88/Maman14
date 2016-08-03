@@ -4,11 +4,14 @@
 #ifndef MAMAN14_FIRSTTRASITIONS_H
 #define MAMAN14_FIRSTTRASITIONS_H
 
+#include <stdbool.h>
+#include <memory.h>
 #include <stdio.h>
+
 #include "../Utilities/FileHandlers.h"
+#include "../DataStructures/AssemblyStructure.h"
+#include "../DataStructures/Command.h"
 
-
-void RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly);
-
+bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly);
 
 #endif //MAMAN14_FIRSTTRASITIONS_H

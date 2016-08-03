@@ -352,9 +352,11 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     {
         char* lineCopy = (char *) malloc(sizeof(line));
         strcpy(lineCopy, line);
+
         FileLine* parsedLine = (FileLine*) malloc(sizeof(FileLine));
         memset(parsedLine, 0, sizeof(FileLine));
         parsedLine->originalLine = lineCopy;
+        parsedLine->lineNumber = lineCounter;
 
         char* errString = lineValidator(parsedLine);
         if (errString != NULL) {

@@ -8,15 +8,15 @@
 #define to16bit(n) (n)>=0? n : ((n)^-65536)
 
 
-bool writeEntOutpuFile(SymbolsTable table) {
+bool writeEntOutpuFile(SymbolsTable* table) {
     //TODO: implement
 }
 
-bool writeExtOutpuFile(SymbolsTable table) {
+bool writeExtOutpuFile(SymbolsTable* table) {
     //TODO: implement
 }
 
-bool writeObOutpuFile(SymbolsTable table) {
+bool writeObOutpuFile(SymbolsTable* table) {
     //TODO: implement
 }
 
@@ -24,12 +24,12 @@ char* transtaleToSpecial8Base(int threeBytes[3]) {
 
 }
 
-bool WriteAllOutpuFiles(AssemblyStructure assembly) {
+bool WriteAllOutpuFiles(AssemblyStructure* assembly) {
     //TODO: implement
 
-    writeEntOutpuFile(assembly.symbolsTable);
+    writeEntOutpuFile(assembly->symbolsTable);
 
-    writeExtOutpuFile(assembly.symbolsTable);
+    writeExtOutpuFile(assembly->symbolsTable);
 
-    writeObOutpuFile(assembly.symbolsTable);
+    writeObOutpuFile(assembly->symbolsTable);
 }

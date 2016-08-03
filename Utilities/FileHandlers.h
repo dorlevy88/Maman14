@@ -14,7 +14,7 @@
 
 
 typedef struct FileLine {
-
+    int lineNumber;
     char* originalLine;
     bool isEmptyOrComment;
 

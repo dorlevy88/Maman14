@@ -7,4 +7,8 @@
 
 void PrintSyntaxError(char* errorMsg, int lineNum);
 
+void PrintCompileError(char* errorMsg, char* param, int lineNum);
+
+void PrintCompileWarning(char* errorMsg, char* param, int lineNum);
+
 #endif //MAMAN14_LOGGER_H
