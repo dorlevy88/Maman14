@@ -9,7 +9,7 @@ bool PushByteFromInt(AssemblyBytes* bytes, int byte) {
     if(bytes->size == MAX_ASSEMBLY_BYTES) {
         return false;
     }
-    bytes->array[++bytes->size] = byte;
+    bytes->array[bytes->size++] = byte;
     return true;
 }
 
@@ -28,7 +28,7 @@ bool PushBytesFromString(AssemblyBytes* bytes, char* string) {
             return false;
         }
     }
-    if (PushByteFromInt(bytes, (int)'\0')) {
+    if (PushByteFromInt(bytes, (int)'\0') == false) {
         return false;
     }
     return true;

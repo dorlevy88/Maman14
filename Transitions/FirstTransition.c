@@ -97,16 +97,16 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
             //Push into data array
             int calcDataSize = 0;
             int firstByte = 0;
-            bool isMemAllocOk = true;
+            bool isMemAllocOk;
             if (line.actionType == DATA ) {
                 calcDataSize = line.firstOperValue->dataSize;
                 firstByte = line.firstOperValue->data[0];
-                isMemAllocOk &= PushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data, line.firstOperValue->dataSize);
+                isMemAllocOk = PushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data, line.firstOperValue->dataSize);
             }
             else {
-                calcDataSize = sizeof(line.firstOperValue->string);
+                calcDataSize = (int)strlen(line.firstOperValue->string);
                 firstByte = line.firstOperValue->string[0];
-                isMemAllocOk &= PushBytesFromString(assembly->dataArray, line.firstOperValue->string);
+                isMemAllocOk = PushBytesFromString(assembly->dataArray, line.firstOperValue->string);
             }
 
             if(isMemAllocOk == false) {
@@ -146,7 +146,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
 
             //Steps 12, 13, 13.1, 14
             //handle Command size
-            int calcCommandSize = getCommandSize(line);
+            int calcCommandSize = getCommandSize(&line);
             //Step 14
             assembly->ic += calcCommandSize;
         }
