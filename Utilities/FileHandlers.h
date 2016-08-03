@@ -16,10 +16,6 @@
 typedef struct FileLine {
 
     char* originalLine;
-    int lineNum;
-    LineType lineType;
-    bool hasSyntaxError;
-    char* errStr;
     bool isEmptyOrComment;
 
     char* label;
@@ -27,11 +23,8 @@ typedef struct FileLine {
     ActionTypes actionType;
     int numOfCommandOprands;
 
-    char* firstOperand;
-    Operand firstOperValue;
-
-    char* secondOperand;
-    Operand secondOperValue;
+    Operand* firstOperValue;
+    Operand* secondOperValue;
 
 } FileLine;
 
@@ -40,11 +33,10 @@ typedef struct FileContent {
 
     FileLine line[MAX_FILE_LINES];
     int size;
-    bool hasError;
 
 } FileContent;
 
-FileContent getFileContent(char* filename);
+bool getFileContent(char* filename, FileContent* fileContent) ;
 
 
 #endif //MAMAN14_FILEHANDLERS_H
