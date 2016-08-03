@@ -16,7 +16,7 @@
 /// \return
 int isLabelExistsInTable(SymbolsTable* table, char* label) {
     for (int i = 0; i < table->recordSize; ++i) {
-        if (strcmp(label, table->records[i].label)) {
+        if (strcmp(label, table->records[i].label) == 0) {
             return i;
         }
     }
@@ -32,13 +32,12 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
         table->records = (SymbolRecord *) realloc(table->records, table->size + (NEW_CHUNK_SIZE * sizeof(SymbolRecord)));
         table->size += NEW_CHUNK_SIZE;
     }
+    table->records[table->recordSize].label = label;
+    table->records[table->recordSize].address = address;
+    table->records[table->recordSize].isExternal = isCommand;
+    table->records[table->recordSize].isCommand = isCommand;
+    table->records[table->recordSize].byteCodeForDynamic = byteCodeForDynamic;
     table->recordSize++;
-    SymbolRecord record = table->records[table->recordSize];
-    record.label = label;
-    record.address = address;
-    record.isExternal = isExternal;
-    record.isCommand = isCommand;
-    record.byteCodeForDynamic = byteCodeForDynamic;
     return true;
 }
 

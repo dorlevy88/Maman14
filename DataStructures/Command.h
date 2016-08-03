@@ -7,9 +7,6 @@
 #include "../Utilities/FileHandlers.h"
 #include "SymbolsTable.h"
 
-
-int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddressingType second);
-
 int buildBinaryCommand(FileLine cmdLine);
 
 int buildBinaryData(Operand* operand, SymbolsTable* table);

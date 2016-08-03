@@ -4,72 +4,32 @@
 
 #include "Command.h"
 
-int getCommandSize(ActionTypes action, OperandAddressingType first, OperandAddressingType second) {
-    int sizeInIc = 0;
-    switch (action) {
-        case MOV:
-        case CMP:
-        case ADD:
-        case SUB:
-        case LEA:
-            sizeInIc++; //command byte
-            if (first == REGISTER && second == REGISTER) {
-                sizeInIc++; //if both register addressing -> share a byte
-            }
-            else {
-                sizeInIc += 2; //source _ destination address array
-            }
-            //TODO: Add 3 array at most
-            break;
-        case NOT:
-        case CLR:
-        case INC:
-        case DEC:
-        case JMP:
-        case BNE:
-        case RED:
-        case PRN:
-        case JSR:
-            sizeInIc += 2; //command byte + adresss
-            break;
-        case RTS:
-        case STOP:
-            sizeInIc++; //only command byte
-            break;
-        default:
-            //BUG in the algorithm should not go here
-            break;
-    }
-    return sizeInIc;
-}
-
 int buildBinaryCommand(FileLine cmdLine) {
     // 101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b)
     int binCmd = 0;
 
-    //const at the beginning of every command & shift 3 bits
+    //const at the beginning of every command
     binCmd += (int)0b101;
-    binCmd <<= 3;
 
-    //add the num of operand & shift 2 bits
-    binCmd += cmdLine.numOfCommandOprands;
+    //shift 2 bits & add the num of operand
     binCmd <<= 2;
+    binCmd += cmdLine.numOfCommandOprands;
 
-    //add command opcode & shift 4 bits
-    binCmd += cmdLine.actionType;
+    //shift 4 bits & add command opcode
     binCmd <<= 4;
+    binCmd += cmdLine.actionType;
 
     if (cmdLine.numOfCommandOprands >= 1) {
         // at least one operand, add source addressing & shift 2 bits
-        binCmd += cmdLine.firstOperValue->addressingType;
         binCmd <<= 2;
+        binCmd += cmdLine.firstOperValue->addressingType;
 
+        // shift 2 bits anyway
+        binCmd <<= 2;
         if (cmdLine.numOfCommandOprands == 2) {
             // two operands, add destination addressing
             binCmd += cmdLine.secondOperValue->addressingType;
         }
-        // shift 2 bits anyway
-        binCmd <<= 2;
     }
     else {
         //in case of no operands shift 4 bits anyway
@@ -78,7 +38,6 @@ int buildBinaryCommand(FileLine cmdLine) {
 
     //shift 2 bits for the A,R,E - for command it's always zero
     binCmd <<= 2;
-    binCmd += 0;
 
     return binCmd;
 }

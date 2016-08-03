@@ -17,6 +17,46 @@ void UpdateSymbolsTableDataAddresses(SymbolsTable* table, int ic) {
 }
 
 
+int getCommandSize(FileLine* line) {
+    int sizeInIc = 0;
+    switch (line->actionType) {
+        case MOV:
+        case CMP:
+        case ADD:
+        case SUB:
+        case LEA:
+            sizeInIc++; //command byte
+            if (line->firstOperValue->addressingType == REGISTER &&
+                line->secondOperValue->addressingType == REGISTER) {
+                sizeInIc++; //if both register addressing -> share a byte
+            }
+            else {
+                sizeInIc += 2; //source _ destination address array
+            }
+            //TODO: Add 3 array at most
+            break;
+        case NOT:
+        case CLR:
+        case INC:
+        case DEC:
+        case JMP:
+        case BNE:
+        case RED:
+        case PRN:
+        case JSR:
+            sizeInIc += 2; //command byte + adresss
+            break;
+        case RTS:
+        case STOP:
+            sizeInIc++; //only command byte
+            break;
+        default:
+            //BUG in the algorithm should not go here
+            break;
+    }
+    return sizeInIc;
+}
+
 bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
     //1. int ic = 0, dc = 0;
     //2. Read line
@@ -106,9 +146,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
 
             //Steps 12, 13, 13.1, 14
             //handle Command size
-            int calcCommandSize = getCommandSize(line.actionType,
-                                                 line.firstOperValue->addressingType,
-                                                 line.secondOperValue->addressingType);
+            int calcCommandSize = getCommandSize(line);
             //Step 14
             assembly->ic += calcCommandSize;
         }
