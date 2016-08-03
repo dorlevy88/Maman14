@@ -184,20 +184,78 @@ char* checkNoOperand(char* rawOperandsString, FileLine* parsedLine){
     return NULL;
 }
 
-char* checkDataOperand() {
-    //TODO:
+char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
+    parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
+    memset(parsedLine->firstOperValue, 0, sizeof(Operand));
+    int dataSize = 1;
+    for (int i = 1; i < strlen(rawOperandsString) - 1; i++){
+        if (rawOperandsString[i] == ',') {
+            dataSize++;
+        }
+    }
+    int* data = (int*)malloc(dataSize * sizeof(int));
+    char* numString = strtok(rawOperandsString, " ,\t\n");
+    int numberInt;
+    for (int i=0; i < dataSize; i++){
+        numberInt = getIntFromString(numString);
+        if (numberInt != INVALID_NUM_TOKEN){
+            data[i] = numberInt;
+            numString = strtok(NULL, " ,\t\n");
+        }
+        else {
+            char* errMsg = strcat(strcat("Data integer - ", numString), " is out of bounds");
+            return errMsg;
+        }
+    }
+    parsedLine->firstOperValue->data = data;
+    parsedLine->firstOperValue->dataSize = dataSize;
+    return NULL;
 }
 
-char* checkStringOperand() {
-    //TODO:
+char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
+    parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
+    memset(parsedLine->firstOperValue, 0, sizeof(Operand));
+    int firstQuotesLocation = -1;
+    int secondQuotesLocation = -1;
+    for (int i = 0; i < strlen(rawOperandString) ; i++) {
+        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ // before word
+            if (rawOperandString[i] != NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
+                return "String does not start with double quotes";
+            }
+        }
+        else if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ //got to first quotes
+            firstQuotesLocation = i;
+        }
+        else if (firstQuotesLocation > -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ //got second quote
+            secondQuotesLocation = i;
+        }
+        else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && // after second quote
+                (rawOperandString[i] != '\n' || rawOperandString[i] != NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' ')){
+            return "String has data after closing double quotes";
+        }
+    }
+    if (secondQuotesLocation > firstQuotesLocation && firstQuotesLocation > -1){
+        size_t stringSize = (size_t)secondQuotesLocation - firstQuotesLocation - 1;
+        char* string = (char*) malloc(stringSize);
+        strncpy(string, // set string
+                strchr(rawOperandString, '"') + 1, // the string after the first double quotes
+                secondQuotesLocation - firstQuotesLocation - 1); // number of char to copy
+
+        parsedLine->firstOperValue->string = string;
+        return NULL;
+    }
+    return "String should be enclosed by double quotes and be more than one char";
 }
 
-char* checkExternOperand() {
-    //TODO:
-}
-
-char* checkEntryOperand() {
-    //TODO:
+char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
+    parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
+    memset(parsedLine->firstOperValue, 0, sizeof(Operand));
+    char* label = strtok(rawOperandString, " \t\n");
+    if (isLabelValid(label)){
+        parsedLine->firstOperValue->entryOrExtern = label;
+        return NULL;
+    }
+    return "Label is not valid";
 }
 
 char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
@@ -269,22 +327,22 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     }
     else if (strcmp(action, ".data") == 0){
         parsedLine->actionType = DATA;
-        errStr = checkDataOperand();
+        errStr = checkDataOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(action, ".string") == 0){
         parsedLine->actionType = STRING;
-        errStr = checkStringOperand();
+        errStr = checkStringOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(action, ".entry") == 0){
         parsedLine->actionType = ENTRY;
-        errStr = checkEntryOperand();
+        errStr = checkExternOrEntryOperand(rawOperandsString, parsedLine);
     }
     else if (strcmp(action, ".extern") == 0){
         parsedLine->actionType = EXTERN;
-        errStr = checkExternOperand();
+        errStr = checkExternOrEntryOperand(rawOperandsString, parsedLine);
     }
     else { //Command is not known
-        return "Unknown command";
+        errStr = "Unknown command";
     }
     return errStr;
 }
@@ -322,11 +380,12 @@ char* lineValidator(FileLine* parsedLine) {
         }
 
         string = strtok(NULL, " \t\n"); //Get action string
+        strSize = strlen(string);
 
     }
 
     char* actionStr = (char*) malloc(strSize);
-    memcpy(actionStr, string, strSize);
+    strcpy(actionStr, string);
     parsedLine->action = actionStr;      //get the action
 
     char* rawOperandsString = strtok(NULL, "\n"); // get remaining of line

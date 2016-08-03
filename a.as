@@ -14,4 +14,4 @@ MAIN:       mov     K[2-4], W
  END:   stop
     STR: .string "abcdef"
     LENGTH: .data 6 ,-9 ,15
-    K: .data 22
+    K: .data 22,21

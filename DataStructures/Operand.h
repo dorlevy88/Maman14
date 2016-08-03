@@ -24,7 +24,7 @@ typedef struct Operand {
     char* string; // only one string in case of .string
 
     //in case .entry\.extern
-    char* entryOrExtern;
+    char* entryOrExtern; // label of entry/extern
 
     //error handling
     bool hasError;
