@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <printf.h>
 #include "SymbolsTable.h"
 
 #define NEW_CHUNK_SIZE 10
@@ -52,4 +53,14 @@ bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int b
         table->records[labelPos].byteCodeForDynamic = byteCodeForDynamic;
 
     return true;
+}
+
+void printSymbolTable(SymbolsTable* table){
+    printf("----------------------------------------------------------------------------------------------------");
+    printf("label\taddress\tisExternal\tisCommand\tbyteCodeForDynamic\n");
+    for (int i = 0; i < table->recordSize ; i++) {
+        printf("%s\t%d\t%d\t%d\t%d\n", table->records[i].label, table->records[i].address,
+               table->records[i].isExternal, table->records[i].isCommand, table->records[i].byteCodeForDynamic);
+    }
+    printf("----------------------------------------------------------------------------------------------------");
 }
