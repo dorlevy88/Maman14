@@ -9,21 +9,21 @@
       <sourceFolder url="file://$MODULE_DIR$/Main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Operand.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/CompilerErrors.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Output/OutputFiles.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Output/OutputFiles.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Transitions/CompilerErrors.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Main.h" isTestSource="false" />
     </content>
@@ -131,6 +131,7 @@
           <root url="file:///System/Library/Frameworks/CoreMIDI.framework/Headers" />
           <root url="file:///System/Library/Frameworks/LocalAuthentication.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Foundation.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/NetFS.framework/Headers" />
           <root url="file:///System/Library/Frameworks/PreferencePanes.framework/Headers" />
           <root url="file:///System/Library/Frameworks/ScreenSaver.framework/Headers" />
           <root url="file:///System/Library/Frameworks/ImageCaptureCore.framework/Headers" />
@@ -142,7 +143,6 @@
           <root url="file:///System/Library/Frameworks/CoreText.framework/Headers" />
           <root url="file:///System/Library/Frameworks/NetworkExtension.framework/Headers" />
           <root url="file:///System/Library/Frameworks/SceneKit.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/NetFS.framework/Headers" />
           <root url="file:///System/Library/Frameworks/PhotosUI.framework/Headers" />
           <root url="file:///System/Library/Frameworks/QuickLook.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Tk.framework/Headers" />
@@ -201,10 +201,11 @@
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Frameworks/vImage.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers" />
-          <root url="file:///Library/Developer/CommandLineTools/usr/include" />
-          <root url="file:///Library/Developer/CommandLineTools/usr/lib/clang/7.3.0/include" />
-          <root url="file:///Library/Frameworks/iTunesLibrary.framework/Headers" />
           <root url="file:///usr/include" />
+          <root url="file:///Library/Frameworks/Mono.framework/Headers" />
+          <root url="file:///Library/Frameworks/iTunesLibrary.framework/Headers" />
+          <root url="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include" />
+          <root url="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/7.3.0/include" />
         </CLASSES>
         <SOURCES>
           <root url="file:///System/Library/Frameworks/AudioToolbox.framework/Headers" />
@@ -307,6 +308,7 @@
           <root url="file:///System/Library/Frameworks/CoreMIDI.framework/Headers" />
           <root url="file:///System/Library/Frameworks/LocalAuthentication.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Foundation.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/NetFS.framework/Headers" />
           <root url="file:///System/Library/Frameworks/PreferencePanes.framework/Headers" />
           <root url="file:///System/Library/Frameworks/ScreenSaver.framework/Headers" />
           <root url="file:///System/Library/Frameworks/ImageCaptureCore.framework/Headers" />
@@ -318,7 +320,6 @@
           <root url="file:///System/Library/Frameworks/CoreText.framework/Headers" />
           <root url="file:///System/Library/Frameworks/NetworkExtension.framework/Headers" />
           <root url="file:///System/Library/Frameworks/SceneKit.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/NetFS.framework/Headers" />
           <root url="file:///System/Library/Frameworks/PhotosUI.framework/Headers" />
           <root url="file:///System/Library/Frameworks/QuickLook.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Tk.framework/Headers" />
@@ -377,10 +378,11 @@
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Frameworks/vImage.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers" />
-          <root url="file:///Library/Developer/CommandLineTools/usr/include" />
-          <root url="file:///Library/Developer/CommandLineTools/usr/lib/clang/7.3.0/include" />
-          <root url="file:///Library/Frameworks/iTunesLibrary.framework/Headers" />
           <root url="file:///usr/include" />
+          <root url="file:///Library/Frameworks/Mono.framework/Headers" />
+          <root url="file:///Library/Frameworks/iTunesLibrary.framework/Headers" />
+          <root url="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include" />
+          <root url="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/7.3.0/include" />
         </SOURCES>
       </library>
     </orderEntry>

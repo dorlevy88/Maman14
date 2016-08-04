@@ -58,7 +58,8 @@ char* translateCommandToSpecial8Base(int byte) {
     char* response = (char*) malloc(sizeof(char) * 5);
     for (int i = 0; i < 5; ++i) {
         int num = byte & 0b111; //Get 3 right most bits
-        response[i] = translateToSpecial8Base(num);
+        byte >>=3;
+        response[4-i] = translateToSpecial8Base(num);
     }
     return response;
 }
@@ -118,12 +119,12 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     for (int i = 0; i < assembly->codeArray->size; ++i) {
         char* address = translateAddressToSpecial8Base(addressCounter++);
         char* command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
-        fprintf(fp, "%s %s", address, command);
+        fprintf(fp, "%s %s\n", address, command);
     }
     for (int i = 0; i < assembly->dataArray->size; ++i) {
         char* address = translateAddressToSpecial8Base(addressCounter++);
         char* command = translateCommandToSpecial8Base(assembly->dataArray->array[i]);
-        fprintf(fp, "%s %s", address, command);
+        fprintf(fp, "%s %s\n", address, command);
     }
     fclose(fp);
     return true;
@@ -140,12 +141,14 @@ bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
         return false;
     }
 
+    filename = getFilenameNoExtension(filename);
     if (writeExtOutputFile(assembly->symbolsTable, filename) == false) {
         //TODO: Throw error file cannot be created
         //TODO: check if file exists and delete it
         return false;
     }
 
+    filename = getFilenameNoExtension(filename);
     if(writeObOutputFile(assembly, filename) == false) {
         //TODO: Throw error file cannot be created
         //TODO: check if file exists and delete it
