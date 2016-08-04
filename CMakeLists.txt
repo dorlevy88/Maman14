@@ -12,7 +12,6 @@ set(SOURCE_FILES
         DataStructures/AssemblyBytes.c
         DataStructures/SymbolsTable.h
         DataStructures/SymbolsTable.c
-        DataStructures/Enums.c
         DataStructures/Enums.h
         DataStructures/Operand.h
         Transitions/SecondTransition.c
