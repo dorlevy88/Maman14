@@ -2,7 +2,10 @@
 // Created by Dor Levy on 7/10/16.
 //
 
+#include <math.h>
 #include "Command.h"
+
+#define OPERAND_BYTE_SIZE 13
 
 int buildBinaryCommand(FileLine cmdLine) {
     // 101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b)
@@ -42,17 +45,20 @@ int buildBinaryCommand(FileLine cmdLine) {
     return binCmd;
 }
 
-int convertCompliment2(int num) {
-    return ((~num) + 1);
+int convertCompliment2(int num, int size) {
+    if (num < 0){
+        return (int)(pow(2, size) + num);
+    }
+    return num;
 }
 
 int getBitRangefromInt(int num, int minBit, int maxBit) {
     int res = 0;
-    int resCount = 0;
     for (int i = minBit; i <= maxBit; ++i) {
-        int mask = 1 << i;
-        res = (mask & num) << resCount++;
+        int mask = ((1 << i) & num);
+        res += mask >> minBit;
     }
+    res = convertCompliment2(res, maxBit - minBit + 1);
     return res;
 }
 
@@ -63,15 +69,15 @@ int buildBinaryData(Operand* operand, SymbolsTable* table) {
     switch (operand->addressingType) {
         case NUMBER:
             //add the number
-            binData += convertCompliment2(operand->value);
+            binData += convertCompliment2(operand->value, OPERAND_BYTE_SIZE);
             //shift 2 bits for linker data absolute
             binData <<= 2;
             binData += (int)Absolute;
             break;
         case REGISTER:
             binData += operand->registerNum;
-            //shift 6 bits (register address)
-            binData <<= 6;
+            //shift 8 bits (register address)
+            binData <<= 8;
             break;
         case DIRECT:
             labelPos = isLabelExistsInTable(table, operand->label);
@@ -100,7 +106,7 @@ int buildBinaryData(Operand* operand, SymbolsTable* table) {
                 //TODO: Throw error: Dynamic addressing is not relevant for extern labels
             }
             int num = getBitRangefromInt(record.byteCodeForDynamic, operand->minNum, operand->maxNum);
-            num = convertCompliment2(num);
+            num = convertCompliment2(num, OPERAND_BYTE_SIZE);
             binData += num;
             binData <<= 2;
             binData += (int)Absolute;

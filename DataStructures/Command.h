@@ -11,4 +11,6 @@ int buildBinaryCommand(FileLine cmdLine);
 
 int buildBinaryData(Operand* operand, SymbolsTable* table);
 
+int convertCompliment2(int num, int size);
+
 #endif //MAMAN14_COMMAND_H

@@ -24,4 +24,6 @@ bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize);
 
 bool PushBytesFromString(AssemblyBytes* bytes, char* string);
 
+void printAssemblyByte(AssemblyBytes* bytes);
+
 #endif //MAMAN14_ASSEMBLYBYTE_H

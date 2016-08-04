@@ -27,12 +27,12 @@ int main(int argc, char **argv) {
         if (getFileContent(argv[fileCounter], fileContent) == false) { //Error in the file
             continue;
         }
-        for (int i=0; i < fileContent->size; i++) {
-            for (int j=0; j < 4; j++){
-                printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent->line[i].originalLine);
-            }
-            printf("\n");
-        }
+//        for (int i=0; i < fileContent->size; i++) {
+//            for (int j=0; j < 4; j++){
+//                printf("Row Number - %d, CellNumber - %d, Value = %s\n", i,j,fileContent->line[i].originalLine);
+//            }
+//            printf("\n");
+//        }
 
         //TODO: Check file validity
         //On Error in file validity (or any error) we need to print into stderr and not stdout

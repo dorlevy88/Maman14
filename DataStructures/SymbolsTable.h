@@ -14,6 +14,7 @@ typedef struct SymbolRecord {
     int address;
     bool isExternal;
     bool isCommand;
+    bool isEntry;
     int byteCodeForDynamic;
 } SymbolRecord;
 
@@ -26,8 +27,12 @@ typedef struct SymbolsTable {
 
 int isLabelExistsInTable(SymbolsTable* table, char* label);
 
-bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, int byteCodeForDynamic);
+bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic);
+
+bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry);
 
 bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int byteCodeForDynamic);
+
+void printSymbolTable(SymbolsTable* table);
 
 #endif //MAMAN14_SYMBOLSTABLE_H

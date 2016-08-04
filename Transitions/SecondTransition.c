@@ -33,7 +33,14 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     assembly->ic = 100;
 
     for (int i=0; i < fileContent->size; i++) { //For every line in file
+
+        printf("%s", fileContent->line[i].originalLine);
         FileLine line = fileContent->line[i];
+
+        //Debug
+        printSymbolTable(assembly->symbolsTable);
+        printAssemblyByte(assembly->codeArray);
+        printAssemblyByte(assembly->dataArray);
 
         //Step: 4
         if (line.actionType == DATA || line.actionType == STRING) {
@@ -42,8 +49,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
         //Step: 5
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
-                if (SetLabelAddressInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, assembly->ic,
-                                           DYNAMIC_ADDRESSING_NOT_AVAILABLE) == false) {
+                if (SetLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, true) == false) {
                     PrintCompileError(ERR_LABEL_NOT_DEFINED, line.firstOperValue->entryOrExtern, line.lineNumber);
                     return false;
                 }
@@ -58,10 +64,11 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
             assembly->ic++;
             // 0000000000000-00 (data 13b - E,R,A (2b))
             int binData = 0;
+            //Building Code Array
             if (line.numOfCommandOprands >= 1) {
                 binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable);
                 if (line.numOfCommandOprands == 2) {
-                    if (line.secondOperValue->addressingType == REGISTER){
+                    if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){ // If both operands are Registers then they share one byte
                         int firstBinData = binData;
                         binData = buildBinaryData(line.secondOperValue, assembly->symbolsTable);
                         firstBinData <<= 6;

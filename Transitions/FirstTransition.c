@@ -9,9 +9,8 @@
 
 void UpdateSymbolsTableDataAddresses(SymbolsTable* table, int ic) {
     for (int i = 0; i < table->recordSize; ++i) {
-        SymbolRecord record = table->records[i];
-        if (record.isCommand == false && record.isExternal == false) { //update only .data\.string types
-            record.address += ic;
+        if (table->records[i].isCommand == false && table->records[i].isExternal == false) { //update only .data\.string types
+            table->records[i].address += ic;
         }
     }
 }
@@ -104,7 +103,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
                 isMemAllocOk = PushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data, line.firstOperValue->dataSize);
             }
             else {
-                calcDataSize = (int)strlen(line.firstOperValue->string);
+                calcDataSize = (int)strlen(line.firstOperValue->string) + 1;
                 firstByte = line.firstOperValue->string[0];
                 isMemAllocOk = PushBytesFromString(assembly->dataArray, line.firstOperValue->string);
             }
@@ -114,7 +113,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
                 return false;
             }
 
-            if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, firstByte) == false) {
+            if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
                 PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
                 return false;
             }
@@ -127,7 +126,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
             }
             //Steps 9, 9.1, 10
             if (line.actionType == EXTERN) {
-                AddNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false, 0);
+                AddNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false, false, 0);
                 //TODO: Should we send error if label exists in table?
             }
         }
@@ -137,7 +136,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
             if (isLabelExists) {
                 //Step 11
                 int binCommandForDynamicAddressing = buildBinaryCommand(line);
-                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true,
+                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true, false,
                                        binCommandForDynamicAddressing) == false) {
                     PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
                     return false;

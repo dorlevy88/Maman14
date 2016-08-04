@@ -24,7 +24,7 @@ int isLabelExistsInTable(SymbolsTable* table, char* label) {
     return LABEL_NOT_EXISTS;
 }
 
-bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, int byteCodeForDynamic) {
+bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic) {
     int labelPos = isLabelExistsInTable(table, label);
     if(labelPos != LABEL_NOT_EXISTS) {
         return false;
@@ -35,10 +35,21 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
     }
     table->records[table->recordSize].label = label;
     table->records[table->recordSize].address = address;
-    table->records[table->recordSize].isExternal = isCommand;
+    table->records[table->recordSize].isExternal = isExternal;
     table->records[table->recordSize].isCommand = isCommand;
+    table->records[table->recordSize].isEntry = isEntry;
     table->records[table->recordSize].byteCodeForDynamic = byteCodeForDynamic;
     table->recordSize++;
+    return true;
+}
+
+bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry){
+    int labelPos = isLabelExistsInTable(table, label);
+    if (labelPos == LABEL_NOT_EXISTS) {
+        return false;
+    }
+
+    table->records[labelPos].isEntry = isEntry;
     return true;
 }
 
@@ -56,11 +67,11 @@ bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int b
 }
 
 void printSymbolTable(SymbolsTable* table){
-    printf("----------------------------------------------------------------------------------------------------");
-    printf("label\taddress\tisExternal\tisCommand\tbyteCodeForDynamic\n");
+    printf("----------------------------------------------------------------------------------------------------\n");
+    printf("label\taddress\tisExternal\tisCommand\tisEntry\tbyteCodeForDynamic\n");
     for (int i = 0; i < table->recordSize ; i++) {
-        printf("%s\t%d\t%d\t%d\t%d\n", table->records[i].label, table->records[i].address,
-               table->records[i].isExternal, table->records[i].isCommand, table->records[i].byteCodeForDynamic);
+        printf("%s\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n", table->records[i].label, table->records[i].address,
+               table->records[i].isExternal, table->records[i].isCommand, table->records[i].isEntry, table->records[i].byteCodeForDynamic);
     }
-    printf("----------------------------------------------------------------------------------------------------");
+    printf("----------------------------------------------------------------------------------------------------\n");
 }
