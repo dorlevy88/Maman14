@@ -22,17 +22,20 @@ int buildBinaryCommand(FileLine cmdLine) {
     binCmd <<= 4;
     binCmd += cmdLine.actionType;
 
-    if (cmdLine.numOfCommandOprands >= 1) {
-        // at least one operand, add source addressing & shift 2 bits
+    if (cmdLine.numOfCommandOprands == 1) {
+        // No source operand -shift 2 for source addressing and shift 2 zeros for destination
+        binCmd <<= 4;
+        binCmd += cmdLine.firstOperValue->addressingType;
+    }
+    else if (cmdLine.numOfCommandOprands == 2) {
+        // shift 2 bits and add source addressing
         binCmd <<= 2;
         binCmd += cmdLine.firstOperValue->addressingType;
 
-        // shift 2 bits anyway
+
+        // shift two bits and add destination addressing
         binCmd <<= 2;
-        if (cmdLine.numOfCommandOprands == 2) {
-            // two operands, add destination addressing
-            binCmd += cmdLine.secondOperValue->addressingType;
-        }
+        binCmd += cmdLine.secondOperValue->addressingType;
     }
     else {
         //in case of no operands shift 4 bits anyway
@@ -69,7 +72,7 @@ int getBitRangefromInt(int num, int minBit, int maxBit) {
     return res;
 }
 
-int buildBinaryData(Operand* operand, SymbolsTable* table) {
+int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOperand) {
     int binData = 0;
     int labelPos = 0;
     SymbolRecord record;
@@ -83,8 +86,14 @@ int buildBinaryData(Operand* operand, SymbolsTable* table) {
             break;
         case REGISTER:
             binData += operand->registerNum;
-            //shift 8 bits (register address)
-            binData <<= 8;
+            if(isDestinationOperand) {
+                //shift 2 bits (destination register address)
+                binData <<= 2;
+            }
+            else {
+                //shift 8 bits (source register address)
+                binData <<= 8;
+            }
             break;
         case DIRECT:
             labelPos = isLabelExistsInTable(table, operand->label);

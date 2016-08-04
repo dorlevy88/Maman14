@@ -63,27 +63,50 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
 
             assembly->ic++;
             // 0000000000000-00 (data 13b - E,R,A (2b))
-            int binData = 0;
             //Building Code Array
-            if (line.numOfCommandOprands >= 1) {
-                binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable);
-                if (line.numOfCommandOprands == 2) {
-                    if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){ // If both operands are Registers then they share one byte
-                        int firstBinData = binData;
-                        binData = buildBinaryData(line.secondOperValue, assembly->symbolsTable);
-                        firstBinData <<= 6;
-                        firstBinData |= binData;
-                        isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData);
-                        assembly->ic++;
-                    }
-                    else {
-                        isMemAllocOk |= PushByteFromInt(assembly->codeArray, binData);
-                        binData = buildBinaryData(line.secondOperValue, assembly->symbolsTable);
-                        isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
-                        assembly->ic += 2;
-                    }
+            if (line.numOfCommandOprands == 1){
+                int binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, true);
+                isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
+                assembly->ic++;
+            }
+            else if (line.numOfCommandOprands == 2) {
+                int firstBinData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, false);
+                int secondBinData = buildBinaryData(line.secondOperValue, assembly->symbolsTable, true);
+                if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){
+                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData + secondBinData);
+                    assembly->ic++;
+                }
+                else{
+                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData);
+                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, secondBinData);
+                    assembly->ic+=2;
                 }
             }
+
+
+
+//            if (line.numOfCommandOprands >= 1) {
+//                binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable);
+//                if (line.numOfCommandOprands == 2) {
+//                    if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){ // If both operands are Registers then they share one byte
+//                        int firstBinData = binData;
+//                        binData = buildBinaryData(line.secondOperValue, assembly->symbolsTable);
+//                        firstBinData += binData >> 6;
+//                        isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData);
+//                        assembly->ic++;
+//                    }
+//                    else {
+//                        isMemAllocOk |= PushByteFromInt(assembly->codeArray, binData);
+//                        binData = buildBinaryData(line.secondOperValue, assembly->symbolsTable);
+//                        isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
+//                        assembly->ic += 2;
+//                    }
+//                }
+//                else {
+//                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
+//                    assembly->ic++;
+//                }
+//            }
 
             if(isMemAllocOk == false){
                 PrintCompileError(ERR_RAM_OVERFLOW, "Code Array", line.lineNumber);
