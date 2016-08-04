@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <printf.h>
+#include <math.h>
 #include "OutputFiles.h"
 
 //TODO: Trim int to 16Bit for writing
@@ -40,8 +41,21 @@ char translateToSpecial8Base(int base8) {
     }
 }
 
+int convertNumFromBase10toBase8(int base10) {
+    int index = 0;
+    int res = 0;
+    while (base10 != 0)
+    {
+        int remainder = base10 % 8;
+        base10 = base10/8;
+        res += remainder * pow(10, index);
+        index ++ ;
+    }
+    return res;
+}
+
 char* translateCommandToSpecial8Base(int byte) {
-    char* response = (char*) malloc(sizeof(char) * 6);
+    char* response = (char*) malloc(sizeof(char) * 5);
     for (int i = 0; i < 5; ++i) {
         int num = byte & 0b111; //Get 3 right most bits
         response[i] = translateToSpecial8Base(num);
@@ -50,10 +64,12 @@ char* translateCommandToSpecial8Base(int byte) {
 }
 
 char* translateAddressToSpecial8Base(int address) {
-    char* response = (char*) malloc(sizeof(char) * 4);
+    int base8 = convertNumFromBase10toBase8(address);
+    char* response = (char*) malloc(sizeof(char) * 3);
     for (int i = 1; i <= 3 ; ++i) { //3 because it could be up to 1000
-        int num = address % (i * 10);
-        response[i-1] = translateToSpecial8Base(num);
+        int num = base8 % 10;
+        response[3-i] = translateToSpecial8Base(num);
+        base8 /= 10;
     }
     return response;
 }
@@ -82,8 +98,10 @@ bool writeExtOutputFile(SymbolsTable *table, char* filename) {
 
     for (int i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isExternal == true) {
-            char* address = translateAddressToSpecial8Base(table->records[i].address);
-            fprintf(fp, "%s %s\n", table->records[i].label, address);
+            for (int j = 0; j < table->records[i].externUsages; ++j) {
+                char* address = translateAddressToSpecial8Base(table->records[i].externUsageAddresses[j]);
+                fprintf(fp, "%s %s\n", table->records[i].label, address);
+            }
         }
     }
     fclose(fp);

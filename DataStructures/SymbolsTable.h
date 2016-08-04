@@ -13,6 +13,8 @@ typedef struct SymbolRecord {
     char* label;
     int address;
     bool isExternal;
+    int* externUsageAddresses;
+    int externUsages;
     bool isCommand;
     bool isEntry;
     int byteCodeForDynamic;
@@ -32,6 +34,8 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
 bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry);
 
 bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int byteCodeForDynamic);
+
+bool AddExternUsageAddress(SymbolRecord* record, int usedAddress);
 
 void printSymbolTable(SymbolsTable* table);
 

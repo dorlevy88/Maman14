@@ -72,10 +72,10 @@ int getBitRangefromInt(int num, int minBit, int maxBit) {
     return res;
 }
 
-int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOperand) {
+int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOperand, int cmdAddress) {
     int binData = 0;
     int labelPos = 0;
-    SymbolRecord record;
+    SymbolRecord* record;
     switch (operand->addressingType) {
         case NUMBER:
             //add the number
@@ -101,11 +101,12 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
                 //TODO: Throw error label should exist in second transition
                 return -1;
             }
-            record = table->records[labelPos];
-            binData += record.address;
+            record = &table->records[labelPos];
+            binData += record->address;
             binData <<= 2;
-            if (record.isExternal) {
+            if (record->isExternal) {
                 binData += (int)External;
+                AddExternUsageAddress(record, cmdAddress);
             }
             else {
                 binData += (int)Relocatable;
@@ -117,11 +118,11 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
                 //TODO: Throw error: label should exist in second transition
                 return -1;
             }
-            record = table->records[labelPos];
-            if (record.isExternal) {
+            record = &table->records[labelPos];
+            if (record->isExternal) {
                 //TODO: Throw error: Dynamic addressing is not relevant for extern labels
             }
-            int num = getBitRangefromInt(record.byteCodeForDynamic, operand->minNum, operand->maxNum);
+            int num = getBitRangefromInt(record->byteCodeForDynamic, operand->minNum, operand->maxNum);
             num = convertCompliment2(num, OPERAND_BYTE_SIZE);
             binData += num;
             binData <<= 2;

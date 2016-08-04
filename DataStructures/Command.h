@@ -9,7 +9,7 @@
 
 int buildBinaryCommand(FileLine cmdLine);
 
-int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOperand);
+int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOperand, int cmdAddress);
 
 int convertCompliment2(int num, int size);
 

@@ -66,6 +66,20 @@ bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int b
     return true;
 }
 
+bool AddExternUsageAddress(SymbolRecord* record, int usedAddress){
+//    int labelPos = isLabelExistsInTable(table, externLabel);
+//    if (labelPos == LABEL_NOT_EXISTS) {
+//        return false;
+//    }
+    //SymbolRecord* record = &table->records[labelPos];
+    record->externUsageAddresses = (int *) realloc(record->externUsageAddresses, record->externUsages + sizeof(int));
+    record->externUsageAddresses[record->externUsages] = usedAddress;
+    record->externUsages++;
+
+    return true;
+}
+
+
 void printSymbolTable(SymbolsTable* table){
     printf("----------------------------------------------------------------------------------------------------\n");
     printf("label\taddress\tisExternal\tisCommand\tisEntry\tbyteCodeForDynamic\n");

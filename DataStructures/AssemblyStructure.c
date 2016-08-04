@@ -19,6 +19,9 @@ AssemblyStructure* InitAssemblyStructure() {
     memset(table, 0, sizeof(SymbolsTable));
     SymbolRecord* record = (SymbolRecord*)malloc(sizeof(SymbolRecord));
     memset(record, 0, sizeof(SymbolRecord));
+    int* externUsages = (int*)malloc(0);
+    memset(externUsages, 0, 0);
+    record->externUsageAddresses = externUsages;
     table->records = record;
     table->size = 1;
     assembly->symbolsTable = table;

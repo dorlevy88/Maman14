@@ -60,18 +60,17 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
             // 101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b)
             int binCmd = buildBinaryCommand(line);
             bool isMemAllocOk = PushByteFromInt(assembly->codeArray, binCmd);
-
             assembly->ic++;
             // 0000000000000-00 (data 13b - E,R,A (2b))
             //Building Code Array
             if (line.numOfCommandOprands == 1){
-                int binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, true);
+                int binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, true, assembly->ic);
                 isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
                 assembly->ic++;
             }
             else if (line.numOfCommandOprands == 2) {
-                int firstBinData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, false);
-                int secondBinData = buildBinaryData(line.secondOperValue, assembly->symbolsTable, true);
+                int firstBinData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, false, assembly->ic);
+                int secondBinData = buildBinaryData(line.secondOperValue, assembly->symbolsTable, true, assembly->ic+1);
                 if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){
                     isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData + secondBinData);
                     assembly->ic++;
