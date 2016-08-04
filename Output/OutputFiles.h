@@ -8,6 +8,6 @@
 #ifndef MAMAN14_OUTPUTFILES_H
 #define MAMAN14_OUTPUTFILES_H
 
-bool WriteAllOutpuFiles(AssemblyStructure* assembly);
+bool WriteAllOutputFiles(AssemblyStructure* assembly, char* filename);
 
 #endif //MAMAN14_OUTPUTFILES_H

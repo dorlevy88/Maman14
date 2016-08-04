@@ -7,6 +7,7 @@
 #include "Transitions/FirstTransition.h"
 #include "Transitions/SecondTransition.h"
 #include "Main.h"
+#include "Output/OutputFiles.h"
 
 
 int main(int argc, char **argv) {
@@ -23,8 +24,9 @@ int main(int argc, char **argv) {
 
     for (int fileCounter = 1; fileCounter < argc; ++fileCounter) {
 
+        char* filename = argv[fileCounter];
         FileContent* fileContent = (FileContent*)malloc(sizeof(FileContent));
-        if (getFileContent(argv[fileCounter], fileContent) == false) { //Error in the file
+        if (getFileContent(filename, fileContent) == false) { //Error in the file
             continue;
         }
 //        for (int i=0; i < fileContent->size; i++) {
@@ -51,7 +53,8 @@ int main(int argc, char **argv) {
             continue;
         }
 
-        //TODO: Translate Assembly Structure to special * base
-        //TODO: Save Files: .ob .ent. ext
+        if (WriteAllOutputFiles(assemblyStructure, filename) == false) {
+            //TODO: delete files in case of a failure
+        }
     }
 }

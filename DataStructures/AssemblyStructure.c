@@ -8,6 +8,7 @@
 AssemblyStructure* InitAssemblyStructure() {
 
     AssemblyStructure* assembly = (AssemblyStructure*)malloc(sizeof(AssemblyStructure));
+    assembly->startAddress = ASSEMBLY_CODE_START_ADDRESS;
 
     AssemblyBytes* codeBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
     assembly->codeArray = codeBytes;

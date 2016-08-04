@@ -8,8 +8,11 @@
 #include "AssemblyBytes.h"
 #include "SymbolsTable.h"
 
+#define ASSEMBLY_CODE_START_ADDRESS 100
+
 typedef struct AssemblyStructure {
 
+    int startAddress;
     int ic;
     int dc;
 

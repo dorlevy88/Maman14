@@ -15,7 +15,6 @@ void UpdateSymbolsTableDataAddresses(SymbolsTable* table, int ic) {
     }
 }
 
-
 int getCommandSize(FileLine* line) {
     int sizeInIc = 0;
     switch (line->actionType) {
@@ -76,7 +75,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
     //14. Add to ic the value of ic + the calculated L value (ic += L)
     //15. go back to step 2
 
-    assembly->ic = 100;
+    assembly->ic = assembly->startAddress;
     assembly->dc = 0;
 
     for (int i=0; i < fileContent->size; i++){ //For every line in file

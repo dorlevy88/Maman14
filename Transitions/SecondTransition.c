@@ -30,7 +30,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     //11.4 symbols table with entry points marks
 
     int tmpIc = assembly->ic;
-    assembly->ic = 100;
+    assembly->ic = assembly->startAddress;
 
     for (int i=0; i < fileContent->size; i++) { //For every line in file
 
@@ -83,31 +83,6 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
                 }
             }
 
-
-
-//            if (line.numOfCommandOprands >= 1) {
-//                binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable);
-//                if (line.numOfCommandOprands == 2) {
-//                    if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){ // If both operands are Registers then they share one byte
-//                        int firstBinData = binData;
-//                        binData = buildBinaryData(line.secondOperValue, assembly->symbolsTable);
-//                        firstBinData += binData >> 6;
-//                        isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData);
-//                        assembly->ic++;
-//                    }
-//                    else {
-//                        isMemAllocOk |= PushByteFromInt(assembly->codeArray, binData);
-//                        binData = buildBinaryData(line.secondOperValue, assembly->symbolsTable);
-//                        isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
-//                        assembly->ic += 2;
-//                    }
-//                }
-//                else {
-//                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
-//                    assembly->ic++;
-//                }
-//            }
-
             if(isMemAllocOk == false){
                 PrintCompileError(ERR_RAM_OVERFLOW, "Code Array", line.lineNumber);
                 return false;
@@ -119,6 +94,8 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     if (assembly->ic != tmpIc) {
         //TODO: BUG: something went wrong with the algorithm
     }
+
+    //TODO: check not more than 1000 bytes of code + data
     return true;
     //Done and ready to save!
 }
