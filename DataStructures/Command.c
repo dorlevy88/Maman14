@@ -54,11 +54,18 @@ int convertCompliment2(int num, int size) {
 
 int getBitRangefromInt(int num, int minBit, int maxBit) {
     int res = 0;
+    bool isNegative = false;
     for (int i = minBit; i <= maxBit; ++i) {
         int mask = ((1 << i) & num);
         res += mask >> minBit;
+        if(i == maxBit && mask != 0) {
+            isNegative = true;
+        }
     }
-    res = convertCompliment2(res, maxBit - minBit + 1);
+    int byteSize = maxBit - minBit + 1;
+    if (isNegative){
+        res = res - (int)pow(2, byteSize);
+    }
     return res;
 }
 
