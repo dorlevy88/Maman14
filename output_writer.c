@@ -58,12 +58,12 @@ char* translateCommandToSpecial8Base(int byte) {
     return response;
 }
 
-char* translateAddressToSpecial8Base(int address) {
+char* translateAddressToSpecial8Base(int address, int size) {
     int base8 = convertNumFromBase10toBase8(address);
-    char* response = (char*) malloc(sizeof(char) * 3);
-    for (int i = 1; i <= 3 ; ++i) { //3 because it could be up to 1000
+    char* response = (char*) malloc(sizeof(char) * size);
+    for (int i = 1; i <= size ; ++i) { //3 because it could be up to 1000
         int num = base8 % 10;
-        response[3-i] = translateToSpecial8Base(num);
+        response[size-i] = translateToSpecial8Base(num);
         base8 /= 10;
     }
     return response;
@@ -77,7 +77,7 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
 
     for (int i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isEntry == true) {
-            char* address = translateAddressToSpecial8Base(table->records[i].address);
+            char* address = translateAddressToSpecial8Base(table->records[i].address, 3);
             fprintf(fp, "%s %s\n", table->records[i].label, address);
         }
     }
@@ -94,7 +94,7 @@ bool writeExtOutputFile(SymbolsTable *table, char* filename) {
     for (int i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isExternal == true) {
             for (int j = 0; j < table->records[i].externUsages; ++j) {
-                char* address = translateAddressToSpecial8Base(table->records[i].externUsageAddresses[j]);
+                char* address = translateAddressToSpecial8Base(table->records[i].externUsageAddresses[j], 3);
                 fprintf(fp, "%s %s\n", table->records[i].label, address);
             }
         }
@@ -108,15 +108,15 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     if (fp == NULL) {
         return false;
     }
-
+    fprintf(fp, "%s %s\n", translateAddressToSpecial8Base(assembly->codeArray->size, 2), translateAddressToSpecial8Base(assembly->dataArray->size, 2));
     int addressCounter = assembly->startAddress;
     for (int i = 0; i < assembly->codeArray->size; ++i) {
-        char* address = translateAddressToSpecial8Base(addressCounter++);
+        char* address = translateAddressToSpecial8Base(addressCounter++, 3);
         char* command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
         fprintf(fp, "%s %s\n", address, command);
     }
     for (int i = 0; i < assembly->dataArray->size; ++i) {
-        char* address = translateAddressToSpecial8Base(addressCounter++);
+        char* address = translateAddressToSpecial8Base(addressCounter++, 3);
         char* command = translateCommandToSpecial8Base(assembly->dataArray->array[i]);
         fprintf(fp, "%s %s\n", address, command);
     }

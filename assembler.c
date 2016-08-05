@@ -2,6 +2,7 @@
 #include "output_writer.h"
 #include "input_reader.h"
 #include "transitions.h"
+#include "utils.h"
 
 
 int main(int argc, char **argv) {
@@ -19,21 +20,27 @@ int main(int argc, char **argv) {
     for (int fileCounter = 1; fileCounter < argc; ++fileCounter) {
 
         char* filename = argv[fileCounter];
+        PrintProcessStep("Start processing file", filename);
         FileContent* fileContent = (FileContent*)malloc(sizeof(FileContent));
         if (getFileContent(filename, fileContent) == false) { //Error in the file
+            PrintProcessStep("Parsing file failed", filename);
             continue;
         }
 
         AssemblyStructure* assemblyStructure = InitAssemblyStructure();
         if(RunFirstTransition(fileContent, assemblyStructure) == false) {
+            PrintProcessStep("Transition one failed", filename);
             continue;
         }
         if (RunSecondTransition(fileContent, assemblyStructure) == false) {
+            PrintProcessStep("Transition two failed", filename);
             continue;
         }
 
         if (WriteAllOutputFiles(assemblyStructure, filename) == false) {
+            PrintProcessStep("Writing file failed", filename);
             //TODO: delete files in case of a failure
         }
+        PrintProcessStep("Processing file succeeded", filename);
     }
 }

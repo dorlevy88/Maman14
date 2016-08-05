@@ -207,7 +207,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     int firstQuotesLocation = -1;
     int secondQuotesLocation = -1;
     for (int i = 0; i < strlen(rawOperandString) ; i++) {
-        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ // before word
+        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ // before word - did not find any quote yet
             if (rawOperandString[i] != (char)NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
                 return "String does not start with double quotes";
             }
@@ -219,7 +219,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
             secondQuotesLocation = i;
         }
         else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && // after second quote
-                (rawOperandString[i] != '\n' || rawOperandString[i] != (char)NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' ')){
+                (rawOperandString[i] != '\n' && rawOperandString[i] != (char)NULL && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
             return "String has data after closing double quotes";
         }
     }
@@ -419,9 +419,7 @@ char* lineValidator(FileLine* parsedLine) {
 
     char* rawOperandsString = strtok(NULL, "\n"); // get remaining of line
 
-    validateActionAndOperands(rawOperandsString, parsedLine);
-
-    return NULL;
+    return validateActionAndOperands(rawOperandsString, parsedLine);
 }
 
 bool getFileContent(char* filename, FileContent* fileContent) {
@@ -429,11 +427,12 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     char line[MAX_LINE_SIZE];
     int lineCounter = 1;
     int arrayIndex = 0;
+    bool isFileOK = true;
 
     fr = fopen (filename, "r"); // Open the file for reading
     if (fr == NULL)
     {
-        fprintf(stderr, "File %s does not exist", filename);
+        fprintf(stderr, "File %s does not exist\n", filename);
         return false;
     }
     while(fgets(line, sizeof(line), fr) != NULL)   //get a word.  done if NULL
@@ -448,6 +447,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
 
         char* errString = lineValidator(parsedLine);
         if (errString != NULL) {
+            isFileOK = false;
             PrintSyntaxError(errString, lineCounter);
         }
         if (parsedLine->isEmptyOrComment == false) {
@@ -458,6 +458,6 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     fileContent->size = arrayIndex;
     fclose(fr);  /* close the file prior to exiting the routine */
 
-    return true;
+    return isFileOK;
 }
 

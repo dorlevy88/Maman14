@@ -11,4 +11,6 @@ void PrintCompileError(char* errorMsg, char* param, int lineNum);
 
 void PrintCompileWarning(char* errorMsg, char* param, int lineNum);
 
+void PrintProcessStep(char* message, char* param);
+
 #endif //MAMAN14_LOGGER_H
