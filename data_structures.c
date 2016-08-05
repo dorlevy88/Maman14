@@ -1,8 +1,8 @@
-#include <printf.h>
 #include <memory.h>
 #include <stdlib.h>
 #include "data_structures.h"
 #include "utils.h"
+#include <stdio.h>
 
 
 #define DATA_BYTE_SIZE 15
@@ -27,7 +27,8 @@ bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize) {
 }
 
 bool PushBytesFromString(AssemblyBytes* bytes, char* string) {
-    for (int i = 0; i < strlen(string); ++i) {
+    int i;
+    for (i = 0; i < strlen(string); ++i) {
         if(PushByteFromInt(bytes, (int)string[i]) == false) {
             return false;
         }
@@ -85,7 +86,8 @@ AssemblyStructure* InitAssemblyStructure() {
 }
 
 int isLabelExistsInTable(SymbolsTable* table, char* label) {
-    for (int i = 0; i < table->recordSize; ++i) {
+    int i;
+    for (i = 0; i < table->recordSize; ++i) {
         if (strcmp(label, table->records[i].label) == 0) {
             return i;
         }
