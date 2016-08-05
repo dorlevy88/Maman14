@@ -155,7 +155,7 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 }
 
 bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
-    char* filename = (char*)malloc(strlen(fullFilename));;
+    char* filename = (char*)malloc(strlen(fullFilename));
     printf("Start of WriteAllOutputFiles");
     strcpy(filename, fullFilename);
     filename = getFilenameNoExtension(filename);
