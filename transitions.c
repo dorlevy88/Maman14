@@ -3,13 +3,14 @@
 #include <memory.h>
 #include "transitions.h"
 
+#define CMD_BYTE_BEGIN 0b101
 
 int buildBinaryCommand(FileLine cmdLine) {
     /*  101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
     int binCmd = 0;
 
     /* const at the beginning of every command */
-    binCmd += (int)0b101;
+    binCmd += CMD_BYTE_BEGIN;
 
     /* shift 2 bits & add the num of operand */
     binCmd <<= 2;
@@ -47,7 +48,7 @@ int buildBinaryCommand(FileLine cmdLine) {
 
 int getBitRangefromInt(int num, int minBit, int maxBit) {
     int res = 0;
-    int i, mask;
+    int i, mask, byteSize;
     bool isNegative = false;
     for (i = minBit; i <= maxBit; ++i) {
         mask = ((1 << i) & num);
@@ -56,7 +57,7 @@ int getBitRangefromInt(int num, int minBit, int maxBit) {
             isNegative = true;
         }
     }
-    int byteSize = maxBit - minBit + 1;
+    byteSize = maxBit - minBit + 1;
     if (isNegative){
         res = res - (int)pow(2, byteSize);
     }
@@ -67,6 +68,7 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
     int binData = 0;
     int labelPos = 0;
     SymbolRecord* record;
+    int num;
     switch (operand->addressingType) {
         case NUMBER:
             /* add the number */
@@ -113,7 +115,7 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
             if (record->isExternal) {
                 /* TODO: Throw error: Dynamic addressing is not relevant for extern labels */
             }
-            int num = getBitRangefromInt(record->byteCodeForDynamic, operand->minNum, operand->maxNum);
+            num = getBitRangefromInt(record->byteCodeForDynamic, operand->minNum, operand->maxNum);
             num = ConvertCompliment2(num, OPERAND_BYTE_SIZE);
             binData += num;
             binData <<= 2;
@@ -193,7 +195,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
         14. Add to ic the value of ic + the calculated L value (ic += L)
         15. go back to step 2
     */
-    int i;
+    int i, calcCommandSize;
     assembly->ic = assembly->startAddress;
     assembly->dc = 0;
 
@@ -265,7 +267,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
 
             /* Steps 12, 13, 13.1, 14 */
             /* handle Command size */
-            int calcCommandSize = getCommandSize(&line);
+            calcCommandSize = getCommandSize(&line);
             /* Step 14 */
             assembly->ic += calcCommandSize;
         }

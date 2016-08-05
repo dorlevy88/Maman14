@@ -4,6 +4,9 @@
 #include <memory.h>
 #include "output_writer.h"
 
+#define THREE_BITS_MASK 0b111;
+
+
 char* getFilenameNoExtension(char *filename) {
     char *dot = strrchr(filename, '.');
     if(dot == NULL || dot == filename) return "";
@@ -52,9 +55,8 @@ int convertNumFromBase10toBase8(int base10) {
 char* translateCommandToSpecial8Base(int byte) {
     char* response = (char*) malloc(sizeof(char) * 5);
     int i,num;
-    const int bits = 0b111;
     for (i = 0; i < 5; ++i) {
-        num = byte & bits; /* Get 3 right most bits */
+        num = byte & THREE_BITS_MASK; /* Get 3 right most bits */
         byte >>=3;
         response[4-i] = translateToSpecial8Base(num);
     }
@@ -118,11 +120,16 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     int i;
     char* address;
     char* command;
+    char* translatedCodeArraySize;
+    char* translatedDataArraySize;
     fp = fopen(strcat(filename, ".ob"), "w");
     if (fp == NULL) {
         return false;
     }
-    fprintf(fp, "%s %s\n", translateAddressToSpecial8Base(assembly->codeArray->size, 2), translateAddressToSpecial8Base(assembly->dataArray->size, 2));
+
+    translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2);
+    translatedDataArraySize = translateAddressToSpecial8Base(assembly->dataArray->size, 2);
+    fprintf(fp, "%s %s\n", translatedCodeArraySize, translatedDataArraySize);
     int addressCounter = assembly->startAddress;
     for (i = 0; i < assembly->codeArray->size; ++i) {
         address = translateAddressToSpecial8Base(addressCounter++, 3);
