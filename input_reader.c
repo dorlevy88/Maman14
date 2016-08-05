@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <ctype.h>
-#include <string.h>
 #include "input_reader.h"
 
 bool isLabelValid(char* label){
@@ -47,7 +46,7 @@ char* getNewSubString(const char* pos, int size) {
     size_t sizeT;
     char* res;
 
-    sizeT = (size_t)size;
+    sizeT = (size_t)size + 1;
     res = (char*)malloc(sizeT);
     memset(res, 0, sizeT);
     strncpy(res, pos, sizeT);
@@ -68,8 +67,6 @@ char* getNewSubStringFromString(const char* orig, int pos1, int pos2) {
     res[sizeT - 1] = '\0';
     return res;
 }
-
-
 
 char* getNewStrBetweenTwoChars(const char* orig, char c1, char c2, bool checkEndOfLine, bool checkStartOfLine) {
     int c1Pos = -1;
@@ -535,20 +532,23 @@ bool getFileContent(char* filename, FileContent* fileContent) {
 
     fr = fopen (filename, "r"); /*  Open the file for reading */
     if (fr == NULL)
-    {
+        {
         fprintf(stderr, "File %s does not exist\n", filename);
         return false;
     }
     while(fgets(line, sizeof(line), fr) != NULL)   /* get a word.  done if NULL */
     {
-        lineCopy = (char *) malloc(sizeof(line));
-        strcpy(lineCopy, line);
         /* Debug */
-        fprintf(stderr, "Line is = %s", line);
-        parsedLine = (FileLine*) malloc(sizeof(FileLine));
+        fprintf(stderr, "Line is -->  %s", line);
+        parsedLine = &fileContent->line[arrayIndex];
         memset(parsedLine, 0, sizeof(FileLine));
-        parsedLine->originalLine = lineCopy;
-        parsedLine->lineNumber = lineCounter;
+        parsedLine->originalLine = (char *) malloc(sizeof(line));
+        if (parsedLine->originalLine == NULL){
+            /* TODO: allocation error */
+            exit(1);
+        }
+        memset(parsedLine->originalLine, 0, strlen(parsedLine->originalLine));
+        strcpy(parsedLine->originalLine, line);
 
         errString = lineValidator(parsedLine);
         if (errString != NULL) {
@@ -556,7 +556,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
             PrintSyntaxError(errString, lineCounter);
         }
         if (parsedLine->isEmptyOrComment == false) {
-            fileContent->line[arrayIndex++] = *parsedLine;
+            arrayIndex++;
         }
         lineCounter++;
     }
@@ -564,5 +564,22 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     fclose(fr);  /* close the file prior to exiting the routine */
 
     return isFileOK;
+}
+
+bool initFileContent(FileContent** fileContent) {
+    *fileContent = (FileContent*)malloc(sizeof(FileContent));
+    memset(*fileContent, 0, sizeof(FileContent));
+    if (fileContent == NULL)
+        return false;
+
+    (*fileContent)->line = (FileLine*)malloc(sizeof(FileLine)*MAX_FILE_LINES);
+    if ((*fileContent)->line == NULL)
+        return false;
+    return true;
+}
+
+void freeFileContent(FileContent** fileContent) {
+    free((*fileContent)->line);
+    free(*fileContent);
 }
 

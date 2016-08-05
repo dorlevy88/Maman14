@@ -1,6 +1,14 @@
 #include <stdlib.h>
 #include "assembler.h"
 
+bool init(AssemblyStructure** assembly, FileContent** file) {
+    if (*assembly != NULL)
+        freeAssemblyStructure(assembly);
+    if (*file != NULL) {
+        freeFileContent(file);
+    }
+    return initAssemblyStructure(assembly) && initFileContent(file);
+}
 
 int main(int argc, char **argv) {
     /*
@@ -18,22 +26,26 @@ int main(int argc, char **argv) {
      */
 
     int fileCounter;
-    FileContent* fileContent;
     char* filename;
+    bool results;
+    FileContent* fileContent = NULL;
     AssemblyStructure* assemblyStructure = NULL;
 
     for (fileCounter = 1; fileCounter < argc; ++fileCounter) {
         filename = argv[fileCounter];
-        FreeAssemblyStructureMemory(assemblyStructure);
+        results = init(&assemblyStructure, &fileContent);
+        if (results == false) {
+            PrintProcessStep("Internal Memory issue", filename);
+            exit(0);
+        }
+
         PrintProcessStep("Start processing file", filename);
-        fileContent = (FileContent*)malloc(sizeof(FileContent));
         if (getFileContent(filename, fileContent) == false) { /*Error in the file*/
             PrintProcessStep("Parsing file failed", filename);
             continue;
         }
         PrintProcessStep("Parsing file succeeded", filename);
 
-        assemblyStructure = InitAssemblyStructure();
         if(RunFirstTransition(fileContent, assemblyStructure) == false) {
             PrintProcessStep("Transition one failed", filename);
             continue;

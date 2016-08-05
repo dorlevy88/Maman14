@@ -316,7 +316,6 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
         printAssemblyByte(assembly->dataArray); */
 
 
-
         /* Step: 4 */
         if (line.actionType == DATA || line.actionType == STRING) {
             /* do nothing */

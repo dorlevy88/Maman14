@@ -79,9 +79,9 @@ bool PushBytesFromString(AssemblyBytes* bytes, char* string);
 void printAssemblyByte(AssemblyBytes* bytes);
 
 /* Assembly Structure Init */
-AssemblyStructure* InitAssemblyStructure();
+bool initAssemblyStructure(AssemblyStructure** assembly);
 
-void FreeAssemblyStructureMemory(AssemblyStructure* assembly);
+void freeAssemblyStructure(AssemblyStructure** assembly);
 
 
 /*  Symbol Table Functions */

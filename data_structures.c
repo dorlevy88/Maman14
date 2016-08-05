@@ -61,50 +61,61 @@ void printAssemblyByte(AssemblyBytes* bytes){
     printf("----------------------------------------------------------------------------------------------------\n");
 }
 
-AssemblyStructure* InitAssemblyStructure() {
+bool initAssemblyStructure(AssemblyStructure** assembly) {
     AssemblyBytes* codeBytes;
     AssemblyBytes* dataBytes;
     SymbolsTable* table;
     SymbolRecord* record;
     int* externUsages;
 
-    AssemblyStructure* assembly = (AssemblyStructure*)malloc(sizeof(AssemblyStructure));
-    assembly->startAddress = ASSEMBLY_CODE_START_ADDRESS;
+    (*assembly) = (AssemblyStructure*)malloc(sizeof(AssemblyStructure));
+    if ((*assembly) == NULL)
+        return false;
+    memset((*assembly), 0, sizeof(AssemblyStructure));
+    (*assembly)->startAddress = ASSEMBLY_CODE_START_ADDRESS;
 
     codeBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
+    if (codeBytes == NULL)
+        return false;
     memset(codeBytes, 0, sizeof(AssemblyBytes));
-    assembly->codeArray = codeBytes;
+    (*assembly)->codeArray = codeBytes;
     dataBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
+    if (dataBytes == NULL)
+        return false;
     memset(dataBytes, 0, sizeof(AssemblyBytes));
-    assembly->dataArray = dataBytes;
+    (*assembly)->dataArray = dataBytes;
 
     table = (SymbolsTable*)malloc(sizeof(SymbolsTable));
+    if (table == NULL)
+        return false;
     memset(table, 0, sizeof(SymbolsTable));
     record = (SymbolRecord*)malloc(sizeof(SymbolRecord));
+    if (record == NULL)
+        return false;
     memset(record, 0, sizeof(SymbolRecord));
     externUsages = (int*)malloc(0);
+    if (externUsages == NULL)
+        return false;
     memset(externUsages, 0, 0);
     record->externUsageAddresses = externUsages;
     table->records = record;
     table->size = 1;
-    assembly->symbolsTable = table;
+    (*assembly)->symbolsTable = table;
 
-    return assembly;
+    return true;
 }
 
-void FreeAssemblyStructureMemory(AssemblyStructure* assembly){
-    if (assembly != NULL){
-        if (assembly->codeArray != NULL){
-            free(assembly->codeArray);
-        }
-        if (assembly->dataArray != NULL){
-            free(assembly->dataArray);
-        }
-        if (assembly->symbolsTable->records != NULL){
-            free(assembly->symbolsTable->records);
-        }
-        free(assembly);
+void freeAssemblyStructure(AssemblyStructure** assembly){
+    if ((*assembly)->codeArray != NULL){
+        free((*assembly)->codeArray);
     }
+    if ((*assembly)->dataArray != NULL){
+        free((*assembly)->dataArray);
+    }
+    if ((*assembly)->symbolsTable->records != NULL){
+        free((*assembly)->symbolsTable->records);
+    }
+    free(assembly);
 }
 
 int isLabelExistsInTable(SymbolsTable* table, char* label) {

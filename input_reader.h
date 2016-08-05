@@ -32,12 +32,14 @@ typedef struct FileLine {
 
 typedef struct FileContent {
 
-    FileLine line[MAX_FILE_LINES];
+    FileLine* line;
     int size;
 
 } FileContent;
 
 bool getFileContent(char* filename, FileContent* fileContent) ;
 
+bool initFileContent(FileContent** fileContent);
+void freeFileContent(FileContent** fileContent);
 
 #endif /* MAMAN14_FILEHANDLERS_H */
