@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <memory.h>
+#include <stdio.h>
 #include "transitions.h"
 
 #define CMD_BYTE_BEGIN 5 /* equal to 0b101 in binary */
@@ -308,17 +309,17 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
 
-/*         printf("%s", fileContent->line[i].originalLine); */
+        printf("%s", fileContent->line[i].originalLine);
         FileLine line = fileContent->line[i];
 
 
-        /* TODO:Debug
+        /* TODO:Debug */
 
         printSymbolTable(assembly->symbolsTable);
         printAssemblyByte(assembly->codeArray);
         printAssemblyByte(assembly->dataArray);
 
-         */
+
 
         /* Step: 4 */
         if (line.actionType == DATA || line.actionType == STRING) {
