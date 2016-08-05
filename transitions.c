@@ -316,9 +316,9 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
 
         /* TODO:Debug */
 
-        printSymbolTable(assembly->symbolsTable);
+        /* printSymbolTable(assembly->symbolsTable);
         printAssemblyByte(assembly->codeArray);
-        printAssemblyByte(assembly->dataArray);
+        printAssemblyByte(assembly->dataArray); */
 
 
 
