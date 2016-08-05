@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
-#include "utils.h"
 #include <inttypes.h>
 #include <ctype.h>
 #include "input_reader.h"

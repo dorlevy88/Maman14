@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "utils.h"
+#include <math.h>
 
 
 void PrintSyntaxError(char* errorMsg, int lineNum){
@@ -17,4 +17,12 @@ void PrintCompileWarning(char* errorMsg, char* param, int lineNum){
 
 void PrintProcessStep(char* message, char* param){
     printf("Message - %s, Parameter: %s\n", message, param);
+}
+
+
+int ConvertCompliment2(int num, int size) {
+    if (num < 0){
+        return (int)(pow(2, size) + num);
+    }
+    return num;
 }

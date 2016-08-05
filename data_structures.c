@@ -2,7 +2,6 @@
 #include <memory.h>
 #include <stdlib.h>
 #include "data_structures.h"
-#include "transitions.h"
 
 
 #define DATA_BYTE_SIZE 15

@@ -1,9 +1,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <memory.h>
-#include <printf.h>
 #include "transitions.h"
-#include "utils.h"
 
 
 int buildBinaryCommand(FileLine cmdLine) {
@@ -47,13 +45,6 @@ int buildBinaryCommand(FileLine cmdLine) {
     return binCmd;
 }
 
-int convertCompliment2(int num, int size) {
-    if (num < 0){
-        return (int)(pow(2, size) + num);
-    }
-    return num;
-}
-
 int getBitRangefromInt(int num, int minBit, int maxBit) {
     int res = 0;
     bool isNegative = false;
@@ -78,7 +69,7 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
     switch (operand->addressingType) {
         case NUMBER:
             //add the number
-            binData += convertCompliment2(operand->value, OPERAND_BYTE_SIZE);
+            binData += ConvertCompliment2(operand->value, OPERAND_BYTE_SIZE);
             //shift 2 bits for linker data absolute
             binData <<= 2;
             binData += (int)Absolute;
@@ -122,7 +113,7 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
                 //TODO: Throw error: Dynamic addressing is not relevant for extern labels
             }
             int num = getBitRangefromInt(record->byteCodeForDynamic, operand->minNum, operand->maxNum);
-            num = convertCompliment2(num, OPERAND_BYTE_SIZE);
+            num = ConvertCompliment2(num, OPERAND_BYTE_SIZE);
             binData += num;
             binData <<= 2;
             binData += (int)Absolute;
