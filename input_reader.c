@@ -66,7 +66,7 @@ char* getOperand(char* operandStr, Operand* operand) {
             return NULL;
         }
         else {
-            strcat("Expected register number between 0 and 7, received - ", operandStr[1]);
+            return "Expected register number between 0 and 7, received register number out of bound";
         }
     }
     /* Dinami Yashir */
@@ -395,7 +395,7 @@ char* lineValidator(FileLine* parsedLine) {
     if (string[strSize - 1] == ':') { /* Label Found */
 
         if (strSize > MAX_LABEL_SIZE + 1){ /* TODO: should we keep this???? */
-            return strcat("label size is more than allowed - ", MAX_LABEL_SIZE);
+            return "label size is more than allowed";
         }
         char* parsedLabel = (char*) malloc(strSize - 1);
         memcpy(parsedLabel, string, strSize - 1);  /* get the label */
