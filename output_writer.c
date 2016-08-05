@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <printf.h>
 #include <math.h>
 #include <memory.h>
 #include "output_writer.h"

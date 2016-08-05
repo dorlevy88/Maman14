@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <ctype.h>
+#include <string.h>
 #include "input_reader.h"
 
 bool isLabelValid(char* label){
@@ -42,20 +43,84 @@ int getIntFromString(char *string){
     return (int)num;
 }
 
+char* getNewSubString(const char* pos, int size) {
+    size_t sizeT;
+    char* res;
+
+    sizeT = (size_t)size;
+    res = (char*)malloc(sizeT);
+    memset(res, 0, sizeT);
+    strncpy(res, pos, sizeT);
+    res[sizeT - 1] = '\0';
+    return res;
+}
+
+char* getNewSubStringFromString(const char* orig, int pos1, int pos2) {
+    size_t sizeT;
+    char* res;
+    const char* pos;
+
+    sizeT = (size_t)pos2 - pos1;
+    res = (char*)malloc(sizeT);
+    memset(res, 0, sizeT);
+    pos = &orig[pos1] + 1;
+    strncpy(res, pos, sizeT);
+    res[sizeT - 1] = '\0';
+    return res;
+}
+
+
+
+char* getNewStrBetweenTwoChars(const char* orig, char c1, char c2, bool checkEndOfLine, bool checkStartOfLine) {
+    int c1Pos = -1;
+    int c2Pos = -1;
+    int i;
+    char* string;
+
+    for (i = 0; i < strlen(orig) ; i++) {
+        if (c1Pos == -1 && c2Pos == -1 && orig[i] != c1){ /*  before word - did not find any quote yet */
+            if (checkStartOfLine && orig[i] != '\0' && orig[i] != '\t' && orig[i] != ' '){
+                return NULL;
+            }
+        }
+        else if (c1Pos == -1 && c2Pos == -1 && orig[i] == c1){ /* got to first quotes */
+            c1Pos = i;
+        }
+        else if (c1Pos > -1 && c2Pos == -1 && orig[i] == c2){ /* got second quote */
+            c2Pos = i;
+        }
+        else if (checkEndOfLine && c1Pos > -1 && c2Pos > -1 && /*  after second quote */
+                 (orig[i] != '\n' && orig[i] != '\r' && orig[i] != '\0' && orig[i] != '\t' && orig[i] != ' ')){
+            return NULL;
+        }
+    }
+    if (c2Pos > c1Pos && c1Pos > -1){
+        string = getNewSubStringFromString(orig, c1Pos, c2Pos);
+        return string;
+    }
+    return NULL;
+}
+
 char* getOperand(char* operandStr, Operand* operand) {
-    size_t minDashLocation;
-    char* openBracketLocationString;
-    char* closeBracketLocationString;
     int num;
     char* label;
-    char* minNum;
-    char* maxNum;
-    char* maxDashLocationString;
-    int numToCheck;
-    int numToCheckMax;
 
-    openBracketLocationString = strchr(operandStr, '[');
-    closeBracketLocationString = strchr(operandStr, ']');
+    int operandStrSize;
+    int openBracketPos;
+    int closeBracketPos;
+    int dashPos;
+    int minNum;
+    int maxNum;
+    char* openBracketPosStr;
+    char* closeBracketPosStr;
+    char* dashPosStr;
+    char* minNumStr;
+    char* maxNumStr;
+
+    operandStrSize = strlen(operandStr);
+    openBracketPosStr = strchr(operandStr, '[');
+    closeBracketPosStr = strchr(operandStr, ']');
+    dashPosStr = strchr(operandStr, '-');
 
     /* Debug */
     /* fprintf(stderr, "Line is = %s\n", operandStr); */
@@ -85,44 +150,48 @@ char* getOperand(char* operandStr, Operand* operand) {
         }
     }
     /* Dinami Yashir */
-    else if (openBracketLocationString != NULL && closeBracketLocationString != NULL) { /* Check we should be in Dinami Yashir */
+    else if (openBracketPosStr != NULL && closeBracketPosStr != NULL && dashPosStr != NULL) { /* Check we should be in Dinami Yashir */
         operand->addressingType = DYNAMIC;
-        if (closeBracketLocationString > openBracketLocationString &&
-                operandStr[0] != '[' && /* Has label instead of [ */
-                strchr(operandStr, '[') - operandStr <= MAX_LABEL_SIZE && /* TODO: do we still need it? */
-                operandStr[strlen(operandStr) - 1] == ']') { /* Check '[' before ']', '[' not in first char, ']' is at the end, Label size is less then max size */
-            label = (char*)malloc(strchr(operandStr, '[') - operandStr);
-            memcpy(label, operandStr, strchr(operandStr, '[') - operandStr); /*  copy label - everything before '[' */
+
+        openBracketPos = (int) (openBracketPosStr - operandStr);
+        closeBracketPos = (int) (closeBracketPosStr - operandStr);
+        dashPos = (int) (dashPosStr - operandStr);
+
+        if (closeBracketPos > dashPos && dashPos > openBracketPos && /* Check '[' then '-' then ']' */
+            openBracketPos != 0 &&         /* Has label instead of [ */
+            openBracketPos <= MAX_LABEL_SIZE && /* TODO: do we still need it? Label size is less then max size */
+            closeBracketPos == operandStrSize - 1) { /* ']' is at the end*/
+
+            label = getNewSubString(operandStr, openBracketPos);
             if (!isLabelValid(label)) {
                 return strcat("Label is not valid - ", label);
             }
-            operand->label = label;
+            minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);
+            if (minNumStr != NULL) {
+                minNum = getIntFromString(minNumStr);
+                free(minNumStr);
+            }
+            else {
+                return "Failed Parsing Dynamic  addressing";
+            }
+            maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);
+            if (maxNumStr != NULL) {
+                maxNum = getIntFromString(maxNumStr);
+                free(maxNumStr);
+            }
+            else {
+                return "Failed Parsing Dynamic  addressing";
+            }
 
-            /*  get min number */
-            minDashLocation = strchr(openBracketLocationString, '-') - openBracketLocationString; /* get the char num where - exists */
-            minNum = (char*)malloc(minDashLocation - 1);
-            strncpy(minNum, openBracketLocationString + 1, minDashLocation - 1);
-            numToCheck = getIntFromString(minNum);
-            if (numToCheck != INVALID_NUM_TOKEN ||
-                numToCheck > MAX_DYNAMIC_OPERAND) { /* Can't be more than the num 13 */
-                operand->minNum = numToCheck;
-            }
-            else {
+            if (minNum == INVALID_NUM_TOKEN || minNum > MAX_DYNAMIC_OPERAND ||
+                    maxNum == INVALID_NUM_TOKEN || maxNum > MAX_DYNAMIC_OPERAND) {
                 return "Operand num is out of bound";
             }
-            /*  get max number */
-            maxDashLocationString = strchr(openBracketLocationString, '-');
-            maxNum = (char*)malloc(strlen(maxDashLocationString) - 2);
-            strncpy(maxNum, maxDashLocationString + 1, strlen(maxDashLocationString) - 2);
-            numToCheckMax = getIntFromString(maxNum);
-            if (numToCheckMax != INVALID_NUM_TOKEN ||
-                numToCheckMax > MAX_DYNAMIC_OPERAND) { /* Can't be more than the num 13 */
-                operand->maxNum = numToCheckMax;
-                return NULL;
-            }
-            else {
-                return "Operand num is out of bound";
-            }
+
+            operand->label = label;
+            operand->minNum = minNum;
+            operand->maxNum = maxNum;
+            return NULL;
         }
     }
     /* Yashir */
@@ -234,6 +303,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
 
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
+
     for (i = 0; i < strlen(rawOperandString) ; i++) {
         if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ /*  before word - did not find any quote yet */
             if (rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' '){
@@ -431,13 +501,7 @@ char* lineValidator(FileLine* parsedLine) {
     /* Handle labels */
     strSize = strlen(string);
     if (string[strSize - 1] == ':') { /* Label Found */
-
-        if (strSize > MAX_LABEL_SIZE + 1){ /* TODO: should we keep this???? */
-            return "label size is more than allowed";
-        }
-        parsedLabel = (char*) malloc(strSize - 1);
-        strncpy(parsedLabel, string, strSize - 1);  /* get the label */
-
+        parsedLabel = getNewSubString(string, strSize - 1);
         if (isLabelValid(parsedLabel)){
             parsedLine->label = parsedLabel;
         }
@@ -480,7 +544,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
         lineCopy = (char *) malloc(sizeof(line));
         strcpy(lineCopy, line);
         /* Debug */
-        /* fprintf(stderr, "Line is = %s\n", line); */
+        fprintf(stderr, "Line is = %s", line);
         parsedLine = (FileLine*) malloc(sizeof(FileLine));
         memset(parsedLine, 0, sizeof(FileLine));
         parsedLine->originalLine = lineCopy;
