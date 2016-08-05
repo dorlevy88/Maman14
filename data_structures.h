@@ -81,6 +81,8 @@ void printAssemblyByte(AssemblyBytes* bytes);
 /* Assembly Structure Init */
 AssemblyStructure* InitAssemblyStructure();
 
+void FreeAssemlyStructureMemory(AssemblyStructure* assembly);
+
 
 /*  Symbol Table Functions */
 int isLabelExistsInTable(SymbolsTable* table, char* label);

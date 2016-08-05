@@ -90,6 +90,15 @@ AssemblyStructure* InitAssemblyStructure() {
     return assembly;
 }
 
+void FreeAssemlyStructureMemory(AssemblyStructure* assembly){
+    if (assembly != NULL){
+        free(assembly->codeArray);
+        free(assembly->dataArray);
+        free(assembly->symbolsTable);
+        free(assembly);
+    }
+}
+
 int isLabelExistsInTable(SymbolsTable* table, char* label) {
     int i;
     for (i = 0; i < table->recordSize; ++i) {

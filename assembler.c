@@ -20,9 +20,9 @@ int main(int argc, char **argv) {
     int fileCounter;
     FileContent* fileContent;
     char* filename;
-    AssemblyStructure* assemblyStructure;
+    AssemblyStructure* assemblyStructure = NULL;
     for (fileCounter = 1; fileCounter < argc; ++fileCounter) {
-
+        FreeAssemlyStructureMemory(assemblyStructure);
         filename = argv[fileCounter];
         PrintProcessStep("Start processing file", filename);
         fileContent = (FileContent*)malloc(sizeof(FileContent));
