@@ -17,7 +17,8 @@ bool PushByteFromInt(AssemblyBytes* bytes, int byte) {
 }
 
 bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize) {
-    for (int i = 0; i < arraySize; ++i) {
+    int i;
+    for (i = 0; i < arraySize; ++i) {
         if(PushByteFromInt(bytes, ConvertCompliment2(array[i], DATA_BYTE_SIZE)) == false) {
             return false;
         }
@@ -52,7 +53,8 @@ long decimalToBinary(int n) {
 
 void printAssemblyByte(AssemblyBytes* bytes){
     printf("----------------------------------------------------------------------------------------------------\n");
-    for (int i = 0; i < bytes->size; i++) {
+    int i;
+    for (i = 0; i < bytes->size; i++) {
         printf("%d\t%015ld\n", i, decimalToBinary(bytes->array[i]));
     }
     printf("----------------------------------------------------------------------------------------------------\n");
@@ -130,7 +132,8 @@ bool AddExternUsageAddress(SymbolRecord* record, int usedAddress){
 void printSymbolTable(SymbolsTable* table){
     printf("----------------------------------------------------------------------------------------------------\n");
     printf("label\taddress\tisExternal\tisCommand\tisEntry\tbyteCodeForDynamic\n");
-    for (int i = 0; i < table->recordSize ; i++) {
+    int i;
+    for (i = 0; i < table->recordSize ; i++) {
         printf("%s\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n", table->records[i].label, table->records[i].address,
                table->records[i].isExternal, table->records[i].isCommand, table->records[i].isEntry, table->records[i].byteCodeForDynamic);
     }

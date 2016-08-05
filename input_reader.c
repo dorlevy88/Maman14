@@ -7,9 +7,10 @@
 
 
 bool isLabelValid(char* label){
+    int i;
     if (strlen(label) > 0){ /* check label is not empty */
         if (isalpha(label[0])){ /*  Check first char is letter */
-            for (int i = 1; i < strlen(label); i++) {
+            for (i = 1; i < strlen(label); i++) {
                 if ((!(isalpha(label[i])) && !(isdigit(label[i]))) ||  /*  All chars are digits or letters */
                     i == MAX_LABEL_SIZE) {  /* Size of Label is less than MAX_LABEL_SIZE (30) */
                     return false;
@@ -176,7 +177,8 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
     int dataSize = 1;
-    for (int i = 1; i < strlen(rawOperandsString) - 1; i++){
+    int i;
+    for (i = 1; i < strlen(rawOperandsString) - 1; i++){
         if (rawOperandsString[i] == ',') {
             dataSize++;
         }
@@ -184,7 +186,7 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     int* data = (int*)malloc(dataSize * sizeof(int));
     char* numString = strtok(rawOperandsString, " ,\t\n");
     int numberInt;
-    for (int i=0; i < dataSize; i++){
+    for (i=0; i < dataSize; i++){
         numberInt = getIntFromString(numString);
         if (numberInt != INVALID_NUM_TOKEN){
             data[i] = numberInt;
