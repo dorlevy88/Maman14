@@ -47,6 +47,8 @@ int main(int argc, char **argv) {
         }
         PrintProcessStep("Writing file succeeded", filename);
         FreeAssemlyStructureMemory(assemblyStructure);
+        free(fileContent->line);
+        free(fileContent);
     }
     return 0;
 }

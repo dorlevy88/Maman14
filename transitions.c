@@ -306,11 +306,12 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     int i;
     int tmpIc = assembly->ic;
     assembly->ic = assembly->startAddress;
+    FileLine line;
 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
 
         printf("%s", fileContent->line[i].originalLine);
-        FileLine line = fileContent->line[i];
+        line = fileContent->line[i];
 
 
         /* TODO:Debug */

@@ -88,6 +88,7 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
         if (table->records[i].isEntry == true) {
             address = translateAddressToSpecial8Base(table->records[i].address, 3);
             fprintf(fp, "%s %s\n", table->records[i].label, address);
+            free(address);
         }
     }
     fclose(fp);
@@ -108,6 +109,7 @@ bool writeExtOutputFile(SymbolsTable *table, char* filename) {
             for (j = 0; j < table->records[i].externUsages; ++j) {
                 address = translateAddressToSpecial8Base(table->records[i].externUsageAddresses[j], 3);
                 fprintf(fp, "%s %s\n", table->records[i].label, address);
+                free(address);
             }
         }
     }
@@ -131,16 +133,22 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2);
     translatedDataArraySize = translateAddressToSpecial8Base(assembly->dataArray->size, 2);
     fprintf(fp, "%s %s\n", translatedCodeArraySize, translatedDataArraySize);
+    free(translatedCodeArraySize);
+    free(translatedDataArraySize);
     addressCounter = assembly->startAddress;
     for (i = 0; i < assembly->codeArray->size; ++i) {
         address = translateAddressToSpecial8Base(addressCounter++, 3);
         command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
         fprintf(fp, "%s %s\n", address, command);
+        free(address);
+        free(command);
     }
     for (i = 0; i < assembly->dataArray->size; ++i) {
         address = translateAddressToSpecial8Base(addressCounter++, 3);
         command = translateCommandToSpecial8Base(assembly->dataArray->array[i]);
         fprintf(fp, "%s %s\n", address, command);
+        free(address);
+        free(command);
     }
     fclose(fp);
     return true;
@@ -171,6 +179,6 @@ bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
         /* TODO: check if file exists and delete it */
         return false;
     }
-
+    free(filename);
     return true;
 }
