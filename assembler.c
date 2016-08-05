@@ -18,17 +18,20 @@ int main(int argc, char **argv) {
      */
 
     int fileCounter;
+    FileContent* fileContent;
+    char* filename;
+    AssemblyStructure* assemblyStructure;
     for (fileCounter = 1; fileCounter < argc; ++fileCounter) {
 
-        char* filename = argv[fileCounter];
+        filename = argv[fileCounter];
         PrintProcessStep("Start processing file", filename);
-        FileContent* fileContent = (FileContent*)malloc(sizeof(FileContent));
+        fileContent = (FileContent*)malloc(sizeof(FileContent));
         if (getFileContent(filename, fileContent) == false) { /*Error in the file*/
             PrintProcessStep("Parsing file failed", filename);
             continue;
         }
 
-        AssemblyStructure* assemblyStructure = InitAssemblyStructure();
+        assemblyStructure = InitAssemblyStructure();
         if(RunFirstTransition(fileContent, assemblyStructure) == false) {
             PrintProcessStep("Transition one failed", filename);
             continue;
