@@ -9,8 +9,8 @@ set(SOURCE_FILES
         input_reader.h
         utils.c
         utils.h
-        output_reader.c
-        output_reader.h
+        output_writer.c
+        output_writer.h
         data_structures.c
         data_structures.h transitions.c transitions.h definitions.h)
 

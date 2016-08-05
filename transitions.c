@@ -234,10 +234,12 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
                 PrintCompileError(ERR_RAM_OVERFLOW, "Data Array", line.lineNumber);
                 return false;
             }
-
-            if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
-                PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
-                return false;
+            if (isLabelExists) {
+                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false,
+                                       firstByte) == false) {
+                    PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
+                    return false;
+                }
             }
             assembly->dc += calcDataSize;
         }

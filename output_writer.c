@@ -2,7 +2,7 @@
 #include <printf.h>
 #include <math.h>
 #include <memory.h>
-#include "output_reader.h"
+#include "output_writer.h"
 
 char* getFilenameNoExtension(char *filename) {
     char *dot = strrchr(filename, '.');
@@ -127,7 +127,9 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
     //TODO: implement
 
-    char* filename = getFilenameNoExtension(fullFilename);
+    char* filename = (char*)malloc(sizeof(fullFilename));
+    strcpy(filename, fullFilename);
+    filename = getFilenameNoExtension(filename);
 
     if (writeEntOutputFile(assembly->symbolsTable, filename) == false) {
         //TODO: Throw error file cannot be created
