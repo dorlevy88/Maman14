@@ -16,7 +16,7 @@ void PrintCompileWarning(char* errorMsg, char* param, int lineNum){
 
 
 void PrintProcessStep(char* message, char* param){
-    printf("Message - %s, Parameter: %s\n", message, param);
+    fprintf(stdout, "Message - %s, Parameter: %s\n", message, param);
 }
 
 
