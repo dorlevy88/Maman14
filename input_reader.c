@@ -5,7 +5,6 @@
 #include <ctype.h>
 #include "input_reader.h"
 
-
 bool isLabelValid(char* label){
     int i;
     if (strlen(label) > 0){ /* check label is not empty */
@@ -210,12 +209,12 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
         }
     }
     data = (int*)malloc(dataSize * sizeof(int));
-    numString = strtok(rawOperandsString, " ,\t\n");
+    numString = strtok(rawOperandsString, " ,\t\n\r");
     for (i=0; i < dataSize; i++){
         numberInt = getIntFromString(numString);
         if (numberInt != INVALID_NUM_TOKEN){
             data[i] = numberInt;
-            numString = strtok(NULL, " ,\t\n");
+            numString = strtok(NULL, " ,\t\n\r");
         }
         else {
             return "Data integer is out of bounds";
@@ -248,7 +247,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
             secondQuotesLocation = i;
         }
         else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && /*  after second quote */
-                (rawOperandString[i] != '\n' && rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
+                (rawOperandString[i] != '\n' && rawOperandString[i] != '\r' && rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
             return "String has data after closing double quotes";
         }
     }
@@ -270,7 +269,7 @@ char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
-    label = strtok(rawOperandString, " \t\n");
+    label = strtok(rawOperandString, " \t\n\r");
 
     if (isLabelValid(label)){
         parsedLine->firstOperValue->entryOrExtern = label;
@@ -417,7 +416,7 @@ char* lineValidator(FileLine* parsedLine) {
     char* lineToCheck = (char*)malloc(strlen(parsedLine->originalLine));
     strcpy(lineToCheck, parsedLine->originalLine);
 
-    string = strtok(lineToCheck, " \t\n"); /* Get first string */
+    string = strtok(lineToCheck, " \t\n\r"); /* Get first string */
 
     /* Handle empty lines */
     if (string == NULL){
@@ -446,7 +445,7 @@ char* lineValidator(FileLine* parsedLine) {
             return "Invalid label";
         }
 
-        string = strtok(NULL, " \t\n"); /* Get action string */
+        string = strtok(NULL, " \t\n\r"); /* Get action string */
         strSize = strlen(string);
 
     }
@@ -455,7 +454,7 @@ char* lineValidator(FileLine* parsedLine) {
     strcpy(actionStr, string);
     parsedLine->action = actionStr;      /* get the action */
 
-    rawOperandsString = strtok(NULL, "\n"); /*  get remaining of line */
+    rawOperandsString = strtok(NULL, "\n\r"); /*  get remaining of line */
 
     return validateActionAndOperands(rawOperandsString, parsedLine);
 }
