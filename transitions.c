@@ -3,7 +3,7 @@
 #include <memory.h>
 #include "transitions.h"
 
-#define CMD_BYTE_BEGIN 0b101
+#define CMD_BYTE_BEGIN 5 /* equal to 0b101 in binary */
 
 int buildBinaryCommand(FileLine cmdLine) {
     /*  101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */

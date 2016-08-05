@@ -29,10 +29,11 @@ bool isLabelValid(char* label){
 
 int getIntFromString(char *string){
     char* ptr;
+    intmax_t num;
     if (strlen(string) == 0){ /* Check string is not empty */
         return INVALID_NUM_TOKEN;
     }
-    intmax_t num = strtoimax(string, &ptr, 10); /* cast string to number */
+    num = strtoimax(string, &ptr, 10); /* cast string to number */
     if (num < MIN_NUM_SIZE || num > MAX_NUM_SIZE) { /* check number could be casted to 15 bits array */
         return INVALID_NUM_TOKEN;
     }
@@ -51,6 +52,8 @@ char* getOperand(char* operandStr, Operand* operand) {
     char* minNum;
     char* maxNum;
     char* maxDashLocationString;
+    int numToCheck;
+    int numToCheckMax;
 
     openBracketLocationString = strchr(operandStr, '[');
     closeBracketLocationString = strchr(operandStr, ']');
@@ -100,7 +103,7 @@ char* getOperand(char* operandStr, Operand* operand) {
             minDashLocation = strchr(openBracketLocationString, '-') - openBracketLocationString; /* get the char num where - exists */
             minNum = (char*)malloc(minDashLocation - 1);
             strncpy(minNum, openBracketLocationString + 1, minDashLocation - 1);
-            int numToCheck = getIntFromString(minNum);
+            numToCheck = getIntFromString(minNum);
             if (numToCheck != INVALID_NUM_TOKEN ||
                 numToCheck > MAX_DYNAMIC_OPERAND) { /* Can't be more than the num 13 */
                 operand->minNum = numToCheck;
@@ -112,7 +115,7 @@ char* getOperand(char* operandStr, Operand* operand) {
             maxDashLocationString = strchr(openBracketLocationString, '-');
             maxNum = (char*)malloc(strlen(maxDashLocationString) - 2);
             strncpy(maxNum, maxDashLocationString + 1, strlen(maxDashLocationString) - 2);
-            int numToCheckMax = getIntFromString(maxNum);
+            numToCheckMax = getIntFromString(maxNum);
             if (numToCheckMax != INVALID_NUM_TOKEN ||
                 numToCheckMax > MAX_DYNAMIC_OPERAND) { /* Can't be more than the num 13 */
                 operand->maxNum = numToCheckMax;
@@ -208,7 +211,6 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     }
     data = (int*)malloc(dataSize * sizeof(int));
     numString = strtok(rawOperandsString, " ,\t\n");
-    numberInt;
     for (i=0; i < dataSize; i++){
         numberInt = getIntFromString(numString);
         if (numberInt != INVALID_NUM_TOKEN){
@@ -411,6 +413,7 @@ char* lineValidator(FileLine* parsedLine) {
     char* parsedLabel;
     char* actionStr;
     char* rawOperandsString;
+    size_t strSize;
     char* lineToCheck = (char*)malloc(strlen(parsedLine->originalLine));
     strcpy(lineToCheck, parsedLine->originalLine);
 
@@ -427,7 +430,7 @@ char* lineValidator(FileLine* parsedLine) {
     }
 
     /* Handle labels */
-    size_t strSize = strlen(string);
+    strSize = strlen(string);
     if (string[strSize - 1] == ':') { /* Label Found */
 
         if (strSize > MAX_LABEL_SIZE + 1){ /* TODO: should we keep this???? */
@@ -465,6 +468,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     bool isFileOK = true;
     char* lineCopy;
     char* errString;
+    FileLine* parsedLine;
 
     fr = fopen (filename, "r"); /*  Open the file for reading */
     if (fr == NULL)
@@ -478,7 +482,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
         strcpy(lineCopy, line);
         /* Debug */
         fprintf(stderr, "Line is = %s\n", line);
-        FileLine* parsedLine = (FileLine*) malloc(sizeof(FileLine));
+        parsedLine = (FileLine*) malloc(sizeof(FileLine));
         memset(parsedLine, 0, sizeof(FileLine));
         parsedLine->originalLine = lineCopy;
         parsedLine->lineNumber = lineCounter;

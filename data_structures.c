@@ -53,8 +53,8 @@ long decimalToBinary(int n) {
 }
 
 void printAssemblyByte(AssemblyBytes* bytes){
-    printf("----------------------------------------------------------------------------------------------------\n");
     int i;
+    printf("----------------------------------------------------------------------------------------------------\n");
     for (i = 0; i < bytes->size; i++) {
         printf("%d\t%015ld\n", i, decimalToBinary(bytes->array[i]));
     }
@@ -62,20 +62,25 @@ void printAssemblyByte(AssemblyBytes* bytes){
 }
 
 AssemblyStructure* InitAssemblyStructure() {
+    AssemblyBytes* codeBytes;
+    AssemblyBytes* dataBytes;
+    SymbolsTable* table;
+    SymbolRecord* record;
+    int* externUsages;
 
     AssemblyStructure* assembly = (AssemblyStructure*)malloc(sizeof(AssemblyStructure));
     assembly->startAddress = ASSEMBLY_CODE_START_ADDRESS;
 
-    AssemblyBytes* codeBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
+    codeBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
     assembly->codeArray = codeBytes;
-    AssemblyBytes* dataBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
+    dataBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
     assembly->dataArray = dataBytes;
 
-    SymbolsTable* table = (SymbolsTable*)malloc(sizeof(SymbolsTable));
+    table = (SymbolsTable*)malloc(sizeof(SymbolsTable));
     memset(table, 0, sizeof(SymbolsTable));
-    SymbolRecord* record = (SymbolRecord*)malloc(sizeof(SymbolRecord));
+    record = (SymbolRecord*)malloc(sizeof(SymbolRecord));
     memset(record, 0, sizeof(SymbolRecord));
-    int* externUsages = (int*)malloc(0);
+    externUsages = (int*)malloc(0);
     memset(externUsages, 0, 0);
     record->externUsageAddresses = externUsages;
     table->records = record;
@@ -96,7 +101,8 @@ int isLabelExistsInTable(SymbolsTable* table, char* label) {
 }
 
 bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic) {
-    int labelPos = isLabelExistsInTable(table, label);
+    int labelPos;
+    labelPos = isLabelExistsInTable(table, label);
     if(labelPos != LABEL_NOT_EXISTS) {
         return false;
     }
@@ -115,7 +121,8 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
 }
 
 bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry){
-    int labelPos = isLabelExistsInTable(table, label);
+    int labelPos;
+    labelPos = isLabelExistsInTable(table, label);
     if (labelPos == LABEL_NOT_EXISTS) {
         return false;
     }
@@ -132,9 +139,9 @@ bool AddExternUsageAddress(SymbolRecord* record, int usedAddress){
 }
 
 void printSymbolTable(SymbolsTable* table){
-    printf("----------------------------------------------------------------------------------------------------\n");
-    printf("label\taddress\tisExternal\tisCommand\tisEntry\tbyteCodeForDynamic\n");
     int i;
+    printf("----------------------------------------------------------------------------------------------------\n");
+    printf("label\taddress\tisExternal\tisCommand\tisEntry\tbyteCodeForDynamic\n");\
     for (i = 0; i < table->recordSize ; i++) {
         printf("%s\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n", table->records[i].label, table->records[i].address,
                table->records[i].isExternal, table->records[i].isCommand, table->records[i].isEntry, table->records[i].byteCodeForDynamic);
