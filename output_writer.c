@@ -159,12 +159,13 @@ bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
     filename = (char*)malloc(sizeof(fullFilename));
     strcpy(filename, fullFilename);
     filename = getFilenameNoExtension(filename);
-
+    printf("ENT file");
     if (writeEntOutputFile(assembly->symbolsTable, filename) == false) {
         /* TODO: Throw error file cannot be created */
         /* TODO: check if file exists and delete it */
         return false;
     }
+    printf("EXT file");
 
     filename = getFilenameNoExtension(filename);
     if (writeExtOutputFile(assembly->symbolsTable, filename) == false) {
@@ -173,6 +174,7 @@ bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
         return false;
     }
 
+    printf("OB file");
     filename = getFilenameNoExtension(filename);
     if(writeObOutputFile(assembly, filename) == false) {
         /* TODO: Throw error file cannot be created */

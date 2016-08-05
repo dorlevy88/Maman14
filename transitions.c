@@ -304,9 +304,9 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     11.3 extern symbols table
     11.4 symbols table with entry points marks */
     int i;
+    FileLine line;
     int tmpIc = assembly->ic;
     assembly->ic = assembly->startAddress;
-    FileLine line;
 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
 
