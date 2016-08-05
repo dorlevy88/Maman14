@@ -12,6 +12,6 @@ set(SOURCE_FILES
         output_writer.c
         output_writer.h
         data_structures.c
-        data_structures.h transitions.c transitions.h definitions.h)
+        data_structures.h transitions.c transitions.h definitions.h assembler.h)
 
 add_executable(assembler ${SOURCE_FILES})

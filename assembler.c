@@ -1,7 +1,5 @@
 #include <stdlib.h>
-#include "output_writer.h"
-#include "input_reader.h"
-#include "transitions.h"
+#include "assembler.h"
 
 
 int main(int argc, char **argv) {
