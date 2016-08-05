@@ -9,7 +9,7 @@
 #define ASSEMBLY_CODE_START_ADDRESS 100
 
 
-//Structs definitions
+/* Structs definitions */
 typedef struct SymbolRecord {
     char* label;
     int address;
@@ -51,25 +51,25 @@ typedef struct Operand {
 
     OperandAddressingType addressingType;
 
-    //in case of command
-    int registerNum;  //register addressing
-    int value;                  //number addressing - #3 -> 3
-    char* label;                //direct\dynamic addressing - X[1-6] -> X
-    int maxNum;                 //dynamic addressing max position - X[1-6] -> 6
-    int minNum;                 //dynamic addressing min position - X[1-6] -> 1
+    /* in case of command */
+    int registerNum;  /* register addressing */
+    int value;                  /* number addressing - #3 -> 3 */
+    char* label;                /* direct\dynamic addressing - X[1-6] -> X */
+    int maxNum;                 /* dynamic addressing max position - X[1-6] -> 6 */
+    int minNum;                 /* dynamic addressing min position - X[1-6] -> 1 */
 
-    //in case of .data\.string
-    int* data; // could be multiple int in case of .data
+    /* in case of .data\.string */
+    int* data; /*  could be multiple int in case of .data */
     int dataSize;
-    char* string; // only one string in case of .string
+    char* string; /*  only one string in case of .string */
 
-    //in case .entry\.extern
-    char* entryOrExtern; // label of entry/extern
+    /* in case .entry\.extern */
+    char* entryOrExtern; /*  label of entry/extern */
 
 } Operand;
 
 
-//Assembly Bytes Functions
+/* Assembly Bytes Functions */
 bool PushByteFromInt(AssemblyBytes* bytes, int byte);
 
 bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize);
@@ -78,21 +78,19 @@ bool PushBytesFromString(AssemblyBytes* bytes, char* string);
 
 void printAssemblyByte(AssemblyBytes* bytes);
 
-//Assembly Structure Init
+/* Assembly Structure Init */
 AssemblyStructure* InitAssemblyStructure();
 
 
-// Symbol Table Functions
+/*  Symbol Table Functions */
 int isLabelExistsInTable(SymbolsTable* table, char* label);
 
 bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic);
 
 bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry);
 
-//bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int byteCodeForDynamic);
-
 bool AddExternUsageAddress(SymbolRecord* record, int usedAddress);
 
 void printSymbolTable(SymbolsTable* table);
 
-#endif //MAMAN14_DATASTRUCTURES_H
+#endif /* MAMAN14_DATASTRUCTURES_H */

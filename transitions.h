@@ -15,4 +15,4 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly);
 
 bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly);
 
-#endif //MAMAN14_TRANSITIONS_H
+#endif /* MAMAN14_TRANSITIONS_H */

@@ -11,7 +11,7 @@
 #define MIN_NUM_SIZE -16384
 #define MAX_NUM_SIZE 16384
 #define INVALID_NUM_TOKEN -999999
-#define MAX_DYNAMIC_OPERAND 13 //max exact number
+#define MAX_DYNAMIC_OPERAND 13 /* max exact number */
 
 
 typedef struct FileLine {
@@ -40,4 +40,4 @@ typedef struct FileContent {
 bool getFileContent(char* filename, FileContent* fileContent) ;
 
 
-#endif //MAMAN14_FILEHANDLERS_H
+#endif /* MAMAN14_FILEHANDLERS_H */

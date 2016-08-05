@@ -1,14 +1,14 @@
 #ifndef MAMAN14_DEFINITIONS_H
 #define MAMAN14_DEFINITIONS_H
 
-//Defines for Compiler Error Strings
+/* Defines for Compiler Error Strings */
 #define ERR_RAM_OVERFLOW "The program is too big for the computer RAM"
 #define ERR_LABEL_DEFINED_TWICE "The label defined twice"
 #define ERR_LABEL_NOT_DEFINED "The label definition doesn't exists"
 #define WARN_LABEL_IN_BAD_LOCATION "Label is not allowed on .extern or .entry"
 
 
-//Defining enums
+/* Defining enums */
 typedef enum ActionTypes {
     MOV = 0,
     CMP = 1,
@@ -36,16 +36,16 @@ typedef enum ActionTypes {
 } ActionTypes;
 
 typedef enum OperandAddressingType {
-    NUMBER = 0, //Miyadi
-    DIRECT = 1, //Yashir
-    DYNAMIC = 2, //Miyadi Dinami
-    REGISTER = 3 //Oger Yashir
+    NUMBER = 0, /* Miyadi */
+    DIRECT = 1, /* Yashir */
+    DYNAMIC = 2, /* Miyadi Dinami */
+    REGISTER = 3 /* Oger Yashir */
 } OperandAddressingType;
 
 typedef enum CommandAREType {
-    Absolute = 0,       //A
-    Relocatable = 2,    //R
-    External = 1        //E
+    Absolute = 0,       /* A */
+    Relocatable = 2,    /* R */
+    External = 1        /* E */
 } CommandAREType;
 
-#endif //MAMAN14_DEFINITIONS_H
+#endif /* MAMAN14_DEFINITIONS_H */

@@ -6,4 +6,4 @@
 
 bool WriteAllOutputFiles(AssemblyStructure* assembly, char* filename);
 
-#endif //MAMAN14_OUTPUTFILES_H
+#endif //MAMAN14_OUTPUTFILES_H */

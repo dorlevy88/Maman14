@@ -2,6 +2,7 @@
 #include <memory.h>
 #include <stdlib.h>
 #include "data_structures.h"
+#include "utils.h"
 
 
 #define DATA_BYTE_SIZE 15
@@ -17,7 +18,7 @@ bool PushByteFromInt(AssemblyBytes* bytes, int byte) {
 
 bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize) {
     for (int i = 0; i < arraySize; ++i) {
-        if(PushByteFromInt(bytes, convertCompliment2(array[i], DATA_BYTE_SIZE)) == false) {
+        if(PushByteFromInt(bytes, ConvertCompliment2(array[i], DATA_BYTE_SIZE)) == false) {
             return false;
         }
     }
@@ -95,7 +96,7 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
     if(labelPos != LABEL_NOT_EXISTS) {
         return false;
     }
-    if (table->recordSize == table->size) { //Allocate additional space to the array
+    if (table->recordSize == table->size) { /* Allocate additional space to the array */
         table->records = (SymbolRecord *) realloc(table->records, table->size + (NEW_CHUNK_SIZE * sizeof(SymbolRecord)));
         table->size += NEW_CHUNK_SIZE;
     }
@@ -118,19 +119,6 @@ bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry){
     table->records[labelPos].isEntry = isEntry;
     return true;
 }
-
-//bool SetLabelAddressInTable(SymbolsTable* table, char* label, int address, int byteCodeForDynamic) {
-//    int labelPos = isLabelExistsInTable(table, label);
-//    if (labelPos == LABEL_NOT_EXISTS) {
-//        return false;
-//    }
-//
-//    table->records[labelPos].address = address;
-//    if (byteCodeForDynamic != DYNAMIC_ADDRESSING_NOT_AVAILABLE)
-//        table->records[labelPos].byteCodeForDynamic = byteCodeForDynamic;
-//
-//    return true;
-//}
 
 bool AddExternUsageAddress(SymbolRecord* record, int usedAddress){
     record->externUsageAddresses = (int *) realloc(record->externUsageAddresses, record->externUsages + sizeof(int));

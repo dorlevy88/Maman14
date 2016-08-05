@@ -13,4 +13,4 @@ void PrintProcessStep(char* message, char* param);
 
 int ConvertCompliment2(int num, int size);
 
-#endif //MAMAN14_LOGGER_H
+#endif /* MAMAN14_LOGGER_H */

@@ -7,7 +7,7 @@
 char* getFilenameNoExtension(char *filename) {
     char *dot = strrchr(filename, '.');
     if(dot == NULL || dot == filename) return "";
-    dot[0] = '\0'; // terminate string at the . (dot) location
+    dot[0] = '\0'; /*  terminate string at the . (dot) location */
     return filename;
 }
 
@@ -30,7 +30,7 @@ char translateToSpecial8Base(int base8) {
         case 7:
             return '*';
         default:
-            //TODO: error: bug in program
+            /* TODO: error: bug in program */
             return 'X';
     }
 }
@@ -51,7 +51,7 @@ int convertNumFromBase10toBase8(int base10) {
 char* translateCommandToSpecial8Base(int byte) {
     char* response = (char*) malloc(sizeof(char) * 5);
     for (int i = 0; i < 5; ++i) {
-        int num = byte & 0b111; //Get 3 right most bits
+        int num = byte & 0b111; /* Get 3 right most bits */
         byte >>=3;
         response[4-i] = translateToSpecial8Base(num);
     }
@@ -61,7 +61,7 @@ char* translateCommandToSpecial8Base(int byte) {
 char* translateAddressToSpecial8Base(int address, int size) {
     int base8 = convertNumFromBase10toBase8(address);
     char* response = (char*) malloc(sizeof(char) * size);
-    for (int i = 1; i <= size ; ++i) { //3 because it could be up to 1000
+    for (int i = 1; i <= size ; ++i) { /* 3 because it could be up to 1000 */
         int num = base8 % 10;
         response[size-i] = translateToSpecial8Base(num);
         base8 /= 10;
@@ -125,29 +125,29 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 }
 
 bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
-    //TODO: implement
+    /* TODO: implement */
 
     char* filename = (char*)malloc(sizeof(fullFilename));
     strcpy(filename, fullFilename);
     filename = getFilenameNoExtension(filename);
 
     if (writeEntOutputFile(assembly->symbolsTable, filename) == false) {
-        //TODO: Throw error file cannot be created
-        //TODO: check if file exists and delete it
+        /* TODO: Throw error file cannot be created */
+        /* TODO: check if file exists and delete it */
         return false;
     }
 
     filename = getFilenameNoExtension(filename);
     if (writeExtOutputFile(assembly->symbolsTable, filename) == false) {
-        //TODO: Throw error file cannot be created
-        //TODO: check if file exists and delete it
+        /* TODO: Throw error file cannot be created */
+        /* TODO: check if file exists and delete it */
         return false;
     }
 
     filename = getFilenameNoExtension(filename);
     if(writeObOutputFile(assembly, filename) == false) {
-        //TODO: Throw error file cannot be created
-        //TODO: check if file exists and delete it
+        /* TODO: Throw error file cannot be created */
+        /* TODO: check if file exists and delete it */
         return false;
     }
 

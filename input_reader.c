@@ -7,35 +7,35 @@
 
 
 bool isLabelValid(char* label){
-    if (strlen(label) > 0){ //check label is not empty
-        if (isalpha(label[0])){ // Check first char is letter
+    if (strlen(label) > 0){ /* check label is not empty */
+        if (isalpha(label[0])){ /*  Check first char is letter */
             for (int i = 1; i < strlen(label); i++) {
-                if ((!(isalpha(label[i])) && !(isdigit(label[i]))) ||  // All chars are digits or letters
-                    i == MAX_LABEL_SIZE) {  //Size of Label is less than MAX_LABEL_SIZE (30)
+                if ((!(isalpha(label[i])) && !(isdigit(label[i]))) ||  /*  All chars are digits or letters */
+                    i == MAX_LABEL_SIZE) {  /* Size of Label is less than MAX_LABEL_SIZE (30) */
                     return false;
                 }
             }
             return true;
         }
         else{
-            return false; //First Char in label is not a letter
+            return false; /* First Char in label is not a letter */
         }
     }
     else{
-        return false; //Label is 0 Chars
+        return false; /* Label is 0 Chars */
     }
 }
 
 int getIntFromString(char *string){
-    if (strlen(string) == 0){ //Check string is not empty
+    if (strlen(string) == 0){ /* Check string is not empty */
         return INVALID_NUM_TOKEN;
     }
     char* ptr;
-    intmax_t num = strtoimax(string, &ptr, 10); //cast string to number
-    if (num < MIN_NUM_SIZE || num > MAX_NUM_SIZE) { //check number could be casted to 15 bits array
+    intmax_t num = strtoimax(string, &ptr, 10); /* cast string to number */
+    if (num < MIN_NUM_SIZE || num > MAX_NUM_SIZE) { /* check number could be casted to 15 bits array */
         return INVALID_NUM_TOKEN;
     }
-    if (strlen(ptr) != 0) { //check if there was any other chars except for digits in the number
+    if (strlen(ptr) != 0) { /* check if there was any other chars except for digits in the number */
         return INVALID_NUM_TOKEN;
     }
     return (int)num;
@@ -45,11 +45,11 @@ char* getOperand(char* operandStr, Operand* operand) {
     char* openBracketLocationString = strchr(operandStr, '[');
     char* closeBracketLocationString = strchr(operandStr, ']');
 
-    //check direct addressing
+    /* check direct addressing */
     if (operandStr[0] == '#') {
         int num = getIntFromString(++operandStr);
-        if (num != INVALID_NUM_TOKEN) { //Miyadi
-            //string is number
+        if (num != INVALID_NUM_TOKEN) { /* Miyadi */
+            /* string is number */
             operand->addressingType = NUMBER;
             operand->value = num;
             return NULL;
@@ -58,7 +58,7 @@ char* getOperand(char* operandStr, Operand* operand) {
             return strcat("expected a number, but received ", operandStr);
         }
     }
-    // Oger
+    /*  Oger */
     else if (operandStr[0] == 'r' && strlen(operandStr) == 2) {
         if (operandStr[1] >= '0' && operandStr[1] <= '7') {
             operand->addressingType = REGISTER;
@@ -69,39 +69,39 @@ char* getOperand(char* operandStr, Operand* operand) {
             strcat("Expected register number between 0 and 7, received - ", operandStr[1]);
         }
     }
-    //Dinami Yashir
-    else if (openBracketLocationString != NULL && closeBracketLocationString != NULL) { //Check we should be in Dinami Yashir
+    /* Dinami Yashir */
+    else if (openBracketLocationString != NULL && closeBracketLocationString != NULL) { /* Check we should be in Dinami Yashir */
         operand->addressingType = DYNAMIC;
         if (closeBracketLocationString > openBracketLocationString &&
-                operandStr[0] != '[' && //Has label instead of [
-                strchr(operandStr, '[') - operandStr <= MAX_LABEL_SIZE && //TODO: do we still need it?
-                operandStr[strlen(operandStr) - 1] == ']') { //Check '[' before ']', '[' not in first char, ']' is at the end, Label size is less then max size
+                operandStr[0] != '[' && /* Has label instead of [ */
+                strchr(operandStr, '[') - operandStr <= MAX_LABEL_SIZE && /* TODO: do we still need it? */
+                operandStr[strlen(operandStr) - 1] == ']') { /* Check '[' before ']', '[' not in first char, ']' is at the end, Label size is less then max size */
             char* label = (char*)malloc(strchr(operandStr, '[') - operandStr);
-            memcpy(label, operandStr, strchr(operandStr, '[') - operandStr); // copy label - everything before '['
+            memcpy(label, operandStr, strchr(operandStr, '[') - operandStr); /*  copy label - everything before '[' */
             if (!isLabelValid(label)) {
                 return strcat("Label is not valid - ", label);
             }
             operand->label = label;
 
-            // get min number
-            size_t minDashLocation = strchr(openBracketLocationString, '-') - openBracketLocationString; //get the char num where - exists
+            /*  get min number */
+            size_t minDashLocation = strchr(openBracketLocationString, '-') - openBracketLocationString; /* get the char num where - exists */
             char* minNum = (char*)malloc(minDashLocation - 1);
             strncpy(minNum, openBracketLocationString + 1, minDashLocation - 1);
             int numToCheck = getIntFromString(minNum);
             if (numToCheck != INVALID_NUM_TOKEN ||
-                numToCheck > MAX_DYNAMIC_OPERAND) { //Can't be more than the num 13
+                numToCheck > MAX_DYNAMIC_OPERAND) { /* Can't be more than the num 13 */
                 operand->minNum = numToCheck;
             }
             else {
                 return "Operand num is out of bound";
             }
-            // get max number
+            /*  get max number */
             char *maxDashLocationString = strchr(openBracketLocationString, '-');
             char* maxNum = (char*)malloc(strlen(maxDashLocationString) - 2);
             strncpy(maxNum, maxDashLocationString + 1, strlen(maxDashLocationString) - 2);
             int numToCheckMax = getIntFromString(maxNum);
             if (numToCheckMax != INVALID_NUM_TOKEN ||
-                numToCheckMax > MAX_DYNAMIC_OPERAND) { //Can't be more than the num 13
+                numToCheckMax > MAX_DYNAMIC_OPERAND) { /* Can't be more than the num 13 */
                 operand->maxNum = numToCheckMax;
                 return NULL;
             }
@@ -110,7 +110,7 @@ char* getOperand(char* operandStr, Operand* operand) {
             }
         }
     }
-    //Yashir
+    /* Yashir */
     else if (isLabelValid(operandStr)) {
         operand->addressingType = DIRECT;
         operand->label = operandStr;
@@ -120,8 +120,8 @@ char* getOperand(char* operandStr, Operand* operand) {
 }
 
 char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine){
-    char* firstRawOperand = strtok(rawOperandsString, " ,\t"); //get first operand - split by comma and/or space
-    char* secondRawOperand = strtok(NULL, " ,\t"); //get second operand - split by comma and/or space
+    char* firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
+    char* secondRawOperand = strtok(NULL, " ,\t"); /* get second operand - split by comma and/or space */
     if (secondRawOperand == NULL){
         return "Expected two operands, received one";
     }
@@ -146,11 +146,11 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine){
 }
 
 char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine){
-    char* firstRawOperand = strtok(rawOperandsString, " ,\t"); //get first operand - split by comma and/or space
-    if (strtok(NULL, " ,\t") != NULL){ //Operand 2 is not empty
+    char* firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
+    if (strtok(NULL, " ,\t") != NULL){ /* Operand 2 is not empty */
         return "Expected One operand - Received more";
     }
-    else if (firstRawOperand == NULL){ //Operand 1 is empty
+    else if (firstRawOperand == NULL){ /* Operand 1 is empty */
         return "Expected One operand - Received None";
     }
 
@@ -165,7 +165,7 @@ char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine){
 
 char* checkNoOperand(char* rawOperandsString, FileLine* parsedLine){
     char* firstRawOperand = strtok(rawOperandsString, " ,\t");
-    if (firstRawOperand != NULL){ //Operand 1 is not empty
+    if (firstRawOperand != NULL){ /* Operand 1 is not empty */
         return "Expected no operand - Received more";
     }
     parsedLine->numOfCommandOprands = 0;
@@ -206,18 +206,18 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     int firstQuotesLocation = -1;
     int secondQuotesLocation = -1;
     for (int i = 0; i < strlen(rawOperandString) ; i++) {
-        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ // before word - did not find any quote yet
+        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ /*  before word - did not find any quote yet */
             if (rawOperandString[i] != (char)NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
                 return "String does not start with double quotes";
             }
         }
-        else if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ //got to first quotes
+        else if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ /* got to first quotes */
             firstQuotesLocation = i;
         }
-        else if (firstQuotesLocation > -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ //got second quote
+        else if (firstQuotesLocation > -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ /* got second quote */
             secondQuotesLocation = i;
         }
-        else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && // after second quote
+        else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && /*  after second quote */
                 (rawOperandString[i] != '\n' && rawOperandString[i] != (char)NULL && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
             return "String has data after closing double quotes";
         }
@@ -225,9 +225,9 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     if (secondQuotesLocation > firstQuotesLocation && firstQuotesLocation > -1){
         size_t stringSize = (size_t)secondQuotesLocation - firstQuotesLocation - 1;
         char* string = (char*) malloc(stringSize);
-        strncpy(string, // set string
-                strchr(rawOperandString, '"') + 1, // the string after the first double quotes
-                secondQuotesLocation - firstQuotesLocation - 1); // number of char to copy
+        strncpy(string, /*  set string */
+                strchr(rawOperandString, '"') + 1, /*  the string after the first double quotes */
+                secondQuotesLocation - firstQuotesLocation - 1); /*  number of char to copy */
 
         parsedLine->firstOperValue->string = string;
         return NULL;
@@ -369,7 +369,7 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
         parsedLine->actionType = EXTERN;
         errStr = checkExternOrEntryOperand(rawOperandsString, parsedLine);
     }
-    else { //Command is not known
+    else { /* Command is not known */
         errStr = "Unknown command";
     }
     return errStr;
@@ -378,27 +378,27 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
 char* lineValidator(FileLine* parsedLine) {
     char* lineToCheck = (char*)malloc(strlen(parsedLine->originalLine));
     strcpy(lineToCheck, parsedLine->originalLine);
-    char* string = strtok(lineToCheck, " \t\n"); //Get first string
+    char* string = strtok(lineToCheck, " \t\n"); /* Get first string */
 
-    //Handle empty lines
+    /* Handle empty lines */
     if (string == NULL){
         parsedLine->isEmptyOrComment = true;
         return NULL;
-    }//Handle Comment Lines
+    }/* Handle Comment Lines */
     else if (strlen(string) >= 1 && string[0] == ';'){
         parsedLine->isEmptyOrComment = true;
         return NULL;
     }
 
-    //Handle labels
+    /* Handle labels */
     size_t strSize = strlen(string);
-    if (string[strSize - 1] == ':') { //Label Found
+    if (string[strSize - 1] == ':') { /* Label Found */
 
-        if (strSize > MAX_LABEL_SIZE + 1){ //TODO: should we keep this????
+        if (strSize > MAX_LABEL_SIZE + 1){ /* TODO: should we keep this???? */
             return strcat("label size is more than allowed - ", MAX_LABEL_SIZE);
         }
         char* parsedLabel = (char*) malloc(strSize - 1);
-        memcpy(parsedLabel, string, strSize - 1);  //get the label
+        memcpy(parsedLabel, string, strSize - 1);  /* get the label */
 
         if (isLabelValid(parsedLabel)){
             parsedLine->label = parsedLabel;
@@ -407,16 +407,16 @@ char* lineValidator(FileLine* parsedLine) {
             return "Invalid label";
         }
 
-        string = strtok(NULL, " \t\n"); //Get action string
+        string = strtok(NULL, " \t\n"); /* Get action string */
         strSize = strlen(string);
 
     }
 
     char* actionStr = (char*) malloc(strSize);
     strcpy(actionStr, string);
-    parsedLine->action = actionStr;      //get the action
+    parsedLine->action = actionStr;      /* get the action */
 
-    char* rawOperandsString = strtok(NULL, "\n"); // get remaining of line
+    char* rawOperandsString = strtok(NULL, "\n"); /*  get remaining of line */
 
     return validateActionAndOperands(rawOperandsString, parsedLine);
 }
@@ -428,13 +428,13 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     int arrayIndex = 0;
     bool isFileOK = true;
 
-    fr = fopen (filename, "r"); // Open the file for reading
+    fr = fopen (filename, "r"); /*  Open the file for reading */
     if (fr == NULL)
     {
         fprintf(stderr, "File %s does not exist\n", filename);
         return false;
     }
-    while(fgets(line, sizeof(line), fr) != NULL)   //get a word.  done if NULL
+    while(fgets(line, sizeof(line), fr) != NULL)   /* get a word.  done if NULL */
     {
         char* lineCopy = (char *) malloc(sizeof(line));
         strcpy(lineCopy, line);
