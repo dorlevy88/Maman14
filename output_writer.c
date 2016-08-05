@@ -72,15 +72,17 @@ char* translateAddressToSpecial8Base(int address, int size) {
 }
 
 bool writeEntOutputFile(SymbolsTable *table, char* filename) {
-    FILE *fp = fopen(strcat(filename, ".ent"), "w");
+    FILE *fp;
     int i;
+    char* address;
+    fp = fopen(strcat(filename, ".ent"), "w");
     if (fp == NULL) {
         return false;
     }
 
     for (i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isEntry == true) {
-            char* address = translateAddressToSpecial8Base(table->records[i].address, 3);
+            address = translateAddressToSpecial8Base(table->records[i].address, 3);
             fprintf(fp, "%s %s\n", table->records[i].label, address);
         }
     }
@@ -89,8 +91,10 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
 }
 
 bool writeExtOutputFile(SymbolsTable *table, char* filename) {
-    FILE *fp = fopen(strcat(filename, ".ext"), "w");
+    FILE *fp;
     int i,j;
+    char* address;
+    fp = fopen(strcat(filename, ".ext"), "w");
     if (fp == NULL) {
         return false;
     }
@@ -98,7 +102,7 @@ bool writeExtOutputFile(SymbolsTable *table, char* filename) {
     for (i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isExternal == true) {
             for (j = 0; j < table->records[i].externUsages; ++j) {
-                char* address = translateAddressToSpecial8Base(table->records[i].externUsageAddresses[j], 3);
+                address = translateAddressToSpecial8Base(table->records[i].externUsageAddresses[j], 3);
                 fprintf(fp, "%s %s\n", table->records[i].label, address);
             }
         }
@@ -108,21 +112,24 @@ bool writeExtOutputFile(SymbolsTable *table, char* filename) {
 }
 
 bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
-    FILE *fp = fopen(strcat(filename, ".ob"), "w");
+    FILE *fp;
     int i;
+    char* address;
+    char* command;
+    fp = fopen(strcat(filename, ".ob"), "w");
     if (fp == NULL) {
         return false;
     }
     fprintf(fp, "%s %s\n", translateAddressToSpecial8Base(assembly->codeArray->size, 2), translateAddressToSpecial8Base(assembly->dataArray->size, 2));
     int addressCounter = assembly->startAddress;
     for (i = 0; i < assembly->codeArray->size; ++i) {
-        char* address = translateAddressToSpecial8Base(addressCounter++, 3);
-        char* command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
+        address = translateAddressToSpecial8Base(addressCounter++, 3);
+        command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
         fprintf(fp, "%s %s\n", address, command);
     }
     for (i = 0; i < assembly->dataArray->size; ++i) {
-        char* address = translateAddressToSpecial8Base(addressCounter++, 3);
-        char* command = translateCommandToSpecial8Base(assembly->dataArray->array[i]);
+        address = translateAddressToSpecial8Base(addressCounter++, 3);
+        command = translateCommandToSpecial8Base(assembly->dataArray->array[i]);
         fprintf(fp, "%s %s\n", address, command);
     }
     fclose(fp);
@@ -130,9 +137,8 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 }
 
 bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
-    /* TODO: implement */
-
-    char* filename = (char*)malloc(sizeof(fullFilename));
+    char* filename;
+    filename = (char*)malloc(sizeof(fullFilename));
     strcpy(filename, fullFilename);
     filename = getFilenameNoExtension(filename);
 
