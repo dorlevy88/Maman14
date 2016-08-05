@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
         6.    build .ob file --> (ic + ' ' + dc) code array and then data array (special base 8)
         7.    build .ext .ent
         8.    write .ob [.ext] [.ent] files for each one of the original files
+
      */
 
     int fileCounter;
