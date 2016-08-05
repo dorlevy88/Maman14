@@ -38,9 +38,10 @@ char translateToSpecial8Base(int base8) {
 int convertNumFromBase10toBase8(int base10) {
     int index = 0;
     int res = 0;
+    int remainder;
     while (base10 != 0)
     {
-        int remainder = base10 % 8;
+        remainder = base10 % 8;
         base10 = base10/8;
         res += remainder * pow(10, index);
         index ++ ;
@@ -50,9 +51,10 @@ int convertNumFromBase10toBase8(int base10) {
 
 char* translateCommandToSpecial8Base(int byte) {
     char* response = (char*) malloc(sizeof(char) * 5);
-    int i;
+    int i,num;
+    const int bits = 0b111;
     for (i = 0; i < 5; ++i) {
-        int num = byte & 0b111; /* Get 3 right most bits */
+        num = byte & bits; /* Get 3 right most bits */
         byte >>=3;
         response[4-i] = translateToSpecial8Base(num);
     }
@@ -62,9 +64,9 @@ char* translateCommandToSpecial8Base(int byte) {
 char* translateAddressToSpecial8Base(int address, int size) {
     int base8 = convertNumFromBase10toBase8(address);
     char* response = (char*) malloc(sizeof(char) * size);
-    int i;
+    int i, num;
     for (i = 1; i <= size ; ++i) { /* 3 because it could be up to 1000 */
-        int num = base8 % 10;
+        num = base8 % 10;
         response[size-i] = translateToSpecial8Base(num);
         base8 /= 10;
     }

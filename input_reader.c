@@ -46,6 +46,9 @@ char* getOperand(char* operandStr, Operand* operand) {
     char* openBracketLocationString = strchr(operandStr, '[');
     char* closeBracketLocationString = strchr(operandStr, ']');
 
+    /* Debug */
+    fprintf(stderr, "Line is = %s\n", operandStr);
+
     /* check direct addressing */
     if (operandStr[0] == '#') {
         int num = getIntFromString(++operandStr);
@@ -441,6 +444,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     {
         char* lineCopy = (char *) malloc(sizeof(line));
         strcpy(lineCopy, line);
+        /* Debug */
         fprintf(stderr, "Line is = %s\n", line);
         FileLine* parsedLine = (FileLine*) malloc(sizeof(FileLine));
         memset(parsedLine, 0, sizeof(FileLine));

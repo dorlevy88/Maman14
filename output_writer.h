@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include "data_structures.h"
 
 #ifndef MAMAN14_OUTPUTFILES_H
