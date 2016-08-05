@@ -81,7 +81,7 @@ void printAssemblyByte(AssemblyBytes* bytes);
 /* Assembly Structure Init */
 AssemblyStructure* InitAssemblyStructure();
 
-void FreeAssemlyStructureMemory(AssemblyStructure* assembly);
+void FreeAssemblyStructureMemory(AssemblyStructure* assembly);
 
 
 /*  Symbol Table Functions */

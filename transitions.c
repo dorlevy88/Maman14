@@ -125,7 +125,6 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
     return binData;
 }
 
-
 void UpdateSymbolsTableDataAddresses(SymbolsTable* table, int ic) {
     int i;
     for (i = 0; i < table->recordSize; ++i) {
@@ -203,9 +202,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
     for (i=0; i < fileContent->size; i++){ /* For every line in file */
         FileLine line = fileContent->line[i];
 
-
         bool isLabelExists = false;
-
         if (line.label != NULL) { /* If Label Exists for line */
             isLabelExists = true;
         }
@@ -234,8 +231,7 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
                 return false;
             }
             if (isLabelExists) {
-                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false,
-                                       firstByte) == false) {
+                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
                     PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
                     return false;
                 }
@@ -310,9 +306,8 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
 
-        printf("%s", fileContent->line[i].originalLine);
         line = fileContent->line[i];
-
+        printf("%s", fileContent->line[i].originalLine);
 
         /* TODO:Debug */
 
@@ -326,7 +321,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
         if (line.actionType == DATA || line.actionType == STRING) {
             /* do nothing */
         }
-            /* Step: 5 */
+        /* Step: 5 */
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
                 if (SetLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, true) == false) {
@@ -335,7 +330,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
                 }
             }
         }
-            /* handle command */
+        /* handle command */
         else{
             /*  101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
             int binCmd = buildBinaryCommand(line);

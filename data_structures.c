@@ -72,8 +72,10 @@ AssemblyStructure* InitAssemblyStructure() {
     assembly->startAddress = ASSEMBLY_CODE_START_ADDRESS;
 
     codeBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
+    memset(codeBytes, 0, sizeof(AssemblyBytes));
     assembly->codeArray = codeBytes;
     dataBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
+    memset(dataBytes, 0, sizeof(AssemblyBytes));
     assembly->dataArray = dataBytes;
 
     table = (SymbolsTable*)malloc(sizeof(SymbolsTable));
@@ -90,7 +92,7 @@ AssemblyStructure* InitAssemblyStructure() {
     return assembly;
 }
 
-void FreeAssemlyStructureMemory(AssemblyStructure* assembly){
+void FreeAssemblyStructureMemory(AssemblyStructure* assembly){
     if (assembly != NULL){
         if (assembly->codeArray != NULL){
             free(assembly->codeArray);
