@@ -155,9 +155,8 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 }
 
 bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
-    char* filename;
+    char* filename = (char*)malloc(strlen(fullFilename));;
     printf("Start of WriteAllOutputFiles");
-    filename = (char*)malloc(strlen(fullFilename));
     strcpy(filename, fullFilename);
     filename = getFilenameNoExtension(filename);
     printf("ENT file");
