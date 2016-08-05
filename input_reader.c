@@ -207,9 +207,10 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
     int firstQuotesLocation = -1;
     int secondQuotesLocation = -1;
-    for (int i = 0; i < strlen(rawOperandString) ; i++) {
+    int i;
+    for (i = 0; i < strlen(rawOperandString) ; i++) {
         if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ /*  before word - did not find any quote yet */
-            if (rawOperandString[i] != (char)NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
+            if (rawOperandString[i] != '\0' || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
                 return "String does not start with double quotes";
             }
         }
@@ -220,7 +221,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
             secondQuotesLocation = i;
         }
         else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && /*  after second quote */
-                (rawOperandString[i] != '\n' && rawOperandString[i] != (char)NULL && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
+                (rawOperandString[i] != '\n' && rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
             return "String has data after closing double quotes";
         }
     }
