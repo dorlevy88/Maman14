@@ -1,9 +1,5 @@
-//
-// Created by Dor Levy on 7/30/16.
-//
-
 #include <stdio.h>
-#include "Logger.h"
+#include "utils.h"
 
 
 void PrintSyntaxError(char* errorMsg, int lineNum){

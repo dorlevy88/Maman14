@@ -1,9 +1,5 @@
-//
-// Created by Or Zamir on 7/31/16.
-//
-
 #include <stdbool.h>
-#include "../DataStructures/AssemblyStructure.h"
+#include "data_structures.h"
 
 #ifndef MAMAN14_OUTPUTFILES_H
 #define MAMAN14_OUTPUTFILES_H

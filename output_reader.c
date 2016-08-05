@@ -1,14 +1,8 @@
-//
-// Created by Or Zamir on 7/31/16.
-//
-
 #include <stdlib.h>
 #include <printf.h>
 #include <math.h>
-#include "OutputFiles.h"
-
-//TODO: Trim int to 16Bit for writing
-#define to16bit(n) (n)>=0? n : ((n)^-65536)
+#include <memory.h>
+#include "output_reader.h"
 
 char* getFilenameNoExtension(char *filename) {
     char *dot = strrchr(filename, '.');

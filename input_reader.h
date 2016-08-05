@@ -1,16 +1,16 @@
-//
-// Created by Dor Levy on 7/26/16.
-//
-
 #ifndef MAMAN14_FILEHANDLERS_H
 #define MAMAN14_FILEHANDLERS_H
 
 #include <stdbool.h>
-#include "../DataStructures/Enums.h"
-#include "../DataStructures/Operand.h"
+#include "data_structures.h"
 
 #define MAX_FILE_LINES 1000
 #define MAX_LINE_SIZE 80
+#define MAX_LABEL_SIZE 30
+#define MIN_NUM_SIZE -16384
+#define MAX_NUM_SIZE 16384
+#define INVALID_NUM_TOKEN -999999
+#define MAX_DYNAMIC_OPERAND 13 //max exact number
 
 
 typedef struct FileLine {

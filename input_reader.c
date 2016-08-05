@@ -1,20 +1,11 @@
-//
-// Created by Dor Levy on 7/26/16.
-//
-
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
-#include "Logger.h"
+#include "utils.h"
 #include <inttypes.h>
 #include <ctype.h>
-#include "FileHandlers.h"
+#include "input_reader.h"
 
-#define MAX_LABEL_SIZE 30
-#define MIN_NUM_SIZE -16384
-#define MAX_NUM_SIZE 16384
-#define INVALID_NUM_TOKEN -999999
-#define MAX_DYNAMIC_OPERAND 13 //max exact number
 
 bool isLabelValid(char* label){
     if (strlen(label) > 0){ //check label is not empty
@@ -126,9 +117,7 @@ char* getOperand(char* operandStr, Operand* operand) {
         operand->label = operandStr;
         return NULL;
     }
-    else {
-        return "unknown addressing type error";
-    }
+    return "unknown addressing type error";
 }
 
 char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine){
@@ -219,7 +208,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     int secondQuotesLocation = -1;
     for (int i = 0; i < strlen(rawOperandString) ; i++) {
         if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ // before word
-            if (rawOperandString[i] != NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
+            if (rawOperandString[i] != (char)NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
                 return "String does not start with double quotes";
             }
         }
@@ -230,7 +219,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
             secondQuotesLocation = i;
         }
         else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && // after second quote
-                (rawOperandString[i] != '\n' || rawOperandString[i] != NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' ')){
+                (rawOperandString[i] != '\n' || rawOperandString[i] != (char)NULL || rawOperandString[i] != '\t' || rawOperandString[i] != ' ')){
             return "String has data after closing double quotes";
         }
     }

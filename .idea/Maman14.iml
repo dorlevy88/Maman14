@@ -2,30 +2,19 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/Logger.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/Logger.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileHandlers.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utilities/FileHandlers.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Main.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Operand.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Enums.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/Command.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyBytes.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/AssemblyStructure.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/DataStructures/SymbolsTable.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Output/OutputFiles.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Output/OutputFiles.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/FirstTransition.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/CompilerErrors.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Transitions/SecondTransition.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/definitions.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/data_structures.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/output_reader.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/transitions.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/input_reader.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/input_reader.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/transitions.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/assembler.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/data_structures.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Main.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/output_reader.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">

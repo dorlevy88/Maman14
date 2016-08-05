@@ -4,25 +4,14 @@ project(Maman14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
-        DataStructures/Command.c
-        DataStructures/Command.h
-        DataStructures/AssemblyStructure.h
-        DataStructures/AssemblyStructure.c
-        DataStructures/AssemblyBytes.h
-        DataStructures/AssemblyBytes.c
-        DataStructures/SymbolsTable.h
-        DataStructures/SymbolsTable.c
-        DataStructures/Enums.h
-        DataStructures/Operand.h
-        Transitions/SecondTransition.c
-        Transitions/SecondTransition.h
-        Transitions/FirstTransition.c
-        Transitions/FirstTransition.h
-        Main.c
-        Main.h
-        Utilities/FileHandlers.c
-        Utilities/FileHandlers.h
-        Utilities/Logger.c
-        Utilities/Logger.h Output/OutputFiles.c Output/OutputFiles.h Transitions/CompilerErrors.h)
+        assembler.c
+        input_reader.c
+        input_reader.h
+        utils.c
+        utils.h
+        output_reader.c
+        output_reader.h
+        data_structures.c
+        data_structures.h transitions.c transitions.h definitions.h)
 
-add_executable(Maman14 ${SOURCE_FILES})
+add_executable(assembler ${SOURCE_FILES})
