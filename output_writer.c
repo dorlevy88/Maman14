@@ -4,7 +4,7 @@
 #include <memory.h>
 #include "output_writer.h"
 
-#define THREE_BITS_MASK 0b111;
+#define THREE_BITS_MASK 7  /* this is equal to 111 binary */
 
 
 char* getFilenameNoExtension(char *filename) {
@@ -122,6 +122,7 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     char* command;
     char* translatedCodeArraySize;
     char* translatedDataArraySize;
+    int addressCounter;
     fp = fopen(strcat(filename, ".ob"), "w");
     if (fp == NULL) {
         return false;
@@ -130,7 +131,7 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2);
     translatedDataArraySize = translateAddressToSpecial8Base(assembly->dataArray->size, 2);
     fprintf(fp, "%s %s\n", translatedCodeArraySize, translatedDataArraySize);
-    int addressCounter = assembly->startAddress;
+    addressCounter = assembly->startAddress;
     for (i = 0; i < assembly->codeArray->size; ++i) {
         address = translateAddressToSpecial8Base(addressCounter++, 3);
         command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
