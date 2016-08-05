@@ -29,22 +29,23 @@ int main(int argc, char **argv) {
             PrintProcessStep("Parsing file failed", filename);
             continue;
         }
-
+        PrintProcessStep("Parsing file succeeded", filename);
         assemblyStructure = InitAssemblyStructure();
         if(RunFirstTransition(fileContent, assemblyStructure) == false) {
             PrintProcessStep("Transition one failed", filename);
             continue;
         }
+        PrintProcessStep("Transition one succeeded", filename);
         if (RunSecondTransition(fileContent, assemblyStructure) == false) {
             PrintProcessStep("Transition two failed", filename);
             continue;
         }
-
+        PrintProcessStep("Transition two succeeded", filename);
         if (WriteAllOutputFiles(assemblyStructure, filename) == false) {
             PrintProcessStep("Writing file failed", filename);
             /*TODO: delete files in case of a failure*/
         }
-        PrintProcessStep("Processing file succeeded", filename);
+        PrintProcessStep("Writing file succeeded", filename);
         FreeAssemlyStructureMemory(assemblyStructure);
     }
     return 0;
