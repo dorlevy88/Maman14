@@ -441,7 +441,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     {
         char* lineCopy = (char *) malloc(sizeof(line));
         strcpy(lineCopy, line);
-        printf("Line is = %s\n", line);
+        fprintf(stderr, "Line is = %s\n", line);
         FileLine* parsedLine = (FileLine*) malloc(sizeof(FileLine));
         memset(parsedLine, 0, sizeof(FileLine));
         parsedLine->originalLine = lineCopy;
