@@ -47,9 +47,10 @@ int buildBinaryCommand(FileLine cmdLine) {
 
 int getBitRangefromInt(int num, int minBit, int maxBit) {
     int res = 0;
+    int i, mask;
     bool isNegative = false;
-    for (int i = minBit; i <= maxBit; ++i) {
-        int mask = ((1 << i) & num);
+    for (i = minBit; i <= maxBit; ++i) {
+        mask = ((1 << i) & num);
         res += mask >> minBit;
         if(i == maxBit && mask != 0) {
             isNegative = true;
@@ -123,7 +124,8 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
 
 
 void UpdateSymbolsTableDataAddresses(SymbolsTable* table, int ic) {
-    for (int i = 0; i < table->recordSize; ++i) {
+    int i;
+    for (i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isCommand == false && table->records[i].isExternal == false) { /* update only .data\.string types */
             table->records[i].address += ic;
         }
@@ -191,11 +193,11 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
         14. Add to ic the value of ic + the calculated L value (ic += L)
         15. go back to step 2
     */
-
+    int i;
     assembly->ic = assembly->startAddress;
     assembly->dc = 0;
 
-    for (int i=0; i < fileContent->size; i++){ /* For every line in file */
+    for (i=0; i < fileContent->size; i++){ /* For every line in file */
         FileLine line = fileContent->line[i];
 
 
@@ -298,11 +300,11 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     11.2 size of the data
     11.3 extern symbols table
     11.4 symbols table with entry points marks */
-
+    int i;
     int tmpIc = assembly->ic;
     assembly->ic = assembly->startAddress;
 
-    for (int i=0; i < fileContent->size; i++) { /* For every line in file */
+    for (i=0; i < fileContent->size; i++) { /* For every line in file */
 
 /*         printf("%s", fileContent->line[i].originalLine); */
         FileLine line = fileContent->line[i];
