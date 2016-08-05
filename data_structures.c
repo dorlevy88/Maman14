@@ -92,9 +92,15 @@ AssemblyStructure* InitAssemblyStructure() {
 
 void FreeAssemlyStructureMemory(AssemblyStructure* assembly){
     if (assembly != NULL){
-        free(assembly->codeArray);
-        free(assembly->dataArray);
-        free(assembly->symbolsTable);
+        if (assembly->codeArray != NULL){
+            free(assembly->codeArray);
+        }
+        if (assembly->dataArray != NULL){
+            free(assembly->dataArray);
+        }
+        if (assembly->symbolsTable->records != NULL){
+            free(assembly->symbolsTable->records);
+        }
         free(assembly);
     }
 }

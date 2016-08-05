@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
     char* filename;
     AssemblyStructure* assemblyStructure = NULL;
     for (fileCounter = 1; fileCounter < argc; ++fileCounter) {
-        FreeAssemlyStructureMemory(assemblyStructure);
         filename = argv[fileCounter];
         PrintProcessStep("Start processing file", filename);
         fileContent = (FileContent*)malloc(sizeof(FileContent));
@@ -46,6 +45,7 @@ int main(int argc, char **argv) {
             /*TODO: delete files in case of a failure*/
         }
         PrintProcessStep("Processing file succeeded", filename);
+        FreeAssemlyStructureMemory(assemblyStructure);
     }
     return 0;
 }

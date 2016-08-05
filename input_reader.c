@@ -236,7 +236,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
     for (i = 0; i < strlen(rawOperandString) ; i++) {
         if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ /*  before word - did not find any quote yet */
-            if (rawOperandString[i] != '\0' || rawOperandString[i] != '\t' || rawOperandString[i] != ' '){
+            if (rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' '){
                 return "String does not start with double quotes";
             }
         }
@@ -436,7 +436,7 @@ char* lineValidator(FileLine* parsedLine) {
             return "label size is more than allowed";
         }
         parsedLabel = (char*) malloc(strSize - 1);
-        memcpy(parsedLabel, string, strSize - 1);  /* get the label */
+        strncpy(parsedLabel, string, strSize - 1);  /* get the label */
 
         if (isLabelValid(parsedLabel)){
             parsedLine->label = parsedLabel;
