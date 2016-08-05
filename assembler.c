@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
         8.    write .ob [.ext] [.ent] files for each one of the original files
      */
 
-    for (int fileCounter = 1; fileCounter < argc; ++fileCounter) {
+    int fileCounter;
+    for (fileCounter = 1; fileCounter < argc; ++fileCounter) {
 
         char* filename = argv[fileCounter];
         PrintProcessStep("Start processing file", filename);
@@ -44,4 +45,5 @@ int main(int argc, char **argv) {
         }
         PrintProcessStep("Processing file succeeded", filename);
     }
+    return 0;
 }
