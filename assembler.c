@@ -46,8 +46,7 @@ int main(int argc, char **argv) {
             /*TODO: delete files in case of a failure*/
         }
         PrintProcessStep("Writing file succeeded", filename);
-        FreeAssemlyStructureMemory(assemblyStructure);
-        free(fileContent->line);
+        free(assemblyStructure);
         free(fileContent);
     }
     return 0;
