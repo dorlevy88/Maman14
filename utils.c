@@ -28,23 +28,22 @@ int ConvertCompliment2(int num, int size) {
     return num;
 }
 
-char* getNewSubString(const char* pos, int size) {
-    size_t sizeT;
-    char* res;
-
-    sizeT = (size_t)size + 1;
-    res = (char*)malloc(sizeT);
-    memset(res, 0, sizeT);
-    strncpy(res, pos, sizeT);
-    res[sizeT - 1] = '\0';
-    return res;
-}
 
 char* getNewString(int size) {
     char* res;
-    res = (char*)malloc(size);
-    memset(res, 0, size);
-    res[size - 1] = '\0';
+    
+    size_t sizeT = (size_t)size+1;
+    res = (char*)malloc(sizeT);
+    memset(res, 0, sizeT);
+    res[size] = '\0';
+    return res;
+}
+
+char* getNewSubString(const char* pos, int size) {
+    char* res;
+
+    res = getNewString(size);
+    strncpy(res, pos, size);
     return res;
 }
 

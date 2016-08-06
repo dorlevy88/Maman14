@@ -60,27 +60,25 @@ int convertNumFromBase10toBase8(int base10) {
 }
 
 char* translateCommandToSpecial8Base(int byte) {
-    char* response = (char*) malloc(sizeof(char) * 6);
+    char* response = getNewString(5);
     int i,num;
     for (i = 0; i < 5; ++i) {
         num = byte & THREE_BITS_MASK; /* Get 3 right most bits */
         byte >>=3;
         response[4-i] = translateToSpecial8Base(num);
     }
-    response[5] = '\0';
     return response;
 }
 
 char* translateAddressToSpecial8Base(int address, int size) {
     int base8 = convertNumFromBase10toBase8(address);
-    char* response = (char*) malloc(sizeof(char) * (size + 1));
+    char* response = getNewString(size);
     int i, num;
     for (i = 1; i <= size ; ++i) { /* 3 because it could be up to 1000 */
         num = base8 % 10;
         response[size-i] = translateToSpecial8Base(num);
         base8 /= 10;
     }
-    response[size] = '\0';
     return response;
 }
 
