@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
         }
 
         PrintProcessStep("Start processing file", filename);
-        if (getFileContent(filename, fileContent) == false) { /*Error in the file*/
+        if (getFileContent(filename, fileContent) == Fail) { /*Error in the file*/
             PrintProcessStep("Parsing file failed", filename);
             continue;
         }

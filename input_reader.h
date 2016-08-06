@@ -5,15 +5,6 @@
 #include "utils.h"
 #include <stdbool.h>
 
-#define MAX_FILE_LINES 1000
-#define MAX_LINE_SIZE 80
-#define MAX_LABEL_SIZE 30
-#define MIN_NUM_SIZE -16384
-#define MAX_NUM_SIZE 16384
-#define INVALID_NUM_TOKEN -999999
-#define MAX_DYNAMIC_OPERAND 13 /* max exact number */
-
-
 typedef struct FileLine {
     int lineNumber;
     char* originalLine;
@@ -37,9 +28,9 @@ typedef struct FileContent {
 
 } FileContent;
 
-bool getFileContent(char* filename, FileContent* fileContent) ;
+Status getFileContent(char *filename, FileContent *fileContent) ;
 
-bool initFileContent(FileContent** fileContent);
+Status initFileContent(FileContent** fileContent);
 void freeFileContent(FileContent** fileContent);
 
 #endif /* MAMAN14_FILEHANDLERS_H */

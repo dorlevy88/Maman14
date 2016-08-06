@@ -1,10 +1,24 @@
 #ifndef MAMAN14_DEFINITIONS_H
 #define MAMAN14_DEFINITIONS_H
 
+#define DEBUG true
+
 /* Defines for General Errors */
-#define ERR_COMPILER_MEMORY_FAILURE "Compiler internal memory error"
+#define ERR_PROG_MEMORY_FAILURE "Program internal memory error"
+#define ERR_FILE_NOT_FOUND "File does not exists"
 
 /* Defines for Syntax Errors */
+#define ERR_INVAILD_LABEL "Invalid label name"
+#define ERR_ILLEGAL_DEST_ADDRESSING "Illegal Destination Operand Addressing on command, allowed addressing types are DIRECT(1), REGISTER(3)"
+#define ERR_LEA_SOURCE_ADDRESSING "Illegal Source Operand Addressing on lea command, allowed addressing type is DIRECT(1)"
+#define ERR_UNKNOWN_CMD "Unknown Command"
+#define ERR_TWO_OP_GOT_ONE "Command expected two operands, received one"
+#define ERR_TWO_OP_GOT_MORE "Command expected two operands, received more"
+#define ERR_ONE_OP_GOT_NONE "Command expected one operand, received none"
+#define ERR_ONE_OP_GOT_MORE "Command expected one operand, received more"
+#define ERR_NO_OP_GOT_MORE "Command expected no operand, received more"
+#define ERR_DATA_OUT_OF_BOUNDS "Data integer is out of bounds"
+#define ERR_STRING_INVALID "String parameter is invalid"
 
 /* Defines for Compiler Errors */
 #define ERR_RAM_OVERFLOW "The program is too big for the computer RAM"
@@ -12,11 +26,10 @@
 #define ERR_LABEL_NOT_DEFINED "The label definition doesn't exists"
 #define WARN_LABEL_IN_BAD_LOCATION "Label is not allowed on .extern or .entry"
 
-#define PASS 1
-#define FAIL -1
-
 /* Defining enums */
 typedef enum ActionTypes {
+    UNKNOWN = -1,
+
     MOV = 0,
     CMP = 1,
     ADD = 2,
@@ -33,7 +46,6 @@ typedef enum ActionTypes {
     JSR = 13,
     RTS = 14,
     STOP = 15,
-
 
     DATA = 16,
     STRING = 17,
@@ -54,5 +66,10 @@ typedef enum CommandAREType {
     Relocatable = 2,    /* R */
     External = 1        /* E */
 } CommandAREType;
+
+typedef enum Status {
+    Pass,
+    Fail
+} Status;
 
 #endif /* MAMAN14_DEFINITIONS_H */

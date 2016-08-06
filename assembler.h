@@ -6,6 +6,4 @@
 #include "transitions.h"
 #include "utils.h"
 
-#define DEBUG 1
-
 #endif /* MAMAN14_ASSEMBLER_H */
