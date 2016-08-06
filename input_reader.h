@@ -1,9 +1,9 @@
 #ifndef MAMAN14_FILEHANDLERS_H
 #define MAMAN14_FILEHANDLERS_H
 
-#include <stdbool.h>
 #include "data_structures.h"
 #include "utils.h"
+#include <stdbool.h>
 
 #define MAX_FILE_LINES 1000
 #define MAX_LINE_SIZE 80

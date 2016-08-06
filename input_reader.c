@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
-#include <inttypes.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include "input_reader.h"
 
 bool isLabelValid(char* label){
@@ -182,7 +185,7 @@ char* getOperand(char* operandStr, Operand* operand) {
     /* Yashir */
     else if (isLabelValid(operandStr)) {
         operand->addressingType = DIRECT;
-        operand->label = operandStr;
+        operand->label = copyString(operandStr);
         return NULL;
     }
     return "unknown addressing type error";
@@ -280,28 +283,31 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
 }
 
 char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
-    int firstQuotesLocation = -1;
-    int secondQuotesLocation = -1;
-    int i;
     char* string;
-    size_t stringSize;
 
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
+    string = getNewStrBetweenTwoChars(rawOperandString, '"', '"', true, true);
+    if (string == NULL)
+        return "Failed parsing data string";
+
+    parsedLine->firstOperValue->string = string;
+    return NULL;
+    /*
     for (i = 0; i < strlen(rawOperandString) ; i++) {
-        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ /*  before word - did not find any quote yet */
+        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ //  before word - did not find any quote yet
             if (rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' '){
                 return "String does not start with double quotes";
             }
         }
-        else if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ /* got to first quotes */
+        else if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ // got to first quotes
             firstQuotesLocation = i;
         }
-        else if (firstQuotesLocation > -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ /* got second quote */
+        else if (firstQuotesLocation > -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ // got second quote
             secondQuotesLocation = i;
         }
-        else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && /*  after second quote */
+        else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && /*  after second quote
                 (rawOperandString[i] != '\n' && rawOperandString[i] != '\r' && rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
             return "String has data after closing double quotes";
         }
@@ -309,14 +315,15 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     if (secondQuotesLocation > firstQuotesLocation && firstQuotesLocation > -1){
         stringSize = (size_t)secondQuotesLocation - firstQuotesLocation - 1;
         string = (char*) malloc(stringSize);
-        strncpy(string, /*  set string */
-                strchr(rawOperandString, '"') + 1, /*  the string after the first double quotes */
-                secondQuotesLocation - firstQuotesLocation - 1); /*  number of char to copy */
+        strncpy(string, //  set string
+                strchr(rawOperandString, '"') + 1,   //the string after the first double quotes
+                secondQuotesLocation - firstQuotesLocation - 1); //  number of char to copy
 
         parsedLine->firstOperValue->string = string;
         return NULL;
     }
     return "String should be enclosed by double quotes and be more than one char";
+    */
 }
 
 char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
@@ -465,21 +472,20 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
 char* lineValidator(FileLine* parsedLine) {
     char* string;
     char* parsedLabel;
-    char* actionStr;
     char* rawOperandsString;
     size_t strSize;
-    char* lineToCheck = (char*)malloc(strlen(parsedLine->originalLine));
-    strcpy(lineToCheck, parsedLine->originalLine);
-
+    char* lineToCheck = copyString(parsedLine->originalLine);
     string = strtok(lineToCheck, " \t\n\r"); /* Get first string */
 
     /* Handle empty lines */
     if (string == NULL){
         parsedLine->isEmptyOrComment = true;
+        free(lineToCheck);
         return NULL;
     }/* Handle Comment Lines */
     else if (strlen(string) >= 1 && string[0] == ';'){
         parsedLine->isEmptyOrComment = true;
+        free(lineToCheck);
         return NULL;
     }
 
@@ -491,21 +497,18 @@ char* lineValidator(FileLine* parsedLine) {
             parsedLine->label = parsedLabel;
         }
         else {
+            free(lineToCheck);
+            free(parsedLabel);
             return "Invalid label";
         }
-
         string = strtok(NULL, " \t\n\r"); /* Get action string */
-        strSize = strlen(string);
-
     }
 
-    actionStr = (char*) malloc(strSize);
-    strcpy(actionStr, string);
-    parsedLine->action = actionStr;      /* get the action */
-
+    parsedLine->action = copyString(string);      /* get the action */
     rawOperandsString = strtok(NULL, "\n\r"); /*  get remaining of line */
-
-    return validateActionAndOperands(rawOperandsString, parsedLine);
+    char* errStr = validateActionAndOperands(rawOperandsString, parsedLine);
+    free(lineToCheck);
+    return errStr;
 }
 
 bool getFileContent(char* filename, FileContent* fileContent) {
@@ -518,8 +521,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     FileLine* parsedLine;
 
     fr = fopen (filename, "r"); /*  Open the file for reading */
-    if (fr == NULL)
-        {
+    if (fr == NULL) {
         fprintf(stderr, "File %s does not exist\n", filename);
         return false;
     }
@@ -566,6 +568,37 @@ bool initFileContent(FileContent** fileContent) {
 }
 
 void freeFileContent(FileContent** fileContent) {
+    int i;
+    if ((*fileContent)->size > 0){
+        printf("Clears file line");
+        for (i = 0; i < (*fileContent)->size; ++i) {
+            free((*fileContent)->line[i].label);
+            free((*fileContent)->line[i].originalLine);
+            free((*fileContent)->line[i].action);
+            if ((*fileContent)->line[i].firstOperValue != NULL) {
+                if ((*fileContent)->line[i].firstOperValue->label != NULL)
+                    free((*fileContent)->line[i].firstOperValue->label);
+                if ((*fileContent)->line[i].firstOperValue->data != NULL)
+                    free((*fileContent)->line[i].firstOperValue->data);
+                if ((*fileContent)->line[i].firstOperValue->entryOrExtern != NULL)
+                    free((*fileContent)->line[i].firstOperValue->entryOrExtern);
+                if ((*fileContent)->line[i].firstOperValue->string != NULL)
+                    free((*fileContent)->line[i].firstOperValue->string);
+            }
+            free((*fileContent)->line[i].firstOperValue);
+            if ((*fileContent)->line[i].secondOperValue != NULL) {
+                if ((*fileContent)->line[i].secondOperValue->label != NULL)
+                    free((*fileContent)->line[i].secondOperValue->label);
+                if ((*fileContent)->line[i].secondOperValue->data != NULL)
+                    free((*fileContent)->line[i].secondOperValue->data);
+                if ((*fileContent)->line[i].secondOperValue->entryOrExtern != NULL)
+                    free((*fileContent)->line[i].secondOperValue->entryOrExtern);
+                if ((*fileContent)->line[i].secondOperValue->string != NULL)
+                    free((*fileContent)->line[i].secondOperValue->string);
+            }
+            free((*fileContent)->line[i].secondOperValue);
+        }
+    }
     free((*fileContent)->line);
     free(*fileContent);
 }

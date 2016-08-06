@@ -3,6 +3,7 @@
 #include "data_structures.h"
 #include "utils.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 
 #define DATA_BYTE_SIZE 15
@@ -112,28 +113,45 @@ bool initAssemblyStructure(AssemblyStructure** assembly) {
         return false;
     memset(recordExt, 0, sizeof(SymbolRecord));
 
-    table->records = recordExt;
-    table->size = 1;
+    tableExt->records = recordExt;
+    tableExt->size = 1;
     (*assembly)->externs = tableExt;
 
     return true;
 }
 
 void freeAssemblyStructure(AssemblyStructure** assembly){
-    if ((*assembly)->codeArray != NULL){
+    int i;
+    if ((*assembly)->codeArray != NULL) {
+        printf("Clears Code Array\n");
         free((*assembly)->codeArray);
     }
     if ((*assembly)->dataArray != NULL){
+        printf("Clears Data Array\n");
         free((*assembly)->dataArray);
     }
-    if ((*assembly)->symbolsTable->records != NULL){
+
+    if ((*assembly)->symbolsTable != NULL){
+        printf("Clears Symbols\n");
+        for (i = 0; i < (*assembly)->symbolsTable->size; ++i) {
+            if ((*assembly)->symbolsTable->records[i].label != NULL)
+                free((*assembly)->symbolsTable->records[i].label);
+        }
         free((*assembly)->symbolsTable->records);
+        free((*assembly)->symbolsTable);
     }
 
-    if ((*assembly)->externs->records != NULL){
+    if ((*assembly)->externs != NULL){
+        printf("Clears Externs\n");
+        for (i = 0; i < (*assembly)->externs->size; ++i) {
+            if ((*assembly)->externs->records[i].label != NULL)
+                free((*assembly)->externs->records[i].label);
+        }
         free((*assembly)->externs->records);
+        free((*assembly)->externs);
     }
-    free(assembly);
+
+    free(*assembly);
 }
 
 int isLabelExistsInTable(SymbolsTable* table, char* label) {
@@ -154,9 +172,13 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
     }
     if (table->recordSize == table->size) { /* Allocate additional space to the array */
         table->records = (SymbolRecord *) realloc(table->records, table->size + (NEW_CHUNK_SIZE * sizeof(SymbolRecord)));
+        if (table->records == NULL) {
+            exit(0);
+        }
+        memset(&table->records[table->recordSize], 0, sizeof(SymbolRecord));
         table->size += NEW_CHUNK_SIZE;
     }
-    table->records[table->recordSize].label = label;
+    table->records[table->recordSize].label = copyString(label);
     table->records[table->recordSize].address = address;
     table->records[table->recordSize].isExternal = isExternal;
     table->records[table->recordSize].isCommand = isCommand;
@@ -177,14 +199,6 @@ bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry){
     return true;
 }
 
-/*
-bool AddExternUsageAddress(SymbolRecord* record, int usedAddress){
-    record->externUsageAddresses = (int *) realloc(record->externUsageAddresses, record->externUsages + sizeof(int));
-    record->externUsageAddresses[record->externUsages] = usedAddress;
-    record->externUsages++;
-    return true;
-}
-*/
 void printSymbolTable(SymbolsTable* table){
     int i;
     printf("----------------------------------------------------------------------------------------------------\n");

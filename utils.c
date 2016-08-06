@@ -21,7 +21,6 @@ void PrintProcessStep(char* message, char* param){
     fprintf(stdout, "Message - %s, Parameter: %s\n", message, param);
 }
 
-
 int ConvertCompliment2(int num, int size) {
     if (num < 0){
         return (int)(pow(2, size) + num);
@@ -39,4 +38,16 @@ char* getNewSubString(const char* pos, int size) {
     strncpy(res, pos, sizeT);
     res[sizeT - 1] = '\0';
     return res;
+}
+
+char* getNewString(int size) {
+    char* res;
+    res = (char*)malloc(size);
+    memset(res, 0, size);
+    res[size - 1] = '\0';
+    return res;
+}
+
+char* copyString(const char* pos) {
+    return getNewSubString(pos, strlen(pos));
 }

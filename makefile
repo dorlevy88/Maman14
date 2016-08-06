@@ -4,7 +4,7 @@ assembler: output_writer.o transitions.o input_reader.o data_structures.o utils.
 assembler.o: assembler.c input_reader.h definitions.h transitions.h output_writer.h utils.h
 	gcc -c -ansi -Wall -pedantic assembler.c -o assembler.o
 
-output_writer.o: input_reader.h definitions.h
+output_writer.o: input_reader.h definitions.h utils.h
 	gcc -c -ansi -Wall -pedantic output_writer.c -o output_writer.o -lm
 
 transitions.o: input_reader.h utils.h

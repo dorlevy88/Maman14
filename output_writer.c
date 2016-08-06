@@ -6,11 +6,19 @@
 #define THREE_BITS_MASK 7  /* this is equal to 111 binary */
 
 
-char* getFilenameNoExtension(char *filename) {
-    char *dot = strrchr(filename, '.');
-    if(dot == NULL || dot == filename) return "";
-    dot[0] = '\0'; /*  terminate string at the . (dot) location */
-    return filename;
+char* getFilenameNewExtension(char *filename, const char* extension) {
+    int dotPos;
+    char* newFileName;
+    char *dot;
+
+    dot = strrchr(filename, '.');
+    if(dot == NULL || dot == filename) return NULL;
+    /*  terminate string at the . (dot) location */
+    dotPos = (int) (dot - filename);
+    newFileName = getNewString(dotPos + strlen(extension));
+    strncpy(newFileName, filename, dotPos);
+    strcat(newFileName, extension);
+    return newFileName;
 }
 
 char translateToSpecial8Base(int base8) {
@@ -52,25 +60,27 @@ int convertNumFromBase10toBase8(int base10) {
 }
 
 char* translateCommandToSpecial8Base(int byte) {
-    char* response = (char*) malloc(sizeof(char) * 5);
+    char* response = (char*) malloc(sizeof(char) * 6);
     int i,num;
     for (i = 0; i < 5; ++i) {
         num = byte & THREE_BITS_MASK; /* Get 3 right most bits */
         byte >>=3;
         response[4-i] = translateToSpecial8Base(num);
     }
+    response[5] = '\0';
     return response;
 }
 
 char* translateAddressToSpecial8Base(int address, int size) {
     int base8 = convertNumFromBase10toBase8(address);
-    char* response = (char*) malloc(sizeof(char) * size);
+    char* response = (char*) malloc(sizeof(char) * (size + 1));
     int i, num;
     for (i = 1; i <= size ; ++i) { /* 3 because it could be up to 1000 */
         num = base8 % 10;
         response[size-i] = translateToSpecial8Base(num);
         base8 /= 10;
     }
+    response[size] = '\0';
     return response;
 }
 
@@ -78,7 +88,14 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
     FILE *fp;
     int i;
     char* address;
-    fp = fopen(strcat(filename, ".ent"), "w");
+    char* newFileName;
+
+    if(table->recordSize == 0)
+        return true;
+
+    newFileName = getFilenameNewExtension(filename, ".ent");
+    fp = fopen(newFileName, "w");
+    PrintProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
         return false;
     }
@@ -91,6 +108,7 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
         }
     }
     fclose(fp);
+    free(newFileName);
     return true;
 }
 
@@ -98,19 +116,25 @@ bool writeExtOutputFile(SymbolsTable* externs, char* filename) {
     FILE *fp;
     int i;
     char* address;
-    fp = fopen(strcat(filename, ".ext"), "w");
+    char* newFileName;
+
+    if(externs->recordSize == 0)
+        return true;
+
+    newFileName = getFilenameNewExtension(filename, ".ext");
+    fp = fopen(newFileName, "w");
+    PrintProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
         return false;
     }
 
     for (i = 0; i < externs->recordSize; ++i) {
-        if (externs->records[i].isExternal == true) {
-            address = translateAddressToSpecial8Base(externs->records[i].address, 3);
-            fprintf(fp, "%s %s\n", externs->records[i].label, address);
-            free(address);
-        }
+        address = translateAddressToSpecial8Base(externs->records[i].address, 3);
+        fprintf(fp, "%s %s\n", externs->records[i].label, address);
+        free(address);
     }
     fclose(fp);
+    free(newFileName);
     return true;
 }
 
@@ -122,7 +146,11 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     char* translatedCodeArraySize;
     char* translatedDataArraySize;
     int addressCounter;
-    fp = fopen(strcat(filename, ".ob"), "w");
+    char* newFileName;
+
+    newFileName = getFilenameNewExtension(filename, ".ob");
+    fp = fopen(newFileName, "w");
+    PrintProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
         return false;
     }
@@ -130,8 +158,6 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2);
     translatedDataArraySize = translateAddressToSpecial8Base(assembly->dataArray->size, 2);
     fprintf(fp, "%s %s\n", translatedCodeArraySize, translatedDataArraySize);
-    free(translatedCodeArraySize);
-    free(translatedDataArraySize);
     addressCounter = assembly->startAddress;
     for (i = 0; i < assembly->codeArray->size; ++i) {
         address = translateAddressToSpecial8Base(addressCounter++, 3);
@@ -148,30 +174,32 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
         free(command);
     }
     fclose(fp);
+    free(translatedCodeArraySize);
+    free(translatedDataArraySize);
+    free(newFileName);
     return true;
 }
 
 bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
-    char* filename = (char*)malloc(strlen(fullFilename));
-    strcpy(filename, fullFilename);
-    filename = getFilenameNoExtension(filename);
-    if (writeEntOutputFile(assembly->symbolsTable, filename) == false) {
+    if (writeEntOutputFile(assembly->symbolsTable, fullFilename) == false) {
         /* TODO: Throw error file cannot be created */
         /* TODO: check if file exists and delete it */
         return false;
     }
-    filename = getFilenameNoExtension(filename);
-    if (writeExtOutputFile(assembly->externs, filename) == false) {
+    PrintProcessStep("End writing file", fullFilename);
+
+    if (writeExtOutputFile(assembly->externs, fullFilename) == false) {
         /* TODO: Throw error file cannot be created */
         /* TODO: check if file exists and delete it */
         return false;
     }
-    filename = getFilenameNoExtension(filename);
-    if(writeObOutputFile(assembly, filename) == false) {
+    PrintProcessStep("End writing file", fullFilename);
+
+    if(writeObOutputFile(assembly, fullFilename) == false) {
         /* TODO: Throw error file cannot be created */
         /* TODO: check if file exists and delete it */
         return false;
     }
-    free(filename);
+    PrintProcessStep("End writing file", fullFilename);
     return true;
 }

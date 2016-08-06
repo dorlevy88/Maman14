@@ -1,12 +1,16 @@
 #include <stdlib.h>
 #include "assembler.h"
 
-bool init(AssemblyStructure** assembly, FileContent** file) {
+void free_all(AssemblyStructure** assembly, FileContent** file) {
     if (*assembly != NULL)
         freeAssemblyStructure(assembly);
     if (*file != NULL) {
         freeFileContent(file);
     }
+}
+
+bool init(AssemblyStructure** assembly, FileContent** file) {
+    free_all(assembly, file);
     return initAssemblyStructure(assembly) && initFileContent(file);
 }
 
@@ -59,11 +63,13 @@ int main(int argc, char **argv) {
         }
         PrintProcessStep("Transition two succeeded", filename);
 
+        PrintProcessStep("Start writing files", filename);
         if (WriteAllOutputFiles(assemblyStructure, filename) == false) {
             PrintProcessStep("Writing file failed", filename);
-            /*TODO: delete files in case of a failure*/
         }
         PrintProcessStep("Writing file succeeded", filename);
+        /*TODO: delete files in case of a failure*/
     }
+    free_all(&assemblyStructure, &fileContent);
     return 0;
 }

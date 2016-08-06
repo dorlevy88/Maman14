@@ -15,4 +15,8 @@ int ConvertCompliment2(int num, int size);
 
 char* getNewSubString(const char* pos, int size);
 
+char* copyString(const char* pos);
+
+char* getNewString(int size);
+
 #endif /* MAMAN14_LOGGER_H */
