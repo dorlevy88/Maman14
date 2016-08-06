@@ -43,7 +43,7 @@ char* getNewSubString(const char* pos, int size) {
     char* res;
 
     res = getNewString(size);
-    strncpy(res, pos, size);
+    strncpy(res, pos, (size_t)size);
     return res;
 }
 

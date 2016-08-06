@@ -319,36 +319,6 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
 
     parsedLine->firstOperValue->string = string;
     return NULL;
-    /*
-    for (i = 0; i < strlen(rawOperandString) ; i++) {
-        if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] != '"'){ //  before word - did not find any quote yet
-            if (rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' '){
-                return "String does not start with double quotes";
-            }
-        }
-        else if (firstQuotesLocation == -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ // got to first quotes
-            firstQuotesLocation = i;
-        }
-        else if (firstQuotesLocation > -1 && secondQuotesLocation == -1 && rawOperandString[i] == '"'){ // got second quote
-            secondQuotesLocation = i;
-        }
-        else if (firstQuotesLocation > -1 && secondQuotesLocation > -1 && /*  after second quote
-                (rawOperandString[i] != '\n' && rawOperandString[i] != '\r' && rawOperandString[i] != '\0' && rawOperandString[i] != '\t' && rawOperandString[i] != ' ')){
-            return "String has data after closing double quotes";
-        }
-    }
-    if (secondQuotesLocation > firstQuotesLocation && firstQuotesLocation > -1){
-        stringSize = (size_t)secondQuotesLocation - firstQuotesLocation - 1;
-        string = (char*) malloc(stringSize);
-        strncpy(string, //  set string
-                strchr(rawOperandString, '"') + 1,   //the string after the first double quotes
-                secondQuotesLocation - firstQuotesLocation - 1); //  number of char to copy
-
-        parsedLine->firstOperValue->string = string;
-        return NULL;
-    }
-    return "String should be enclosed by double quotes and be more than one char";
-    */
 }
 
 char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
@@ -499,6 +469,8 @@ char* lineValidator(FileLine* parsedLine) {
     char* parsedLabel;
     char* rawOperandsString;
     size_t strSize;
+    char* errStr;
+
     char* lineToCheck = copyString(parsedLine->originalLine);
     string = strtok(lineToCheck, " \t\n\r"); /* Get first string */
 
@@ -531,7 +503,7 @@ char* lineValidator(FileLine* parsedLine) {
 
     parsedLine->action = copyString(string);      /* get the action */
     rawOperandsString = strtok(NULL, "\n\r"); /*  get remaining of line */
-    char* errStr = validateActionAndOperands(rawOperandsString, parsedLine);
+    errStr = validateActionAndOperands(rawOperandsString, parsedLine);
     free(lineToCheck);
     return errStr;
 }

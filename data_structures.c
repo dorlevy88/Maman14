@@ -1,13 +1,12 @@
 #include <memory.h>
 #include <stdlib.h>
-#include "data_structures.h"
 #include "utils.h"
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "data_structures.h"
 
 #define DATA_BYTE_SIZE 15
-#define NEW_CHUNK_SIZE 10
 
 bool PushByteFromInt(AssemblyBytes* bytes, int byte) {
     if(bytes->size == MAX_ASSEMBLY_BYTES) {

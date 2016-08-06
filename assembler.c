@@ -30,14 +30,15 @@ int main(int argc, char **argv) {
 
      */
 
-    int fileCounter;
+    int filesCounter;
     char* filename;
     bool results;
     FileContent* fileContent = NULL;
     AssemblyStructure* assemblyStructure = NULL;
 
-    for (fileCounter = 1; fileCounter < argc; ++fileCounter) {
-        filename = argv[fileCounter];
+    for (filesCounter = 1; filesCounter < argc; ++filesCounter) {
+        filename = argv[filesCounter];
+
         results = init(&assemblyStructure, &fileContent);
         if (results == false) {
             PrintProcessStep("Internal Memory issue", filename);

@@ -1,7 +1,12 @@
 #ifndef MAMAN14_DEFINITIONS_H
 #define MAMAN14_DEFINITIONS_H
 
-/* Defines for Compiler Error Strings */
+/* Defines for General Errors */
+#define ERR_COMPILER_MEMORY_FAILURE "Compiler internal memory error"
+
+/* Defines for Syntax Errors */
+
+/* Defines for Compiler Errors */
 #define ERR_RAM_OVERFLOW "The program is too big for the computer RAM"
 #define ERR_LABEL_DEFINED_TWICE "The label defined twice"
 #define ERR_LABEL_NOT_DEFINED "The label definition doesn't exists"
