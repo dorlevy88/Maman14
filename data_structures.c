@@ -192,14 +192,33 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
     return true;
 }
 
-bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry){
+bool AddNewExternToTable(SymbolsTable* table, char *label, int address) {
+    if (table->recordSize == table->size) { /* Allocate additional space to the array */
+        table->records = (SymbolRecord *) realloc(table->records, (table->size + 1) * sizeof(SymbolRecord));
+        if (table->records == NULL) {
+            exit(0);
+        }
+        memset(&table->records[table->size], 0, sizeof(SymbolRecord));
+        table->size++;
+    }
+    table->records[table->recordSize].label = copyString(label);
+    table->records[table->recordSize].address = address;
+    table->records[table->recordSize].isExternal = false;
+    table->records[table->recordSize].isCommand = false;
+    table->records[table->recordSize].isEntry = false;
+    table->records[table->recordSize].byteCodeForDynamic = false;
+    table->recordSize++;
+    return true;
+}
+
+bool SetLabelIsEntryInTable(SymbolsTable* table, char* label){
     int labelPos;
     labelPos = isLabelExistsInTable(table, label);
     if (labelPos == LABEL_NOT_EXISTS) {
         return false;
     }
 
-    table->records[labelPos].isEntry = isEntry;
+    table->records[labelPos].isEntry = true;
     return true;
 }
 

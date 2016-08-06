@@ -3,13 +3,21 @@
 
 #include "utils.h"
 
-void PrintSyntaxError(char* errorMsg, int lineNum);
 
-void PrintCompileError(char* errorMsg, char* param, int lineNum);
+/*
+void print_error(const char* file, int line, char* msg);
 
-void PrintCompileWarning(char* errorMsg, char* param, int lineNum);
+void print_output(const char* file, int line, char* msg, ...);
 
-void PrintProcessStep(char* message, char* param);
+*/
+void PrintSyntaxError(const char* errorMsg, int lineNum);
+
+void PrintCompileError(const char* errorMsg, const char* param, int lineNum);
+
+void PrintCompileWarning(const char* errorMsg, const char* param, int lineNum);
+
+void PrintProcessStep(const char* message, const char* param);
+
 
 int ConvertCompliment2(int num, int size);
 

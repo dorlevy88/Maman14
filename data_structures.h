@@ -85,7 +85,9 @@ int isLabelExistsInTable(SymbolsTable* table, char* label);
 
 bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic);
 
-bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry);
+bool AddNewExternToTable(SymbolsTable* table, char *label, int address);
+
+bool SetLabelIsEntryInTable(SymbolsTable* table, char* label);
 
 void printSymbolTable(SymbolsTable* table);
 

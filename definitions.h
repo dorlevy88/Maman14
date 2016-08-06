@@ -12,6 +12,8 @@
 #define ERR_LABEL_NOT_DEFINED "The label definition doesn't exists"
 #define WARN_LABEL_IN_BAD_LOCATION "Label is not allowed on .extern or .entry"
 
+#define PASS 1
+#define FAIL -1
 
 /* Defining enums */
 typedef enum ActionTypes {

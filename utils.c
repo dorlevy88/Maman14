@@ -3,6 +3,19 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include "utils.h"
+
+/*
+void print_error(const char* file, int line, char* msg) {
+
+    "File: %s\tline:%d\\t"
+    fprintf(stderr, "%s\t at File: %s\tline:%d", msg, file, line);
+}
+
+void print_output(const char* file, int line, char* msg, ...);
+
+
+*/
 
 void PrintSyntaxError(const char* errorMsg, int lineNum){
     fprintf(stderr, "Syntax Error in line %d - %s\n", lineNum, errorMsg);

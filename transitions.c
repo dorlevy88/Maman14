@@ -101,7 +101,7 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, SymbolsTable* externs
             binData <<= 2;
             if (record->isExternal) {
                 binData += (int)External;
-                AddNewLabelToTable(externs, operand->label, cmdAddress, false, false, false, 0);
+                AddNewExternToTable(externs, operand->label, cmdAddress);
             }
             else {
                 binData += (int)Relocatable;
@@ -324,7 +324,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
         /* Step: 5 */
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
-                if (SetLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, true) == false) {
+                if (SetLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern) == false) {
                     PrintCompileError(ERR_LABEL_NOT_DEFINED, line.firstOperValue->entryOrExtern, line.lineNumber);
                     return false;
                 }
