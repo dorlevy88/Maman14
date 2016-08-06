@@ -308,7 +308,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
 
         line = fileContent->line[i];
-        /* printf("%s", fileContent->line[i].originalLine); */
+        printf("%s", fileContent->line[i].originalLine);
 
         /* TODO:Debug */
 

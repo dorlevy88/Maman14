@@ -89,27 +89,83 @@ char* getNewStrBetweenTwoChars(const char* orig, char c1, char c2, bool checkEnd
     return NULL;
 }
 
-char* getOperand(char* operandStr, Operand* operand) {
-    int num;
-    char* label;
-
+char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* maxNum) {
     int operandStrSize;
     int openBracketPos;
     int closeBracketPos;
     int dashPos;
-    int minNum;
-    int maxNum;
     char* openBracketPosStr;
     char* closeBracketPosStr;
     char* dashPosStr;
     char* minNumStr;
     char* maxNumStr;
 
+    int minNumTemp;
+    int maxNumTemp;
+    char* labelTemp;
+
     operandStrSize = strlen(operandStr);
     openBracketPosStr = strchr(operandStr, '[');
     closeBracketPosStr = strchr(operandStr, ']');
     dashPosStr = strchr(operandStr, '-');
 
+    openBracketPos = (int) (openBracketPosStr - operandStr);
+    closeBracketPos = (int) (closeBracketPosStr - operandStr);
+    dashPos = (int) (dashPosStr - operandStr);
+
+    if (closeBracketPos > dashPos && dashPos > openBracketPos && /* Check '[' then '-' then ']' */
+        openBracketPos != 0 &&         /* Has label instead of [ */
+        openBracketPos <= MAX_LABEL_SIZE && /* TODO: do we still need it? Label size is less then max size */
+        closeBracketPos == operandStrSize - 1) { /* ']' is at the end*/
+
+        labelTemp = getNewSubString(operandStr, openBracketPos);
+        if (!isLabelValid(labelTemp)) {
+            return strcat("Label is not valid - ", labelTemp);
+        }
+        minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);
+        if (minNumStr != NULL) {
+            minNumTemp = getIntFromString(minNumStr);
+            free(minNumStr);
+        }
+        else {
+            return "Failed Parsing Dynamic  addressing";
+        }
+        maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);
+        if (maxNumStr != NULL) {
+            maxNumTemp = getIntFromString(maxNumStr);
+            free(maxNumStr);
+        }
+        else {
+            return "Failed Parsing Dynamic  addressing";
+        }
+
+        if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND ||
+                maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
+            return "Operand num is out of bound";
+        }
+
+        *label = labelTemp;
+        *minNum = minNumTemp;
+        *maxNum = maxNumTemp;
+        return NULL;
+    }
+    return "Incorrect dynamic addressing format";
+}
+
+char* getOperand(char* operandStr, Operand* operand) {
+    int num;
+    char* label;
+
+    char* openBracketPosStr;
+    char* closeBracketPosStr;
+    char* dashPosStr;
+    int minNum;
+    int maxNum;
+    char* errStr;
+
+    openBracketPosStr = strchr(operandStr, '[');
+    closeBracketPosStr = strchr(operandStr, ']');
+    dashPosStr = strchr(operandStr, '-');
     /* Debug */
     /* fprintf(stderr, "Line is = %s\n", operandStr); */
 
@@ -139,47 +195,16 @@ char* getOperand(char* operandStr, Operand* operand) {
     }
     /* Dinami Yashir */
     else if (openBracketPosStr != NULL && closeBracketPosStr != NULL && dashPosStr != NULL) { /* Check we should be in Dinami Yashir */
-        operand->addressingType = DYNAMIC;
-
-        openBracketPos = (int) (openBracketPosStr - operandStr);
-        closeBracketPos = (int) (closeBracketPosStr - operandStr);
-        dashPos = (int) (dashPosStr - operandStr);
-
-        if (closeBracketPos > dashPos && dashPos > openBracketPos && /* Check '[' then '-' then ']' */
-            openBracketPos != 0 &&         /* Has label instead of [ */
-            openBracketPos <= MAX_LABEL_SIZE && /* TODO: do we still need it? Label size is less then max size */
-            closeBracketPos == operandStrSize - 1) { /* ']' is at the end*/
-
-            label = getNewSubString(operandStr, openBracketPos);
-            if (!isLabelValid(label)) {
-                return strcat("Label is not valid - ", label);
-            }
-            minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);
-            if (minNumStr != NULL) {
-                minNum = getIntFromString(minNumStr);
-                free(minNumStr);
-            }
-            else {
-                return "Failed Parsing Dynamic  addressing";
-            }
-            maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);
-            if (maxNumStr != NULL) {
-                maxNum = getIntFromString(maxNumStr);
-                free(maxNumStr);
-            }
-            else {
-                return "Failed Parsing Dynamic  addressing";
-            }
-
-            if (minNum == INVALID_NUM_TOKEN || minNum > MAX_DYNAMIC_OPERAND ||
-                    maxNum == INVALID_NUM_TOKEN || maxNum > MAX_DYNAMIC_OPERAND) {
-                return "Operand num is out of bound";
-            }
-
+        errStr = checkDynamicAddressing(operandStr, &label, &minNum, &maxNum);
+        if (errStr == NULL) {
+            operand->addressingType = DYNAMIC;
             operand->label = label;
             operand->minNum = minNum;
             operand->maxNum = maxNum;
             return NULL;
+        }
+        else {
+            return errStr;
         }
     }
     /* Yashir */
@@ -334,7 +359,7 @@ char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
     label = strtok(rawOperandString, " \t\n\r");
 
     if (isLabelValid(label)){
-        parsedLine->firstOperValue->entryOrExtern = label;
+        parsedLine->firstOperValue->entryOrExtern = copyString(label);
         return NULL;
     }
     return "Label is not valid";
