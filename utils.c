@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+#include <memory.h>
 
 
 void PrintSyntaxError(char* errorMsg, int lineNum){
@@ -25,4 +27,16 @@ int ConvertCompliment2(int num, int size) {
         return (int)(pow(2, size) + num);
     }
     return num;
+}
+
+char* getNewSubString(const char* pos, int size) {
+    size_t sizeT;
+    char* res;
+
+    sizeT = (size_t)size + 1;
+    res = (char*)malloc(sizeT);
+    memset(res, 0, sizeT);
+    strncpy(res, pos, sizeT);
+    res[sizeT - 1] = '\0';
+    return res;
 }

@@ -94,22 +94,20 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
     return true;
 }
 
-bool writeExtOutputFile(SymbolsTable *table, char* filename) {
+bool writeExtOutputFile(SymbolsTable* externs, char* filename) {
     FILE *fp;
-    int i,j;
+    int i;
     char* address;
     fp = fopen(strcat(filename, ".ext"), "w");
     if (fp == NULL) {
         return false;
     }
 
-    for (i = 0; i < table->recordSize; ++i) {
-        if (table->records[i].isExternal == true) {
-            for (j = 0; j < table->records[i].externUsages; ++j) {
-                address = translateAddressToSpecial8Base(table->records[i].externUsageAddresses[j], 3);
-                fprintf(fp, "%s %s\n", table->records[i].label, address);
-                free(address);
-            }
+    for (i = 0; i < externs->recordSize; ++i) {
+        if (externs->records[i].isExternal == true) {
+            address = translateAddressToSpecial8Base(externs->records[i].address, 3);
+            fprintf(fp, "%s %s\n", externs->records[i].label, address);
+            free(address);
         }
     }
     fclose(fp);
@@ -163,7 +161,7 @@ bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
         return false;
     }
     filename = getFilenameNoExtension(filename);
-    if (writeExtOutputFile(assembly->symbolsTable, filename) == false) {
+    if (writeExtOutputFile(assembly->externs, filename) == false) {
         /* TODO: Throw error file cannot be created */
         /* TODO: check if file exists and delete it */
         return false;

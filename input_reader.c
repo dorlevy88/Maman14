@@ -42,18 +42,6 @@ int getIntFromString(char *string){
     return (int)num;
 }
 
-char* getNewSubString(const char* pos, int size) {
-    size_t sizeT;
-    char* res;
-
-    sizeT = (size_t)size + 1;
-    res = (char*)malloc(sizeT);
-    memset(res, 0, sizeT);
-    strncpy(res, pos, sizeT);
-    res[sizeT - 1] = '\0';
-    return res;
-}
-
 char* getNewSubStringFromString(const char* orig, int pos1, int pos2) {
     size_t sizeT;
     char* res;
@@ -526,7 +514,6 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     int lineCounter = 1;
     int arrayIndex = 0;
     bool isFileOK = true;
-    char* lineCopy;
     char* errString;
     FileLine* parsedLine;
 
@@ -539,7 +526,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
     while(fgets(line, sizeof(line), fr) != NULL)   /* get a word.  done if NULL */
     {
         /* Debug */
-        fprintf(stderr, "Line is -->  %s", line);
+        /* fprintf(stderr, "Line is -->  %s", line); */
         parsedLine = &fileContent->line[arrayIndex];
         memset(parsedLine, 0, sizeof(FileLine));
         parsedLine->originalLine = (char *) malloc(sizeof(line));

@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <memory.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "transitions.h"
 
 #define CMD_BYTE_BEGIN 5 /* equal to 0b101 in binary */
@@ -65,7 +66,7 @@ int getBitRangefromInt(int num, int minBit, int maxBit) {
     return res;
 }
 
-int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOperand, int cmdAddress) {
+int buildBinaryData(Operand* operand, SymbolsTable* table, SymbolsTable* externs, bool isDestinationOperand, int cmdAddress) {
     int binData = 0;
     int labelPos = 0;
     SymbolRecord* record;
@@ -100,7 +101,7 @@ int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOpe
             binData <<= 2;
             if (record->isExternal) {
                 binData += (int)External;
-                AddExternUsageAddress(record, cmdAddress);
+                AddNewLabelToTable(externs, operand->label, cmdAddress, false, false, false, 0);
             }
             else {
                 binData += (int)Relocatable;
@@ -307,7 +308,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
 
         line = fileContent->line[i];
-        printf("%s", fileContent->line[i].originalLine);
+        /* printf("%s", fileContent->line[i].originalLine); */
 
         /* TODO:Debug */
 
@@ -338,13 +339,13 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
             /*  0000000000000-00 (data 13b - E,R,A (2b)) */
             /* Building Code Array */
             if (line.numOfCommandOprands == 1){
-                int binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, true, assembly->ic);
+                int binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic);
                 isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
                 assembly->ic++;
             }
             else if (line.numOfCommandOprands == 2) {
-                int firstBinData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, false, assembly->ic);
-                int secondBinData = buildBinaryData(line.secondOperValue, assembly->symbolsTable, true, assembly->ic+1);
+                int firstBinData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, assembly->externs, false, assembly->ic);
+                int secondBinData = buildBinaryData(line.secondOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic+1);
                 if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){
                     isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData + secondBinData);
                     assembly->ic++;
@@ -352,7 +353,7 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
                 else{
                     isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData);
                     isMemAllocOk &= PushByteFromInt(assembly->codeArray, secondBinData);
-                    assembly->ic+=2;
+                    assembly->ic += 2;
                 }
             }
 

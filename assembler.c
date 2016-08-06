@@ -11,6 +11,7 @@ bool init(AssemblyStructure** assembly, FileContent** file) {
 }
 
 int main(int argc, char **argv) {
+    /* TODO: malloc checks, syntax error strings, name refactoring */
     /*
         1. read .as files
         2. iterate on each one of the files

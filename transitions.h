@@ -9,7 +9,7 @@
 
 int buildBinaryCommand(FileLine cmdLine);
 
-int buildBinaryData(Operand* operand, SymbolsTable* table, bool isDestinationOperand, int cmdAddress);
+int buildBinaryData(Operand* operand, SymbolsTable* table, SymbolsTable* externs, bool isDestinationOperand, int cmdAddress);
 
 bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly);
 

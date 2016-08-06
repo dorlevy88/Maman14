@@ -66,7 +66,8 @@ bool initAssemblyStructure(AssemblyStructure** assembly) {
     AssemblyBytes* dataBytes;
     SymbolsTable* table;
     SymbolRecord* record;
-    int* externUsages;
+    SymbolsTable* tableExt;
+    SymbolRecord* recordExt;
 
     (*assembly) = (AssemblyStructure*)malloc(sizeof(AssemblyStructure));
     if ((*assembly) == NULL)
@@ -79,28 +80,41 @@ bool initAssemblyStructure(AssemblyStructure** assembly) {
         return false;
     memset(codeBytes, 0, sizeof(AssemblyBytes));
     (*assembly)->codeArray = codeBytes;
+
     dataBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
     if (dataBytes == NULL)
         return false;
     memset(dataBytes, 0, sizeof(AssemblyBytes));
     (*assembly)->dataArray = dataBytes;
 
+
     table = (SymbolsTable*)malloc(sizeof(SymbolsTable));
     if (table == NULL)
         return false;
     memset(table, 0, sizeof(SymbolsTable));
+
     record = (SymbolRecord*)malloc(sizeof(SymbolRecord));
     if (record == NULL)
         return false;
     memset(record, 0, sizeof(SymbolRecord));
-    externUsages = (int*)malloc(0);
-    if (externUsages == NULL)
-        return false;
-    memset(externUsages, 0, 0);
-    record->externUsageAddresses = externUsages;
+
     table->records = record;
     table->size = 1;
     (*assembly)->symbolsTable = table;
+
+    tableExt = (SymbolsTable*)malloc(sizeof(SymbolsTable));
+    if (tableExt == NULL)
+        return false;
+    memset(tableExt, 0, sizeof(SymbolsTable));
+
+    recordExt = (SymbolRecord*)malloc(sizeof(SymbolRecord));
+    if (recordExt == NULL)
+        return false;
+    memset(recordExt, 0, sizeof(SymbolRecord));
+
+    table->records = recordExt;
+    table->size = 1;
+    (*assembly)->externs = tableExt;
 
     return true;
 }
@@ -114,6 +128,10 @@ void freeAssemblyStructure(AssemblyStructure** assembly){
     }
     if ((*assembly)->symbolsTable->records != NULL){
         free((*assembly)->symbolsTable->records);
+    }
+
+    if ((*assembly)->externs->records != NULL){
+        free((*assembly)->externs->records);
     }
     free(assembly);
 }
@@ -159,13 +177,14 @@ bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry){
     return true;
 }
 
+/*
 bool AddExternUsageAddress(SymbolRecord* record, int usedAddress){
     record->externUsageAddresses = (int *) realloc(record->externUsageAddresses, record->externUsages + sizeof(int));
     record->externUsageAddresses[record->externUsages] = usedAddress;
     record->externUsages++;
     return true;
 }
-
+*/
 void printSymbolTable(SymbolsTable* table){
     int i;
     printf("----------------------------------------------------------------------------------------------------\n");

@@ -8,14 +8,10 @@
 #define LABEL_NOT_EXISTS -1
 #define ASSEMBLY_CODE_START_ADDRESS 100
 
-
-/* Structs definitions */
 typedef struct SymbolRecord {
     char* label;
     int address;
     bool isExternal;
-    int* externUsageAddresses;
-    int externUsages;
     bool isCommand;
     bool isEntry;
     int byteCodeForDynamic;
@@ -44,6 +40,7 @@ typedef struct AssemblyStructure {
     AssemblyBytes* dataArray;
 
     SymbolsTable* symbolsTable;
+    SymbolsTable* externs;
 
 } AssemblyStructure;
 
@@ -83,15 +80,12 @@ bool initAssemblyStructure(AssemblyStructure** assembly);
 
 void freeAssemblyStructure(AssemblyStructure** assembly);
 
-
 /*  Symbol Table Functions */
 int isLabelExistsInTable(SymbolsTable* table, char* label);
 
 bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic);
 
 bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry);
-
-bool AddExternUsageAddress(SymbolRecord* record, int usedAddress);
 
 void printSymbolTable(SymbolsTable* table);
 

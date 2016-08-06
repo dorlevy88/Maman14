@@ -13,4 +13,6 @@ void PrintProcessStep(char* message, char* param);
 
 int ConvertCompliment2(int num, int size);
 
+char* getNewSubString(const char* pos, int size);
+
 #endif /* MAMAN14_LOGGER_H */
