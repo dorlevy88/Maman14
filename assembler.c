@@ -65,9 +65,9 @@ int main(int argc, char **argv) {
 
         PrintProcessStep("Start writing files", filename);
         if (WriteAllOutputFiles(assemblyStructure, filename) == false) {
-            PrintProcessStep("Writing file failed", filename);
+            PrintProcessStep("Writing files failed", filename);
         }
-        PrintProcessStep("Writing file succeeded", filename);
+        PrintProcessStep("Writing files succeeded", filename);
         /*TODO: delete files in case of a failure*/
     }
     free_all(&assemblyStructure, &fileContent);

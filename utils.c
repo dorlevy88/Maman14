@@ -4,20 +4,20 @@
 #include <memory.h>
 
 
-void PrintSyntaxError(char* errorMsg, int lineNum){
+void PrintSyntaxError(const char* errorMsg, int lineNum){
     fprintf(stderr, "Syntax Error in line %d - %s\n", lineNum, errorMsg);
 }
 
-void PrintCompileError(char* errorMsg, char* param, int lineNum){
+void PrintCompileError(const char* errorMsg, const char* param, int lineNum){
     fprintf(stderr, "Compile Error in line %d - %s, Parameter: %s\n", lineNum, errorMsg, param);
 }
 
-void PrintCompileWarning(char* errorMsg, char* param, int lineNum){
+void PrintCompileWarning(const char* errorMsg, const char* param, int lineNum){
     fprintf(stderr, "Compile Warning in line %d - %s, Parameter: %s\n", lineNum, errorMsg, param);
 }
 
 
-void PrintProcessStep(char* message, char* param){
+void PrintProcessStep(const char* message, const char* param){
     fprintf(stdout, "Message - %s, Parameter: %s\n", message, param);
 }
 
@@ -31,8 +31,8 @@ int ConvertCompliment2(int num, int size) {
 
 char* getNewString(int size) {
     char* res;
-    
-    size_t sizeT = (size_t)size+1;
+
+    size_t sizeT = ((size_t)size+1) * sizeof(char);
     res = (char*)malloc(sizeT);
     memset(res, 0, sizeT);
     res[size] = '\0';

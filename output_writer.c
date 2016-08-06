@@ -184,20 +184,17 @@ bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
         /* TODO: check if file exists and delete it */
         return false;
     }
-    PrintProcessStep("End writing file", fullFilename);
 
     if (writeExtOutputFile(assembly->externs, fullFilename) == false) {
         /* TODO: Throw error file cannot be created */
         /* TODO: check if file exists and delete it */
         return false;
     }
-    PrintProcessStep("End writing file", fullFilename);
 
     if(writeObOutputFile(assembly, fullFilename) == false) {
         /* TODO: Throw error file cannot be created */
         /* TODO: check if file exists and delete it */
         return false;
     }
-    PrintProcessStep("End writing file", fullFilename);
     return true;
 }

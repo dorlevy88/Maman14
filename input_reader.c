@@ -583,7 +583,7 @@ bool getFileContent(char* filename, FileContent* fileContent) {
 bool initFileContent(FileContent** fileContent) {
     *fileContent = (FileContent*)malloc(sizeof(FileContent));
     memset(*fileContent, 0, sizeof(FileContent));
-    if (fileContent == NULL)
+    if (*fileContent == NULL)
         return false;
 
     (*fileContent)->line = (FileLine*)malloc(sizeof(FileLine)*MAX_FILE_LINES);
@@ -595,7 +595,7 @@ bool initFileContent(FileContent** fileContent) {
 void freeFileContent(FileContent** fileContent) {
     int i;
     if ((*fileContent)->size > 0){
-        printf("Clears file line");
+        printf("Clears file line\n");
         for (i = 0; i < (*fileContent)->size; ++i) {
             free((*fileContent)->line[i].label);
             free((*fileContent)->line[i].originalLine);

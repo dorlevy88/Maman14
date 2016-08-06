@@ -133,22 +133,27 @@ void freeAssemblyStructure(AssemblyStructure** assembly){
 
     if ((*assembly)->symbolsTable != NULL){
         printf("Clears Symbols\n");
+        printSymbolTable((*assembly)->symbolsTable);
         for (i = 0; i < (*assembly)->symbolsTable->size; ++i) {
             if ((*assembly)->symbolsTable->records[i].label != NULL)
+                printf("Clear Record: %s\n", (*assembly)->symbolsTable->records[i].label);
                 free((*assembly)->symbolsTable->records[i].label);
         }
         free((*assembly)->symbolsTable->records);
         free((*assembly)->symbolsTable);
+        printf("Cleared Symbols\n");
     }
 
     if ((*assembly)->externs != NULL){
         printf("Clears Externs\n");
+        printSymbolTable((*assembly)->externs);
         for (i = 0; i < (*assembly)->externs->size; ++i) {
             if ((*assembly)->externs->records[i].label != NULL)
                 free((*assembly)->externs->records[i].label);
         }
         free((*assembly)->externs->records);
         free((*assembly)->externs);
+        printf("Cleared Externs\n");
     }
 
     free(*assembly);
@@ -171,12 +176,12 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
         return false;
     }
     if (table->recordSize == table->size) { /* Allocate additional space to the array */
-        table->records = (SymbolRecord *) realloc(table->records, table->size + (NEW_CHUNK_SIZE * sizeof(SymbolRecord)));
+        table->records = (SymbolRecord *) realloc(table->records, (table->size + 1) * sizeof(SymbolRecord));
         if (table->records == NULL) {
             exit(0);
         }
-        memset(&table->records[table->recordSize], 0, sizeof(SymbolRecord));
-        table->size += NEW_CHUNK_SIZE;
+        memset(&table->records[table->size], 0, sizeof(SymbolRecord));
+        table->size++;
     }
     table->records[table->recordSize].label = copyString(label);
     table->records[table->recordSize].address = address;
@@ -202,7 +207,7 @@ bool SetLabelIsEntryInTable(SymbolsTable* table, char* label, bool isEntry){
 void printSymbolTable(SymbolsTable* table){
     int i;
     printf("----------------------------------------------------------------------------------------------------\n");
-    printf("label\taddress\tisExternal\tisCommand\tisEntry\tbyteCodeForDynamic\n");\
+    printf("label\t\taddress\tisExternal\tisCommand\tisEntry\tbyteCodeForDynamic\n");\
     for (i = 0; i < table->recordSize ; i++) {
         printf("%s\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n", table->records[i].label, table->records[i].address,
                table->records[i].isExternal, table->records[i].isCommand, table->records[i].isEntry, table->records[i].byteCodeForDynamic);
