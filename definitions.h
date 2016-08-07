@@ -6,6 +6,7 @@
 /* Defines for General Errors */
 #define ERR_PROG_MEMORY_FAILURE "Program internal memory error"
 #define ERR_FILE_NOT_FOUND "File does not exists"
+#define EER_NEW_FILE_FAILURE "Error trying to create new file"
 
 /* Defines for Syntax Errors */
 #define ERR_INVAILD_LABEL "Invalid label name"

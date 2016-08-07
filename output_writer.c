@@ -89,13 +89,15 @@ void writeEntOutputFile(SymbolsTable *table, char* filename) {
     char* newFileName;
 
     if(table->recordSize == 0)
-        return true;
+        return;
 
     newFileName = getFilenameNewExtension(filename, ".ent");
     fp = fopen(newFileName, "w");
     printProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
-        return false;
+        printInternalError(EER_NEW_FILE_FAILURE, newFileName);
+        free(newFileName);
+        return;
     }
 
     for (i = 0; i < table->recordSize; ++i) {
@@ -107,7 +109,7 @@ void writeEntOutputFile(SymbolsTable *table, char* filename) {
     }
     fclose(fp);
     free(newFileName);
-    return true;
+    return;
 }
 
 void writeExtOutputFile(SymbolsTable* externs, char* filename) {
@@ -117,13 +119,15 @@ void writeExtOutputFile(SymbolsTable* externs, char* filename) {
     char* newFileName;
 
     if(externs->recordSize == 0)
-        return true;
+        return;
 
     newFileName = getFilenameNewExtension(filename, ".ext");
     fp = fopen(newFileName, "w");
     printProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
-        return false;
+        printInternalError(EER_NEW_FILE_FAILURE, newFileName);
+        free(newFileName);
+        return;
     }
 
     for (i = 0; i < externs->recordSize; ++i) {
@@ -133,7 +137,7 @@ void writeExtOutputFile(SymbolsTable* externs, char* filename) {
     }
     fclose(fp);
     free(newFileName);
-    return true;
+    return;
 }
 
 void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
@@ -150,7 +154,9 @@ void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     fp = fopen(newFileName, "w");
     printProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
-        return false;
+        printInternalError(EER_NEW_FILE_FAILURE, newFileName);
+        free(newFileName);
+        return;
     }
 
     translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2);
@@ -175,7 +181,7 @@ void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     free(translatedCodeArraySize);
     free(translatedDataArraySize);
     free(newFileName);
-    return true;
+    return;
 }
 
 void writeAllOutputFiles(AssemblyStructure *assembly, char *fullFilename) {

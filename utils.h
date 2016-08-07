@@ -1,5 +1,5 @@
-#ifndef MAMAN14_LOGGER_H
-#define MAMAN14_LOGGER_H
+#ifndef MAMAN14_UTILS_H
+#define MAMAN14_UTILS_H
 
 #include "definitions.h"
 #include "utils.h"
@@ -24,6 +24,6 @@ char* copyString(const char* pos);
 
 char* getNewString(int size);
 
-long decimalToBinary(int n)
+long decimalToBinary(int n);
 
-#endif /* MAMAN14_LOGGER_H */
+#endif /* MAMAN14_UTILS_H */
