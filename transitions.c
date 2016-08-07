@@ -204,7 +204,7 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
         15. go back to step 2
     */
     int i, calcCommandSize;
-    assembly->ic = assembly->startAddress;
+    assembly->ic = ASSEMBLY_CODE_START_ADDRESS;
     assembly->dc = 0;
 
     for (i=0; i < fileContent->size; i++){ /* For every line in file */
@@ -254,11 +254,7 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
             }
             /* Steps 9, 9.1, 10 */
             if (line.actionType == EXTERN) {
-                if (addNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false,
-                                       false, 0)){
-                    printCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
-                    return Fail;
-                }
+                addNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false, false, 0);
             }
         }
         else {/*  handle command line */
@@ -320,8 +316,7 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
     11.4 symbols table with entry points marks */
     int i;
     FileLine line;
-    int tmpIc = assembly->ic;
-    assembly->ic = assembly->startAddress;
+    assembly->ic = ASSEMBLY_CODE_START_ADDRESS;
 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
         line = fileContent->line[i];

@@ -4,7 +4,6 @@
 #include "definitions.h"
 #include "utils.h"
 
-#include <mem.h>
 
 void printSyntaxError(const char *msg, const char *filename, int lineNum);
 

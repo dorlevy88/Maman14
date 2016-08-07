@@ -4,7 +4,7 @@
 #include "output_writer.h"
 
 #define THREE_BITS_MASK 7  /* this is equal to 111 binary */
-
+#define FILE_OUTPUT_FORMAT "%s\t%s\n"
 
 char* getFilenameNewExtension(char *filename, const char* extension) {
     int dotPos;
@@ -87,8 +87,16 @@ void writeEntOutputFile(SymbolsTable *table, char* filename) {
     int i;
     char* address;
     char* newFileName;
+    bool tableHasEntry = false;
 
-    if(table->recordSize == 0)
+    /* check for entry records */
+    for (i = 0; i < table->recordSize; ++i) {
+        if (table->records[i].isEntry == true) {
+            tableHasEntry = true;
+            break;
+        }
+    }
+    if (tableHasEntry == false)
         return;
 
     newFileName = getFilenameNewExtension(filename, ".ent");
@@ -103,7 +111,7 @@ void writeEntOutputFile(SymbolsTable *table, char* filename) {
     for (i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isEntry == true) {
             address = translateAddressToSpecial8Base(table->records[i].address, 3);
-            fprintf(fp, "%s %s\n", table->records[i].label, address);
+            fprintf(fp, FILE_OUTPUT_FORMAT, table->records[i].label, address);
             free(address);
         }
     }
@@ -132,7 +140,7 @@ void writeExtOutputFile(SymbolsTable* externs, char* filename) {
 
     for (i = 0; i < externs->recordSize; ++i) {
         address = translateAddressToSpecial8Base(externs->records[i].address, 3);
-        fprintf(fp, "%s %s\n", externs->records[i].label, address);
+        fprintf(fp, FILE_OUTPUT_FORMAT, externs->records[i].label, address);
         free(address);
     }
     fclose(fp);
@@ -161,19 +169,19 @@ void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 
     translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2);
     translatedDataArraySize = translateAddressToSpecial8Base(assembly->dataArray->size, 2);
-    fprintf(fp, "%s %s\n", translatedCodeArraySize, translatedDataArraySize);
-    addressCounter = assembly->startAddress;
+    fprintf(fp, FILE_OUTPUT_FORMAT, translatedCodeArraySize, translatedDataArraySize);
+    addressCounter = ASSEMBLY_CODE_START_ADDRESS;
     for (i = 0; i < assembly->codeArray->size; ++i) {
         address = translateAddressToSpecial8Base(addressCounter++, 3);
         command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
-        fprintf(fp, "%s %s\n", address, command);
+        fprintf(fp, FILE_OUTPUT_FORMAT, address, command);
         free(address);
         free(command);
     }
     for (i = 0; i < assembly->dataArray->size; ++i) {
         address = translateAddressToSpecial8Base(addressCounter++, 3);
         command = translateCommandToSpecial8Base(assembly->dataArray->array[i]);
-        fprintf(fp, "%s %s\n", address, command);
+        fprintf(fp, FILE_OUTPUT_FORMAT, address, command);
         free(address);
         free(command);
     }

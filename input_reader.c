@@ -257,7 +257,7 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine){
     if (errString != NULL) return errString;
 
     if (parsedLine->secondOperValue->addressingType == NUMBER || parsedLine->secondOperValue->addressingType == DYNAMIC)
-        errString = ERR_ILLEGAL_DEST_ADDRESSING;
+        return ERR_ILLEGAL_DEST_ADDRESSING;
 
     return NULL;
 }
@@ -377,8 +377,8 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     else if (strcmp(action, "lea") == 0){
         parsedLine->actionType = LEA;
         errStr = checkTwoOperands(rawOperandsString, parsedLine);
-
-        if (errStr == NULL && parsedLine->firstOperValue->addressingType != DIRECT)
+        if (errStr == NULL && parsedLine->firstOperValue != NULL &&
+                parsedLine->firstOperValue->addressingType != DIRECT)
             errStr = ERR_LEA_SOURCE_ADDRESSING;
     }
     else if (strcmp(action, "clr") == 0){
@@ -416,7 +416,7 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     else if (strcmp(action, "prn") == 0){
         parsedLine->actionType = PRN;
         errStr = checkOneOperand(rawOperandsString, parsedLine);
-        if (errStr == ERR_ILLEGAL_DEST_ADDRESSING) /* For prn command there is no problem with destination operand*/
+        if (errStr != NULL && strcmp(errStr, ERR_ILLEGAL_DEST_ADDRESSING) == 0) /* For prn command there is no problem with destination operand*/
             errStr = NULL;
     }
     else if (strcmp(action, "rts") == 0){

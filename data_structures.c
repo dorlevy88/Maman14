@@ -60,7 +60,7 @@ void printAssemblyByte(AssemblyBytes* bytes){
  *
  * **********************************************************************/
 
-bool initAssemblyStructure(AssemblyStructure** assembly) {
+Status initAssemblyStructure(AssemblyStructure** assembly) {
     AssemblyBytes* codeBytes;
     AssemblyBytes* dataBytes;
     SymbolsTable* table;
@@ -70,31 +70,30 @@ bool initAssemblyStructure(AssemblyStructure** assembly) {
 
     (*assembly) = (AssemblyStructure*)malloc(sizeof(AssemblyStructure));
     if ((*assembly) == NULL)
-        return false;
+        return Fail;
     memset((*assembly), 0, sizeof(AssemblyStructure));
-    (*assembly)->startAddress = ASSEMBLY_CODE_START_ADDRESS;
 
     codeBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
     if (codeBytes == NULL)
-        return false;
+        return Fail;
     memset(codeBytes, 0, sizeof(AssemblyBytes));
     (*assembly)->codeArray = codeBytes;
 
     dataBytes = (AssemblyBytes*)malloc(sizeof(AssemblyBytes));
     if (dataBytes == NULL)
-        return false;
+        return Fail;
     memset(dataBytes, 0, sizeof(AssemblyBytes));
     (*assembly)->dataArray = dataBytes;
 
 
     table = (SymbolsTable*)malloc(sizeof(SymbolsTable));
     if (table == NULL)
-        return false;
+        return Fail;
     memset(table, 0, sizeof(SymbolsTable));
 
     record = (SymbolRecord*)malloc(sizeof(SymbolRecord));
     if (record == NULL)
-        return false;
+        return Fail;
     memset(record, 0, sizeof(SymbolRecord));
 
     table->records = record;
@@ -103,55 +102,58 @@ bool initAssemblyStructure(AssemblyStructure** assembly) {
 
     tableExt = (SymbolsTable*)malloc(sizeof(SymbolsTable));
     if (tableExt == NULL)
-        return false;
+        return Fail;
     memset(tableExt, 0, sizeof(SymbolsTable));
 
     recordExt = (SymbolRecord*)malloc(sizeof(SymbolRecord));
     if (recordExt == NULL)
-        return false;
+        return Fail;
     memset(recordExt, 0, sizeof(SymbolRecord));
 
     tableExt->records = recordExt;
     tableExt->size = 1;
     (*assembly)->externs = tableExt;
 
-    return true;
+    return Pass;
 }
 
 void freeAssemblyStructure(AssemblyStructure** assembly){
     int i;
     if ((*assembly)->codeArray != NULL) {
-        printf("Clears Code Array\n");
+        if(DEBUG) printf("Clears Code Array\n");
         free((*assembly)->codeArray);
     }
     if ((*assembly)->dataArray != NULL){
-        printf("Clears Data Array\n");
+        if(DEBUG) printf("Clears Data Array\n");
         free((*assembly)->dataArray);
     }
 
     if ((*assembly)->symbolsTable != NULL){
-        printf("Clears Symbols\n");
+        if(DEBUG) printf("Clears Symbols\n");
         printSymbolTable((*assembly)->symbolsTable);
         for (i = 0; i < (*assembly)->symbolsTable->size; ++i) {
-            if ((*assembly)->symbolsTable->records[i].label != NULL)
-                printf("Clear Record: %s\n", (*assembly)->symbolsTable->records[i].label);
+            if ((*assembly)->symbolsTable->records[i].label != NULL) {
+                if (DEBUG) printf("Clear Record: %s\n", (*assembly)->symbolsTable->records[i].label);
                 free((*assembly)->symbolsTable->records[i].label);
+            }
         }
         free((*assembly)->symbolsTable->records);
         free((*assembly)->symbolsTable);
-        printf("Cleared Symbols\n");
+        if(DEBUG) printf("Cleared Symbols\n");
     }
 
     if ((*assembly)->externs != NULL){
-        printf("Clears Externs\n");
+        if(DEBUG) printf("Clears Externs\n");
         printSymbolTable((*assembly)->externs);
         for (i = 0; i < (*assembly)->externs->size; ++i) {
-            if ((*assembly)->externs->records[i].label != NULL)
+            if ((*assembly)->externs->records[i].label != NULL) {
+                if (DEBUG) printf("Clear Record: %s\n", (*assembly)->symbolsTable->records[i].label);
                 free((*assembly)->externs->records[i].label);
+            }
         }
         free((*assembly)->externs->records);
         free((*assembly)->externs);
-        printf("Cleared Externs\n");
+        if(DEBUG) printf("Cleared Externs\n");
     }
 
     free(*assembly);

@@ -18,7 +18,7 @@ void printCompileWarning(const char *msg, const char *filename, int lineNum){
 }
 
 void printProcessStep(const char *msg, const char *filename){
-    fprintf(stdout, "Step: %s ---> file: %s", msg, filename);
+    fprintf(stdout, "Step: %s ---> file: %s\n", msg, filename);
 }
 
 void printInternalError(const char *msg, const char *param){

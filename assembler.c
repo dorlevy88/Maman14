@@ -9,65 +9,76 @@ void free_all(AssemblyStructure** assembly, FileContent** file) {
     }
 }
 
-bool init(AssemblyStructure** assembly, FileContent** file) {
+Status init(AssemblyStructure** assembly, FileContent** file) {
     free_all(assembly, file);
     return initAssemblyStructure(assembly) && initFileContent(file);
 }
 
+/**
+ * Assembler Compiler Program:
+ * Takes .as files parsing them and outputing the liker files (.ob/[.ext]/[.ent]) in special 8 base style
+ * @param argc arguments count
+ * @param argv .as file names as arguments
+ * @return
+ */
 int main(int argc, char **argv) {
-    /* TODO: malloc checks, syntax error strings, name refactoring */
     /*
-        1. read .as files
-        2. iterate on each one of the files
-        3.0   create data array & code array (represent memory layout) : arrays type is bit12[]
-        3.1   crease ic & dc
-        3.2   create symbols tables
-        4.    Run transitions
-        5.    Translate arrays to special base8
-        6.    build .ob file --> (ic + ' ' + dc) code array and then data array (special base 8)
-        7.    build .ext .ent
-        8.    write .ob [.ext] [.ent] files for each one of the original files
-
+        1.  iterate on each one of the .as files
+        2.1 initialize data structures (data and code arrays, ic & dc, symbols & extern tables)
+        2.2 initialize parsed file content structure
+        3.    Run first & second transitions
+        4.    Translate arrays to special base8
+        5.    write .ob file --> (ic + ' ' + dc) code array and then data array (special base 8)
+        6.    write .ext .ent (symbols table & extern table)
      */
 
     int filesCounter;
     char* filename;
-    bool results;
     FileContent* fileContent = NULL;
     AssemblyStructure* assemblyStructure = NULL;
 
-    for (filesCounter = 1; filesCounter < argc; ++filesCounter) {
+    for (filesCounter = 1; filesCounter < argc; ++filesCounter) { /* iterate on each one of the .as files */
         filename = argv[filesCounter];
-
-        results = init(&assemblyStructure, &fileContent);
-        if (results == false) {
+        printProcessStep("Start processing file", filename);
+        /*
+         * initialize data structures (data and code arrays, ic & dc, symbols & extern tables)
+         * initialize parsed file content structure
+         */
+        if (init(&assemblyStructure, &fileContent) == Fail) {  /* error allocating data structures */
             printInternalError(ERR_PROG_MEMORY_FAILURE, "While initializing data structures");
-            exit(0);
+            return 1;
         }
 
-        printProcessStep("Start processing file", filename);
-        if (getFileContent(filename, fileContent) == Fail) { /*Error in the file*/
+        printProcessStep("Start parsing file", filename);    /* parse file content into the FileContent struct */
+        if (getFileContent(filename, fileContent) == Fail) {    /* syntax errors in the file continue to next file*/
             printProcessStep("Parsing file failed", filename);
             continue;
         }
         printProcessStep("Parsing file succeeded", filename);
 
-        if(runFirstTransition(fileContent, assemblyStructure) == Fail) {
+
+        printProcessStep("Transition one started", filename);   /* Run first pass of the file */
+        if(runFirstTransition(fileContent, assemblyStructure) == Fail) { /* compiler errors in the file continue to next file */
             printProcessStep("Transition one failed", filename);
             continue;
         }
         printProcessStep("Transition one succeeded", filename);
 
-        if (runSecondTransition(fileContent, assemblyStructure) == Fail) {
+
+        printProcessStep("Transition two started", filename);   /* Run second pass of the file */
+        if (runSecondTransition(fileContent, assemblyStructure) == Fail) { /* compiler errors in the file continue to next file */
             printProcessStep("Transition two failed", filename);
             continue;
         }
         printProcessStep("Transition two succeeded", filename);
 
-        printProcessStep("Start writing files", filename);
+
+        printProcessStep("Start writing files", filename); /* Write .ob [.ext] [.ent] files in special 8 base */
         writeAllOutputFiles(assemblyStructure, filename);
         printProcessStep("Writing files succeeded", filename);
+
+        printProcessStep("File processing done", filename);
     }
-    free_all(&assemblyStructure, &fileContent);
+    free_all(&assemblyStructure, &fileContent); /* Program done */
     return 0;
 }

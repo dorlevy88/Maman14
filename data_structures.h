@@ -38,7 +38,6 @@ typedef struct AssemblyBytes {
 
 typedef struct AssemblyStructure {
 
-    int startAddress;
     int ic;
     int dc;
 
@@ -70,7 +69,7 @@ void printAssemblyByte(AssemblyBytes* bytes);
  *
  * **********************************************************************/
 
-bool initAssemblyStructure(AssemblyStructure** assembly);
+Status initAssemblyStructure(AssemblyStructure** assembly);
 
 void freeAssemblyStructure(AssemblyStructure** assembly);
 

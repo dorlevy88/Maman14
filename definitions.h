@@ -1,7 +1,9 @@
 #ifndef MAMAN14_DEFINITIONS_H
 #define MAMAN14_DEFINITIONS_H
 
-#define DEBUG true
+#include <stdbool.h>
+
+#define DEBUG false
 
 /* Defines for General Errors */
 #define ERR_PROG_MEMORY_FAILURE "Program internal memory error"
@@ -73,8 +75,8 @@ typedef enum CommandAREType {
 } CommandAREType;
 
 typedef enum Status {
-    Pass,
-    Fail
+    Pass = true,
+    Fail = false
 } Status;
 
 #endif /* MAMAN14_DEFINITIONS_H */
