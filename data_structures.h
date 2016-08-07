@@ -8,6 +8,12 @@
 #define LABEL_NOT_EXISTS -1
 #define ASSEMBLY_CODE_START_ADDRESS 100
 
+/* **********************************************************************
+ *
+ *     DATA STRUCTURES DEFINITIONS
+ *
+ * **********************************************************************/
+
 typedef struct SymbolRecord {
     char* label;
     int address;
@@ -44,50 +50,44 @@ typedef struct AssemblyStructure {
 
 } AssemblyStructure;
 
-typedef struct Operand {
+/* **********************************************************************
+ *
+ *     HANDLE ASSEMBLY BYTE STRUCTURES
+ *
+ * **********************************************************************/
 
-    OperandAddressingType addressingType;
+bool pushByteFromInt(AssemblyBytes *bytes, int byte);
 
-    /* in case of command */
-    int registerNum;  /* register addressing */
-    int value;                  /* number addressing - #3 -> 3 */
-    char* label;                /* direct\dynamic addressing - X[1-6] -> X */
-    int maxNum;                 /* dynamic addressing max position - X[1-6] -> 6 */
-    int minNum;                 /* dynamic addressing min position - X[1-6] -> 1 */
+bool pushBytesFromIntArray(AssemblyBytes *bytes, int *array, int arraySize);
 
-    /* in case of .data\.string */
-    int* data; /*  could be multiple int in case of .data */
-    int dataSize;
-    char* string; /*  only one string in case of .string */
-
-    /* in case .entry\.extern */
-    char* entryOrExtern; /*  label of entry/extern */
-
-} Operand;
-
-
-/* Assembly Bytes Functions */
-bool PushByteFromInt(AssemblyBytes* bytes, int byte);
-
-bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize);
-
-bool PushBytesFromString(AssemblyBytes* bytes, char* string);
+bool pushBytesFromString(AssemblyBytes *bytes, char *string);
 
 void printAssemblyByte(AssemblyBytes* bytes);
 
-/* Assembly Structure Init */
+/* **********************************************************************
+ *
+ *     HANDLE ASSEMBLY STRUCTURE MEMORY
+ *
+ * **********************************************************************/
+
 bool initAssemblyStructure(AssemblyStructure** assembly);
 
 void freeAssemblyStructure(AssemblyStructure** assembly);
 
-/*  Symbol Table Functions */
+/* **********************************************************************
+ *
+ *     HANDLE SYMBOLS TABLE STRUCTURE
+ *
+ * **********************************************************************/
+
 int isLabelExistsInTable(SymbolsTable* table, char* label);
 
-bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic);
+bool addNewLabelToTable(SymbolsTable *table, char *label, int address, bool isExternal, bool isCommand, bool isEntry,
+                        int byteCodeForDynamic);
 
-bool AddNewExternToTable(SymbolsTable* table, char *label, int address);
+bool addNewExternToTable(SymbolsTable *table, char *label, int address);
 
-bool SetLabelIsEntryInTable(SymbolsTable* table, char* label);
+bool setLabelIsEntryInTable(SymbolsTable *table, char *label);
 
 void printSymbolTable(SymbolsTable* table);
 

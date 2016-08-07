@@ -82,7 +82,7 @@ char* translateAddressToSpecial8Base(int address, int size) {
     return response;
 }
 
-bool writeEntOutputFile(SymbolsTable *table, char* filename) {
+void writeEntOutputFile(SymbolsTable *table, char* filename) {
     FILE *fp;
     int i;
     char* address;
@@ -93,7 +93,7 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
 
     newFileName = getFilenameNewExtension(filename, ".ent");
     fp = fopen(newFileName, "w");
-    PrintProcessStep("Start writing file", newFileName);
+    printProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
         return false;
     }
@@ -110,7 +110,7 @@ bool writeEntOutputFile(SymbolsTable *table, char* filename) {
     return true;
 }
 
-bool writeExtOutputFile(SymbolsTable* externs, char* filename) {
+void writeExtOutputFile(SymbolsTable* externs, char* filename) {
     FILE *fp;
     int i;
     char* address;
@@ -121,7 +121,7 @@ bool writeExtOutputFile(SymbolsTable* externs, char* filename) {
 
     newFileName = getFilenameNewExtension(filename, ".ext");
     fp = fopen(newFileName, "w");
-    PrintProcessStep("Start writing file", newFileName);
+    printProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
         return false;
     }
@@ -136,7 +136,7 @@ bool writeExtOutputFile(SymbolsTable* externs, char* filename) {
     return true;
 }
 
-bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
+void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     FILE *fp;
     int i;
     char* address;
@@ -148,7 +148,7 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 
     newFileName = getFilenameNewExtension(filename, ".ob");
     fp = fopen(newFileName, "w");
-    PrintProcessStep("Start writing file", newFileName);
+    printProcessStep("Start writing file", newFileName);
     if (fp == NULL) {
         return false;
     }
@@ -178,23 +178,8 @@ bool writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     return true;
 }
 
-bool WriteAllOutputFiles(AssemblyStructure* assembly, char* fullFilename) {
-    if (writeEntOutputFile(assembly->symbolsTable, fullFilename) == false) {
-        /* TODO: Throw error file cannot be created */
-        /* TODO: check if file exists and delete it */
-        return false;
-    }
-
-    if (writeExtOutputFile(assembly->externs, fullFilename) == false) {
-        /* TODO: Throw error file cannot be created */
-        /* TODO: check if file exists and delete it */
-        return false;
-    }
-
-    if(writeObOutputFile(assembly, fullFilename) == false) {
-        /* TODO: Throw error file cannot be created */
-        /* TODO: check if file exists and delete it */
-        return false;
-    }
-    return true;
+void writeAllOutputFiles(AssemblyStructure *assembly, char *fullFilename) {
+    writeEntOutputFile(assembly->symbolsTable, fullFilename);
+    writeExtOutputFile(assembly->externs, fullFilename);
+    writeObOutputFile(assembly, fullFilename);
 }

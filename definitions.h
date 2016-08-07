@@ -21,10 +21,14 @@
 #define ERR_STRING_INVALID "String parameter is invalid"
 
 /* Defines for Compiler Errors */
-#define ERR_RAM_OVERFLOW "The program is too big for the computer RAM"
+#define ERR_RAM_OVERFLOW "Assembly code & data is too big for the computer RAM"
+#define ERR_CODE_RAM_OVERFLOW "Assembly code is too big for the computer RAM"
+#define ERR_DATA_RAM_OVERFLOW "Assembly data is too big for the computer RAM"
 #define ERR_LABEL_DEFINED_TWICE "The label defined twice"
 #define ERR_LABEL_NOT_DEFINED "The label definition doesn't exists"
 #define WARN_LABEL_IN_BAD_LOCATION "Label is not allowed on .extern or .entry"
+#define ERR_LABEL_NOT_FOUND "Label not found, should exist in second transition"
+#define ERR_DYNAM_ADDRESS_EXTERN "Dynamic addressing not relevant for external labels"
 
 /* Defining enums */
 typedef enum ActionTypes {

@@ -5,26 +5,20 @@
 
 #include "utils.h"
 
-/*
- *
-void print_output(const char* file, int line, char* msg, ...);
-
- */
-
 void printSyntaxError(const char *msg, const char *filename, int lineNum) {
     fprintf(stderr, "Syntax Error: %s ---> file: %s, line %d\n", msg, filename, lineNum);
 }
 
-void PrintCompileError(const char* msg, const char* param, const char* filename, int lineNum){
-    fprintf(stderr, "Compiler Error: %s %s ---> file: %s, line %d\n", msg, param, filename, lineNum);
+void printCompileError(const char *msg, const char *filename, int lineNum){
+    fprintf(stderr, "Compiler Error: %s ---> file: %s, line %d\n", msg, filename, lineNum);
 }
 
-void PrintCompileWarning(const char* msg, const char* param, const char* filename, int lineNum){
-    fprintf(stderr, "Compiler Warning: %s %s ---> file: %s, line %d\n", msg, param, filename, lineNum);
+void printCompileWarning(const char *msg, const char *filename, int lineNum){
+    fprintf(stderr, "Compiler Warning: %s ---> file: %s, line %d\n", msg, filename, lineNum);
 }
 
-void PrintProcessStep(const char* msg, const char* param, const char* filename){
-    fprintf(stderr, "Step: %s %s ---> file: %s", msg, param, filename);
+void printProcessStep(const char *msg, const char *filename){
+    fprintf(stdout, "Step: %s ---> file: %s", msg, filename);
 }
 
 void printInternalError(const char *msg, const char *param){
@@ -59,9 +53,22 @@ char* copyString(const char* pos) {
 }
 
 
-int ConvertCompliment2(int num, int size) {
+int convertCompliment2(int num, int size) {
     if (num < 0){
         return (int)(pow(2, size) + num);
     }
     return num;
+}
+
+long decimalToBinary(int n) {
+    int remainder;
+    long binary = 0, i = 1;
+
+    while(n != 0) {
+        remainder = n%2;
+        n = n/2;
+        binary= binary + (remainder*i);
+        i = i*10;
+    }
+    return binary;
 }

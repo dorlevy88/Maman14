@@ -41,35 +41,32 @@ int main(int argc, char **argv) {
 
         results = init(&assemblyStructure, &fileContent);
         if (results == false) {
-            PrintProcessStep("Internal Memory issue", filename);
+            printInternalError(ERR_PROG_MEMORY_FAILURE, "While initializing data structures");
             exit(0);
         }
 
-        PrintProcessStep("Start processing file", filename);
+        printProcessStep("Start processing file", filename);
         if (getFileContent(filename, fileContent) == Fail) { /*Error in the file*/
-            PrintProcessStep("Parsing file failed", filename);
+            printProcessStep("Parsing file failed", filename);
             continue;
         }
-        PrintProcessStep("Parsing file succeeded", filename);
+        printProcessStep("Parsing file succeeded", filename);
 
-        if(RunFirstTransition(fileContent, assemblyStructure) == false) {
-            PrintProcessStep("Transition one failed", filename);
+        if(runFirstTransition(fileContent, assemblyStructure) == Fail) {
+            printProcessStep("Transition one failed", filename);
             continue;
         }
-        PrintProcessStep("Transition one succeeded", filename);
+        printProcessStep("Transition one succeeded", filename);
 
-        if (RunSecondTransition(fileContent, assemblyStructure) == false) {
-            PrintProcessStep("Transition two failed", filename);
+        if (runSecondTransition(fileContent, assemblyStructure) == Fail) {
+            printProcessStep("Transition two failed", filename);
             continue;
         }
-        PrintProcessStep("Transition two succeeded", filename);
+        printProcessStep("Transition two succeeded", filename);
 
-        PrintProcessStep("Start writing files", filename);
-        if (WriteAllOutputFiles(assemblyStructure, filename) == false) {
-            PrintProcessStep("Writing files failed", filename);
-        }
-        PrintProcessStep("Writing files succeeded", filename);
-        /*TODO: delete files in case of a failure*/
+        printProcessStep("Start writing files", filename);
+        writeAllOutputFiles(assemblyStructure, filename);
+        printProcessStep("Writing files succeeded", filename);
     }
     free_all(&assemblyStructure, &fileContent);
     return 0;

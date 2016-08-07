@@ -8,7 +8,13 @@
 
 #define DATA_BYTE_SIZE 15
 
-bool PushByteFromInt(AssemblyBytes* bytes, int byte) {
+/* **********************************************************************
+ *
+ *     HANDLE ASSEMBLY BYTE STRUCTURES
+ *
+ * **********************************************************************/
+
+bool pushByteFromInt(AssemblyBytes *bytes, int byte) {
     if(bytes->size == MAX_ASSEMBLY_BYTES) {
         return false;
     }
@@ -16,40 +22,27 @@ bool PushByteFromInt(AssemblyBytes* bytes, int byte) {
     return true;
 }
 
-bool PushBytesFromIntArray(AssemblyBytes* bytes, int* array, int arraySize) {
+bool pushBytesFromIntArray(AssemblyBytes *bytes, int *array, int arraySize) {
     int i;
     for (i = 0; i < arraySize; ++i) {
-        if(PushByteFromInt(bytes, ConvertCompliment2(array[i], DATA_BYTE_SIZE)) == false) {
+        if(pushByteFromInt(bytes, convertCompliment2(array[i], DATA_BYTE_SIZE)) == false) {
             return false;
         }
     }
     return true;
 }
 
-bool PushBytesFromString(AssemblyBytes* bytes, char* string) {
+bool pushBytesFromString(AssemblyBytes *bytes, char *string) {
     int i;
     for (i = 0; i < strlen(string); ++i) {
-        if(PushByteFromInt(bytes, (int)string[i]) == false) {
+        if(pushByteFromInt(bytes, (int) string[i]) == false) {
             return false;
         }
     }
-    if (PushByteFromInt(bytes, (int)'\0') == false) {
+    if (pushByteFromInt(bytes, (int) '\0') == false) {
         return false;
     }
     return true;
-}
-
-long decimalToBinary(int n) {
-    int remainder;
-    long binary = 0, i = 1;
-
-    while(n != 0) {
-        remainder = n%2;
-        n = n/2;
-        binary= binary + (remainder*i);
-        i = i*10;
-    }
-    return binary;
 }
 
 void printAssemblyByte(AssemblyBytes* bytes){
@@ -60,6 +53,12 @@ void printAssemblyByte(AssemblyBytes* bytes){
     }
     printf("----------------------------------------------------------------------------------------------------\n");
 }
+
+/* **********************************************************************
+ *
+ *     HANDLE ASSEMBLY STRUCTURE MEMORY
+ *
+ * **********************************************************************/
 
 bool initAssemblyStructure(AssemblyStructure** assembly) {
     AssemblyBytes* codeBytes;
@@ -158,6 +157,12 @@ void freeAssemblyStructure(AssemblyStructure** assembly){
     free(*assembly);
 }
 
+/* **********************************************************************
+ *
+ *     HANDLE SYMBOLS TABLE STRUCTURE
+ *
+ * **********************************************************************/
+
 int isLabelExistsInTable(SymbolsTable* table, char* label) {
     int i;
     for (i = 0; i < table->recordSize; ++i) {
@@ -168,7 +173,8 @@ int isLabelExistsInTable(SymbolsTable* table, char* label) {
     return LABEL_NOT_EXISTS;
 }
 
-bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isExternal, bool isCommand, bool isEntry, int byteCodeForDynamic) {
+bool addNewLabelToTable(SymbolsTable *table, char *label, int address, bool isExternal, bool isCommand, bool isEntry,
+                        int byteCodeForDynamic) {
     int labelPos;
     labelPos = isLabelExistsInTable(table, label);
     if(labelPos != LABEL_NOT_EXISTS) {
@@ -192,7 +198,7 @@ bool AddNewLabelToTable(SymbolsTable* table, char *label, int address, bool isEx
     return true;
 }
 
-bool AddNewExternToTable(SymbolsTable* table, char *label, int address) {
+bool addNewExternToTable(SymbolsTable *table, char *label, int address) {
     if (table->recordSize == table->size) { /* Allocate additional space to the array */
         table->records = (SymbolRecord *) realloc(table->records, (table->size + 1) * sizeof(SymbolRecord));
         if (table->records == NULL) {
@@ -211,7 +217,7 @@ bool AddNewExternToTable(SymbolsTable* table, char *label, int address) {
     return true;
 }
 
-bool SetLabelIsEntryInTable(SymbolsTable* table, char* label){
+bool setLabelIsEntryInTable(SymbolsTable *table, char *label){
     int labelPos;
     labelPos = isLabelExistsInTable(table, label);
     if (labelPos == LABEL_NOT_EXISTS) {

@@ -6,6 +6,8 @@
 #include "transitions.h"
 
 #define CMD_BYTE_BEGIN 5 /* equal to 0b101 in binary */
+#define OPERAND_BYTE_SIZE 13
+#define MAX_CPU_MEMORY 1000
 
 int buildBinaryCommand(FileLine cmdLine) {
     /*  101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
@@ -48,7 +50,7 @@ int buildBinaryCommand(FileLine cmdLine) {
     return binCmd;
 }
 
-int getBitRangefromInt(int num, int minBit, int maxBit) {
+int getBitRangeFromInt(int num, int minBit, int maxBit) {
     int res = 0;
     int i, mask, byteSize;
     bool isNegative = false;
@@ -66,67 +68,64 @@ int getBitRangefromInt(int num, int minBit, int maxBit) {
     return res;
 }
 
-int buildBinaryData(Operand* operand, SymbolsTable* table, SymbolsTable* externs, bool isDestinationOperand, int cmdAddress) {
-    int binData = 0;
+char* buildBinaryData(int* binData, Operand* operand, SymbolsTable* table, SymbolsTable* externs, bool isDestinationOperand, int cmdAddress) {
     int labelPos = 0;
     SymbolRecord* record;
     int num;
     switch (operand->addressingType) {
         case NUMBER:
             /* add the number */
-            binData += ConvertCompliment2(operand->value, OPERAND_BYTE_SIZE);
+            *binData += convertCompliment2(operand->value, OPERAND_BYTE_SIZE);
             /* shift 2 bits for linker data absolute */
-            binData <<= 2;
-            binData += (int)Absolute;
+            *binData <<= 2;
+            *binData += (int)Absolute;
             break;
         case REGISTER:
-            binData += operand->registerNum;
+            *binData += operand->registerNum;
             if(isDestinationOperand) {
                 /* shift 2 bits (destination register address) */
-                binData <<= 2;
+                *binData <<= 2;
             }
             else {
                 /* shift 8 bits (source register address) */
-                binData <<= 8;
+                *binData <<= 8;
             }
             break;
         case DIRECT:
             labelPos = isLabelExistsInTable(table, operand->label);
             if (labelPos == LABEL_NOT_EXISTS) {
-                /* TODO: Throw error label should exist in second transition */
-                return -1;
+                return ERR_LABEL_NOT_FOUND;
             }
             record = &table->records[labelPos];
-            binData += record->address;
-            binData <<= 2;
+            *binData += record->address;
+            *binData <<= 2;
             if (record->isExternal) {
-                binData += (int)External;
-                AddNewExternToTable(externs, operand->label, cmdAddress);
+                *binData += (int)External;
+                addNewExternToTable(externs, operand->label, cmdAddress);
             }
             else {
-                binData += (int)Relocatable;
+                *binData += (int)Relocatable;
             }
             break;
         case DYNAMIC:
             labelPos = isLabelExistsInTable(table, operand->label);
             if (labelPos == LABEL_NOT_EXISTS) {
-                /* TODO: Throw error: label should exist in second transition */
-                return -1;
+                return ERR_LABEL_NOT_FOUND;
             }
             record = &table->records[labelPos];
             if (record->isExternal) {
-                /* TODO: Throw error: Dynamic addressing is not relevant for extern labels */
+                return ERR_DYNAM_ADDRESS_EXTERN;
             }
-            num = getBitRangefromInt(record->byteCodeForDynamic, operand->minNum, operand->maxNum);
-            num = ConvertCompliment2(num, OPERAND_BYTE_SIZE);
-            binData += num;
-            binData <<= 2;
-            binData += (int)Absolute;
+            num = getBitRangeFromInt(record->byteCodeForDynamic, operand->minNum, operand->maxNum);
+            num = convertCompliment2(num, OPERAND_BYTE_SIZE);
+            *binData += num;
+            *binData <<= 2;
+            *binData += (int)Absolute;
     }
-    return binData;
+    return NULL;
 }
 
-void UpdateSymbolsTableDataAddresses(SymbolsTable* table, int ic) {
+void updateSymbolsTableDataAddresses(SymbolsTable *table, int ic) {
     int i;
     for (i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isCommand == false && table->records[i].isExternal == false) { /* update only .data\.string types */
@@ -175,7 +174,15 @@ int getCommandSize(FileLine* line) {
     return sizeInIc;
 }
 
-bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
+/* Public Methods */
+
+/**
+ * First compiler transition mainly for searching all labels and data array building
+ * @param fileContent
+ * @param assembly
+ * @return Status (Pass/Fail)
+ */
+Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly) {
     /*
         1. int ic = 0, dc = 0;
         2. Read line
@@ -219,22 +226,23 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
             if (line.actionType == DATA ) {
                 calcDataSize = line.firstOperValue->dataSize;
                 firstByte = line.firstOperValue->data[0];
-                isMemAllocOk = PushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data, line.firstOperValue->dataSize);
+                isMemAllocOk = pushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data,
+                                                     line.firstOperValue->dataSize);
             }
             else {
                 calcDataSize = (int)strlen(line.firstOperValue->string) + 1;
                 firstByte = line.firstOperValue->string[0];
-                isMemAllocOk = PushBytesFromString(assembly->dataArray, line.firstOperValue->string);
+                isMemAllocOk = pushBytesFromString(assembly->dataArray, line.firstOperValue->string);
             }
 
             if(isMemAllocOk == false) {
-                PrintCompileError(ERR_RAM_OVERFLOW, "Data Array", line.lineNumber);
-                return false;
+                printCompileError(ERR_DATA_RAM_OVERFLOW, fileContent->filename, line.lineNumber);
+                return Fail;
             }
             if (isLabelExists) {
-                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
-                    PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
-                    return false;
+                if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
+                    printCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
+                    return Fail;
                 }
             }
             assembly->dc += calcDataSize;
@@ -242,12 +250,15 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
             /* Handle External Symbols */
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (isLabelExists) {
-                PrintCompileWarning(WARN_LABEL_IN_BAD_LOCATION, line.label, line.lineNumber);
+                printCompileWarning(WARN_LABEL_IN_BAD_LOCATION, fileContent->filename, line.lineNumber);
             }
             /* Steps 9, 9.1, 10 */
             if (line.actionType == EXTERN) {
-                AddNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false, false, 0);
-                /* TODO: Should we send error if label exists in table? */
+                if (addNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false,
+                                       false, 0)){
+                    printCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
+                    return Fail;
+                }
             }
         }
         else {/*  handle command line */
@@ -256,10 +267,10 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
             if (isLabelExists) {
                 /* Step 11 */
                 int binCommandForDynamicAddressing = buildBinaryCommand(line);
-                if (AddNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true, false,
+                if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true, false,
                                        binCommandForDynamicAddressing) == false) {
-                    PrintCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
-                    return false;
+                    printCompileError(ERR_LABEL_DEFINED_TWICE, fileContent->filename, line.lineNumber);
+                    return Fail;
                 }
             }
 
@@ -272,15 +283,22 @@ bool RunFirstTransition(FileContent* fileContent, AssemblyStructure* assembly) {
     }
 
     if (assembly->ic + assembly->dc >= MAX_CPU_MEMORY) {
-        /* TODO: Throw error program is larger than CPU memory */
+        printInternalError(ERR_RAM_OVERFLOW, fileContent->filename);
+        return Fail;
     }
 
-    UpdateSymbolsTableDataAddresses(assembly->symbolsTable, assembly->ic);
-    return true;
+    /* update the .data & .string records in the symbols table */
+    updateSymbolsTableDataAddresses(assembly->symbolsTable, assembly->ic);
+    return Pass;
 }
 
-bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) {
-
+/**
+ * Second compiler transition is building the code array and locating the extrens/entries usages
+ * @param fileContent
+ * @param assembly
+ * @return Status (Pass/Fail)
+ */
+Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly) {
     /* 1. ic = 0
     2. read word if done go to step 11
     3. ignore label on the beginning of line
@@ -306,16 +324,14 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
     assembly->ic = assembly->startAddress;
 
     for (i=0; i < fileContent->size; i++) { /* For every line in file */
-
         line = fileContent->line[i];
-        printf("%s", fileContent->line[i].originalLine);
 
-        /* TODO:Debug */
-
-        /* printSymbolTable(assembly->symbolsTable);
-        printAssemblyByte(assembly->codeArray);
-        printAssemblyByte(assembly->dataArray); */
-
+        if(DEBUG) {
+            printSymbolTable(assembly->symbolsTable);
+            printSymbolTable(assembly->externs);
+            printAssemblyByte(assembly->codeArray);
+            printAssemblyByte(assembly->dataArray);
+        }
 
         /* Step: 4 */
         if (line.actionType == DATA || line.actionType == STRING) {
@@ -324,52 +340,61 @@ bool RunSecondTransition(FileContent* fileContent, AssemblyStructure* assembly) 
         /* Step: 5 */
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
-                if (SetLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern) == false) {
-                    PrintCompileError(ERR_LABEL_NOT_DEFINED, line.firstOperValue->entryOrExtern, line.lineNumber);
-                    return false;
+                if (setLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern) == false) {
+                    printCompileError(ERR_LABEL_NOT_DEFINED, fileContent->filename, line.lineNumber);
+                    return Fail;
                 }
             }
         }
         /* handle command */
         else{
             /*  101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
+            char* errStr;
             int binCmd = buildBinaryCommand(line);
-            bool isMemAllocOk = PushByteFromInt(assembly->codeArray, binCmd);
+            bool isMemAllocOk = pushByteFromInt(assembly->codeArray, binCmd);
             assembly->ic++;
             /*  0000000000000-00 (data 13b - E,R,A (2b)) */
             /* Building Code Array */
             if (line.numOfCommandOprands == 1){
-                int binData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic);
-                isMemAllocOk &= PushByteFromInt(assembly->codeArray, binData);
+                int binData = 0;
+                errStr = buildBinaryData(&binData, line.firstOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic);
+                if (errStr != NULL) {
+                    printCompileError(errStr, fileContent->filename, line.lineNumber);
+                    return Fail;
+                }
+                isMemAllocOk &= pushByteFromInt(assembly->codeArray, binData);
                 assembly->ic++;
             }
             else if (line.numOfCommandOprands == 2) {
-                int firstBinData = buildBinaryData(line.firstOperValue, assembly->symbolsTable, assembly->externs, false, assembly->ic);
-                int secondBinData = buildBinaryData(line.secondOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic+1);
+                int firstBinData = 0, secondBinData = 0;
+                errStr = buildBinaryData(&firstBinData, line.firstOperValue, assembly->symbolsTable, assembly->externs, false, assembly->ic);
+                if (errStr != NULL) {
+                    printCompileError(errStr, fileContent->filename, line.lineNumber);
+                    return Fail;
+                }
+                errStr = buildBinaryData(&secondBinData, line.secondOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic+1);
+                if (errStr != NULL) {
+                    printCompileError(errStr, fileContent->filename, line.lineNumber);
+                    return Fail;
+                }
                 if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){
-                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData + secondBinData);
+                    isMemAllocOk &= pushByteFromInt(assembly->codeArray, firstBinData + secondBinData);
                     assembly->ic++;
                 }
                 else{
-                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, firstBinData);
-                    isMemAllocOk &= PushByteFromInt(assembly->codeArray, secondBinData);
+                    isMemAllocOk &= pushByteFromInt(assembly->codeArray, firstBinData);
+                    isMemAllocOk &= pushByteFromInt(assembly->codeArray, secondBinData);
                     assembly->ic += 2;
                 }
             }
 
             if(isMemAllocOk == false){
-                PrintCompileError(ERR_RAM_OVERFLOW, "Code Array", line.lineNumber);
-                return false;
+                printCompileError(ERR_CODE_RAM_OVERFLOW, fileContent->filename, line.lineNumber);
+                return Fail;
             }
         }
 
     }
-
-    if (assembly->ic != tmpIc) {
-        /* TODO: BUG: something went wrong with the algorithm */
-    }
-
-    /* TODO: check not more than 1000 bytes of code + data */
-    return true;
+    return Pass;
     /* Done and ready to save! */
 }

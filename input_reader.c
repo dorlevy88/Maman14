@@ -17,7 +17,11 @@
 #define INVALID_NUM_TOKEN -999999
 #define MAX_DYNAMIC_OPERAND 13 /* max exact number */
 
-/* Private Methods */
+/* **********************************************************************
+ *
+ *     FILE HANDLERS INTERNAL METHODS
+ *
+ * **********************************************************************/
 
 bool isLabelValid(char* label){
     int i;
@@ -490,7 +494,11 @@ char* lineValidator(FileLine* parsedLine) {
     return errStr;
 }
 
-/* Public Methods */
+/* **********************************************************************
+ *
+ *     FILE HANDLERS PUBLIC METHODS
+ *
+ * **********************************************************************/
 
 /**
  * Return a struct full with the file data as needed for the transition pass
@@ -513,10 +521,10 @@ Status getFileContent(char *filename, FileContent *fileContent) {
         printInternalError(ERR_FILE_NOT_FOUND, filename);
         return Fail;
     }
+    fileContent->filename = copyString(filename);
     while(fgets(line, sizeof(line), fr) != NULL)   /* get a word.  done if NULL */
     {
-        /* Debug */
-        /* fprintf(stderr, "Line is -->  %s", line); */
+        if(DEBUG) printf("Line is -->  %s", line);
         parsedLine = &fileContent->line[arrayIndex];
         memset(parsedLine, 0, sizeof(FileLine));
         parsedLine->originalLine = (char *) malloc(sizeof(line));
@@ -587,6 +595,8 @@ void freeFileContent(FileContent** fileContent) {
         }
     }
     free((*fileContent)->line);
+    if ((*fileContent)->filename != NULL)
+        free((*fileContent)->filename);
     free(*fileContent);
 }
 
