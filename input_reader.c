@@ -237,6 +237,10 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool check
     char* secondRawOperand;
     char* errString;
 
+    if (rawOperandsString == NULL) {
+        return errMessage(ERR_TWO_OP_GOT_NONE, parsedLine->action);
+    }
+
     firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
     secondRawOperand = strtok(NULL, " ,\t"); /* get second operand - split by comma and/or space */
 
@@ -270,12 +274,16 @@ char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine, bool checkA
     char* firstRawOperand;
     char* errString;
 
+    if (rawOperandsString == NULL) {
+        return errMessage(ERR_ONE_OP_GOT_NONE, parsedLine->action);
+    }
+
     firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
     if (strtok(NULL, " ,\t") != NULL){ /* Operand 2 is not empty */
         return errMessage(ERR_ONE_OP_GOT_MORE, rawOperandsString);
     }
     else if (firstRawOperand == NULL){ /* Operand 1 is empty */
-        return errMessage(ERR_ONE_OP_GOT_NONE, rawOperandsString);
+        return errMessage(ERR_ONE_OP_GOT_NONE, parsedLine->action);
     }
 
     parsedLine->numOfCommandOprands = 1;
@@ -310,6 +318,10 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
+    if (rawOperandsString == NULL) {
+        return copyString(ERR_DATA_INVALID);
+    }
+
     for (i = 1; i < strlen(rawOperandsString) - 1; i++){
         if (rawOperandsString[i] == ',') {
             dataSize++;
@@ -317,11 +329,17 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     }
     data = (int*)malloc(dataSize * sizeof(int));
     numString = strtok(rawOperandsString, " ,\t\n\r");
+    if (numString == NULL) {
+        return copyString(ERR_DATA_INVALID);
+    }
     for (i=0; i < dataSize; i++){
         numberInt = getIntFromString(numString);
         if (numberInt != INVALID_NUM_TOKEN){
             data[i] = numberInt;
             numString = strtok(NULL, " ,\t\n\r");
+            if (numString == NULL && i < dataSize) {
+                return copyString(ERR_DATA_INVALID);
+            }
         }
         else {
             return errMessage(ERR_DATA_OUT_OF_BOUNDS, numString);
@@ -338,6 +356,10 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
+    if (rawOperandString == NULL) {
+        return copyString(ERR_DATA_INVALID);
+    }
+
     string = getNewStrBetweenTwoChars(rawOperandString, '"', '"', true, true);
     if (string == NULL)
         return errMessage(ERR_STRING_INVALID, rawOperandString);
@@ -351,6 +373,10 @@ char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
     char* errStr;
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
+
+    if (rawOperandString == NULL) {
+        return errMessage(ERR_ONE_OP_GOT_NONE, parsedLine->action);
+    }
 
     label = strtok(rawOperandString, " \t\n\r");
     errStr = isLabelValid(label);
@@ -457,7 +483,6 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
 char* lineValidator(FileLine* parsedLine) {
     char* string;
     char* parsedLabel;
-    char* rawOperandsString;
     size_t strSize;
     char* errStr;
 
@@ -494,8 +519,8 @@ char* lineValidator(FileLine* parsedLine) {
     }
 
     parsedLine->action = copyString(string);      /* get the action */
-    rawOperandsString = strtok(NULL, "\n\r"); /*  get remaining of line */
-    errStr = validateActionAndOperands(rawOperandsString, parsedLine);
+    string = strtok(NULL, "\n\r"); /*  get remaining of line */
+    errStr = validateActionAndOperands(string, parsedLine);
     free(lineToCheck);
     return errStr;
 }
