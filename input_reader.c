@@ -411,7 +411,7 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
         errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
         if (errStr == NULL && parsedLine->firstOperValue != NULL &&
                 parsedLine->firstOperValue->addressingType != DIRECT)
-            errStr = ERR_LEA_SOURCE_ADDRESSING;
+            errStr = copyString(ERR_LEA_SOURCE_ADDRESSING);
     }
     else if (strcmp(action, "clr") == 0){
         parsedLine->actionType = CLR;

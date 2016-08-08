@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define DEBUG false
+#define DEBUG true
 #define PRINT_STEPS true
 
 /* Defines for General Errors */
