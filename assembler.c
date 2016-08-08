@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "assembler.h"
 
-void free_all(AssemblyStructure** assembly, FileContent** file) {
+Status free_all(AssemblyStructure** assembly, FileContent** file) {
     if (*assembly != NULL)
         freeAssemblyStructure(assembly);
     if (*file != NULL) {
@@ -11,7 +11,10 @@ void free_all(AssemblyStructure** assembly, FileContent** file) {
 
 Status init(AssemblyStructure** assembly, FileContent** file) {
     free_all(assembly, file);
-    return initAssemblyStructure(assembly) && initFileContent(file);
+    if (initAssemblyStructure(assembly) == Fail)
+        return Fail;
+    if (initFileContent(file) == Fail)
+    return Pass;
 }
 
 /**

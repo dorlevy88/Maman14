@@ -150,7 +150,6 @@ int getCommandSize(FileLine* line) {
             else {
                 sizeInIc += 2; /* source _ destination address array */
             }
-            /* TODO: Add 3 array at most */
             break;
         case NOT:
         case CLR:
@@ -161,7 +160,7 @@ int getCommandSize(FileLine* line) {
         case RED:
         case PRN:
         case JSR:
-            sizeInIc += 2; /* command byte + adresss */
+            sizeInIc += 2; /* command byte + addresss */
             break;
         case RTS:
         case STOP:
