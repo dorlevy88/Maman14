@@ -33,6 +33,7 @@
 #define ERR_INVALID_NUMBER "Expected a number, but received"
 #define ERR_NUM_OUT_OF_BOUNDS "Dynamic addressing - Integer is invalid or out of bounds"
 #define ERR_LEFT_RIGHT_BOUNDS "Dynamic addressing - Left number is greater than right number"
+#define ERR_LEFT_RIGHT_RANGE "Dynamic addressing - Range between minimum number and maximum number is greater than maximum allowed"
 #define ERR_BAD_DYNAMIC_ADDRESSING "Incorrect dynamic addressing format"
 
 /* Defines for Compiler Errors */

@@ -15,7 +15,8 @@
 #define MIN_NUM_SIZE -16384
 #define MAX_NUM_SIZE 16384
 #define INVALID_NUM_TOKEN -999999
-#define MAX_DYNAMIC_OPERAND 13 /* max exact number */
+#define MAX_DYNAMIC_OPERAND 14 /* max exact number */
+#define MAX_DYNAMIC_RANGE 13
 
 /* **********************************************************************
  *
@@ -161,6 +162,9 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
 
         if (minNumTemp > maxNumTemp) {
             return copyString(ERR_LEFT_RIGHT_BOUNDS);
+        }
+        if (maxNumTemp - minNumTemp >= MAX_DYNAMIC_RANGE) {
+            return copyString(ERR_LEFT_RIGHT_RANGE);
         }
 
         *label = labelTemp;
