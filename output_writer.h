@@ -1,5 +1,5 @@
-#ifndef MAMAN14_OUTPUTFILES_H
-#define MAMAN14_OUTPUTFILES_H
+#ifndef MAMAN14_OUTPUTWRITER_H
+#define MAMAN14_OUTPUTWRITER_H
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -8,4 +8,4 @@
 
 void writeAllOutputFiles(AssemblyStructure *assembly, char *filename);
 
-#endif /* MAMAN14_OUTPUTFILES_H */
+#endif /* MAMAN14_OUTPUTWRITER_H */

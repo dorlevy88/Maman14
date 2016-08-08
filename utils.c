@@ -5,20 +5,24 @@
 
 #include "utils.h"
 
-void printSyntaxError(const char *msg, const char *filename, int lineNum) {
+void printSyntaxError(char *msg, const char *filename, int lineNum) {
     fprintf(stderr, "Syntax Error: %s ---> file: %s, line %d\n", msg, filename, lineNum);
+    free(msg);
 }
 
-void printCompileError(const char *msg, const char *filename, int lineNum){
+void printCompileError(char *msg, const char *filename, int lineNum){
     fprintf(stderr, "Compiler Error: %s ---> file: %s, line %d\n", msg, filename, lineNum);
+    free(msg);
 }
 
-void printCompileWarning(const char *msg, const char *filename, int lineNum){
+void printCompileWarning(char *msg, const char *filename, int lineNum){
     fprintf(stderr, "Compiler Warning: %s ---> file: %s, line %d\n", msg, filename, lineNum);
+    free(msg);
 }
 
 void printProcessStep(const char *msg, const char *filename){
-    fprintf(stdout, "Step: %s ---> file: %s\n", msg, filename);
+    if (PRINT_STEPS)
+        printf("Step: %s ---> file: %s\n", msg, filename);
 }
 
 void printInternalError(const char *msg, const char *param){
@@ -52,6 +56,13 @@ char* copyString(const char* pos) {
     return getNewSubString(pos, strlen(pos));
 }
 
+char* errMessage(const char *err, const char *param) {
+    char* errMsg = getNewString(strlen(err) + 1 + strlen(param));
+    strcpy(errMsg, err);
+    strcat(errMsg, " ");
+    strcat(errMsg, param);
+    return errMsg;
+}
 
 int convertCompliment2(int num, int size) {
     if (num < 0){

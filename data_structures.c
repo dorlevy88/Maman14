@@ -129,8 +129,10 @@ void freeAssemblyStructure(AssemblyStructure** assembly){
     }
 
     if ((*assembly)->symbolsTable != NULL){
-        if(DEBUG) printf("Clears Symbols\n");
-        printSymbolTable((*assembly)->symbolsTable);
+        if(DEBUG) {
+            printf("Clears Symbols\n");
+            printSymbolTable((*assembly)->symbolsTable);
+        }
         for (i = 0; i < (*assembly)->symbolsTable->size; ++i) {
             if ((*assembly)->symbolsTable->records[i].label != NULL) {
                 if (DEBUG) printf("Clear Record: %s\n", (*assembly)->symbolsTable->records[i].label);
@@ -143,8 +145,10 @@ void freeAssemblyStructure(AssemblyStructure** assembly){
     }
 
     if ((*assembly)->externs != NULL){
-        if(DEBUG) printf("Clears Externs\n");
-        printSymbolTable((*assembly)->externs);
+        if(DEBUG) {
+            printf("Clears Externs\n");
+            printSymbolTable((*assembly)->externs);
+        }
         for (i = 0; i < (*assembly)->externs->size; ++i) {
             if ((*assembly)->externs->records[i].label != NULL) {
                 if (DEBUG) printf("Clear Record: %s\n", (*assembly)->symbolsTable->records[i].label);

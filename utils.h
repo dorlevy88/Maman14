@@ -5,11 +5,11 @@
 #include "utils.h"
 
 
-void printSyntaxError(const char *msg, const char *filename, int lineNum);
+void printSyntaxError(char *msg, const char *filename, int lineNum);
 
-void printCompileError(const char *msg, const char *filename, int lineNum);
+void printCompileError(char *msg, const char *filename, int lineNum);
 
-void printCompileWarning(const char *msg, const char *filename, int lineNum);
+void printCompileWarning(char *msg, const char *filename, int lineNum);
 
 void printProcessStep(const char *msg, const char *filename);
 
@@ -20,6 +20,8 @@ int convertCompliment2(int num, int size);
 char* getNewSubString(const char* pos, int size);
 
 char* copyString(const char* pos);
+
+char* errMessage(const char *err, const char *param);
 
 char* getNewString(int size);
 

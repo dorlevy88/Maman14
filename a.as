@@ -4,7 +4,7 @@
 .extern W
 MAIN:       mov     K[2-4], W
     add r2 ,STR
-    LOOP: jmp   W
+     jmp   W
     prn #-5
     sub r1,r4
      inc K

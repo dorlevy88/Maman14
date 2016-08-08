@@ -23,25 +23,18 @@
  *
  * **********************************************************************/
 
-bool isLabelValid(char* label){
+char* isLabelValid(char* label) {
     int i;
-    if (strlen(label) > 0){ /* check label is not empty */
-        if (isalpha(label[0])){ /*  Check first char is letter */
-            for (i = 1; i < strlen(label); i++) {
-                if ((!(isalpha(label[i])) && !(isdigit(label[i]))) ||  /*  All chars are digits or letters */
-                    i == MAX_LABEL_SIZE) {  /* Size of Label is less than MAX_LABEL_SIZE (30) */
-                    return false;
-                }
-            }
-            return true;
-        }
-        else{
-            return false; /* First Char in label is not a letter */
+    if (strlen(label) <= 0) return ERR_INVAILD_LABEL_EMPTY;
+    if (isalpha(label[0]) == false) return ERR_INVAILD_LABEL_FIRST;
+    if (strlen(label) >= MAX_LABEL_SIZE) return ERR_INVAILD_LABEL_MAX;
+
+    for (i = 1; i < strlen(label); i++) {
+        if (!isalpha(label[i]) && !isdigit(label[i])) {
+            return ERR_INVAILD_LABEL_ILLEGAL;
         }
     }
-    else{
-        return false; /* Label is 0 Chars */
-    }
+    return NULL; /* Valid label */
 }
 
 int getIntFromString(char *string){
@@ -119,6 +112,8 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
     int maxNumTemp;
     char* labelTemp;
 
+    char* errStr;
+
     operandStrSize = strlen(operandStr);
     openBracketPosStr = strchr(operandStr, '[');
     closeBracketPosStr = strchr(operandStr, ']');
@@ -130,12 +125,12 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
 
     if (closeBracketPos > dashPos && dashPos > openBracketPos && /* Check '[' then '-' then ']' */
         openBracketPos != 0 &&         /* Has label instead of [ */
-        openBracketPos <= MAX_LABEL_SIZE && /* TODO: do we still need it? Label size is less then max size */
         closeBracketPos == operandStrSize - 1) { /* ']' is at the end*/
 
         labelTemp = getNewSubString(operandStr, openBracketPos);
-        if (!isLabelValid(labelTemp)) {
-            return strcat("Label is not valid - ", labelTemp);
+        errStr = isLabelValid(labelTemp);
+        if (errStr != NULL) {
+            return errMessage(errStr, labelTemp);
         }
         minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);
         if (minNumStr != NULL) {
@@ -143,7 +138,7 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
             free(minNumStr);
         }
         else {
-            return "Failed Parsing Dynamic  addressing";
+            return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
         }
         maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);
         if (maxNumStr != NULL) {
@@ -151,12 +146,14 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
             free(maxNumStr);
         }
         else {
-            return "Failed Parsing Dynamic  addressing";
+            return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
         }
 
-        if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND ||
-                maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
-            return "Operand num is out of bound";
+        if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND) {
+            return errMessage(ERR_NUM_OUT_OF_BOUNDS, minNumStr);
+        }
+        if (maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
+            return errMessage(ERR_NUM_OUT_OF_BOUNDS, maxNumStr);
         }
 
         *label = labelTemp;
@@ -164,7 +161,7 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
         *maxNum = maxNumTemp;
         return NULL;
     }
-    return "Incorrect dynamic addressing format";
+    return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
 }
 
 char* getOperand(char* operandStr, Operand* operand) {
@@ -192,19 +189,14 @@ char* getOperand(char* operandStr, Operand* operand) {
             return NULL;
         }
         else {
-            return strcat("expected a number, but received ", operandStr);
+            return errMessage(ERR_INVALID_NUMBER, operandStr);
         }
     }
     /*  Oger */
-    else if (operandStr[0] == 'r' && strlen(operandStr) == 2) {
-        if (operandStr[1] >= '0' && operandStr[1] <= '7') {
+    else if (operandStr[0] == 'r' && strlen(operandStr) == 2 && operandStr[1] >= '0' && operandStr[1] <= '7') {
             operand->addressingType = REGISTER;
             operand->registerNum = (int)operandStr[1] - '0';
             return NULL;
-        }
-        else {
-            return "Expected register number between 0 and 7, received register number out of bound";
-        }
     }
     /* Dinami Yashir */
     else if (openBracketPosStr != NULL && closeBracketPosStr != NULL && dashPosStr != NULL) { /* Check we should be in Dinami Yashir */
@@ -221,15 +213,15 @@ char* getOperand(char* operandStr, Operand* operand) {
         }
     }
     /* Yashir */
-    else if (isLabelValid(operandStr)) {
+    else if (isLabelValid(operandStr) == NULL) {
         operand->addressingType = DIRECT;
         operand->label = copyString(operandStr);
         return NULL;
     }
-    return "unknown addressing type error";
+    return errMessage(ERR_UNKNOWN_ADDRESSING, operandStr);
 }
 
-char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine){
+char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool checkAddressing){
     char* firstRawOperand;
     char* secondRawOperand;
     char* errString;
@@ -238,10 +230,10 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine){
     secondRawOperand = strtok(NULL, " ,\t"); /* get second operand - split by comma and/or space */
 
     if (secondRawOperand == NULL){
-        return ERR_TWO_OP_GOT_ONE;
+        return errMessage(ERR_TWO_OP_GOT_ONE, rawOperandsString);
     }
     if (strtok(NULL, " ,\t") != NULL){
-        return ERR_TWO_OP_GOT_MORE;
+        return errMessage(ERR_TWO_OP_GOT_MORE, rawOperandsString);
     }
 
     parsedLine->numOfCommandOprands = 2;
@@ -256,22 +248,23 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine){
     errString = getOperand(secondRawOperand, parsedLine->secondOperValue);
     if (errString != NULL) return errString;
 
-    if (parsedLine->secondOperValue->addressingType == NUMBER || parsedLine->secondOperValue->addressingType == DYNAMIC)
-        return ERR_ILLEGAL_DEST_ADDRESSING;
+    if (checkAddressing && (parsedLine->secondOperValue->addressingType == NUMBER ||
+            parsedLine->secondOperValue->addressingType == DYNAMIC))
+        return errMessage(ERR_ILLEGAL_DEST_ADDRESSING, parsedLine->action);
 
     return NULL;
 }
 
-char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine){
+char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine, bool checkAddressing){
     char* firstRawOperand;
     char* errString;
 
     firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
     if (strtok(NULL, " ,\t") != NULL){ /* Operand 2 is not empty */
-        return ERR_ONE_OP_GOT_MORE;
+        return errMessage(ERR_ONE_OP_GOT_MORE, rawOperandsString);
     }
     else if (firstRawOperand == NULL){ /* Operand 1 is empty */
-        return ERR_ONE_OP_GOT_NONE;
+        return errMessage(ERR_ONE_OP_GOT_NONE, rawOperandsString);
     }
 
     parsedLine->numOfCommandOprands = 1;
@@ -280,8 +273,9 @@ char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine){
     errString = getOperand(firstRawOperand, parsedLine->firstOperValue);
     if (errString != NULL) return errString;
 
-    if (parsedLine->firstOperValue->addressingType == NUMBER || parsedLine->firstOperValue->addressingType == DYNAMIC)
-       return ERR_ILLEGAL_DEST_ADDRESSING;
+    if (checkAddressing && (parsedLine->firstOperValue->addressingType == NUMBER ||
+            parsedLine->firstOperValue->addressingType == DYNAMIC))
+       return errMessage(ERR_ILLEGAL_DEST_ADDRESSING, parsedLine->action);
 
     return NULL;
 }
@@ -290,7 +284,7 @@ char* checkNoOperand(char* rawOperandsString, FileLine* parsedLine){
     char* firstRawOperand;
     firstRawOperand = strtok(rawOperandsString, " ,\t");
     if (firstRawOperand != NULL){ /* Operand 1 is not empty */
-        return ERR_NO_OP_GOT_MORE;
+        return errMessage(ERR_NO_OP_GOT_MORE, rawOperandsString);
     }
     parsedLine->numOfCommandOprands = 0;
     return NULL;
@@ -319,7 +313,7 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
             numString = strtok(NULL, " ,\t\n\r");
         }
         else {
-            return ERR_DATA_OUT_OF_BOUNDS;
+            return errMessage(ERR_DATA_OUT_OF_BOUNDS, numString);
         }
     }
     parsedLine->firstOperValue->data = data;
@@ -335,7 +329,7 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
 
     string = getNewStrBetweenTwoChars(rawOperandString, '"', '"', true, true);
     if (string == NULL)
-        return ERR_STRING_INVALID;
+        return errMessage(ERR_STRING_INVALID, rawOperandString);
 
     parsedLine->firstOperValue->string = string;
     return NULL;
@@ -343,16 +337,17 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
 
 char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
     char* label;
+    char* errStr;
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
     label = strtok(rawOperandString, " \t\n\r");
-
-    if (isLabelValid(label)){
+    errStr = isLabelValid(label);
+    if (errStr == NULL){
         parsedLine->firstOperValue->entryOrExtern = copyString(label);
         return NULL;
     }
-    return ERR_INVAILD_LABEL;
+    return errMessage(errStr, label);
 }
 
 char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
@@ -360,64 +355,62 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     char* action = parsedLine->action;
     if (strcmp(action, "mov") == 0) {
         parsedLine->actionType = MOV;
-        errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "cmp") == 0){
         parsedLine->actionType = CMP;
-        errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        errStr = checkTwoOperands(rawOperandsString, parsedLine, false); /* For cmp command there is no problem with destination operand addressing*/
     }
     else if (strcmp(action, "add") == 0){
         parsedLine->actionType = ADD;
-        errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "sub") == 0){
         parsedLine->actionType = SUB;
-        errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "lea") == 0){
         parsedLine->actionType = LEA;
-        errStr = checkTwoOperands(rawOperandsString, parsedLine);
+        errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
         if (errStr == NULL && parsedLine->firstOperValue != NULL &&
                 parsedLine->firstOperValue->addressingType != DIRECT)
             errStr = ERR_LEA_SOURCE_ADDRESSING;
     }
     else if (strcmp(action, "clr") == 0){
         parsedLine->actionType = CLR;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "not") == 0){
         parsedLine->actionType = NOT;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "inc") == 0){
         parsedLine->actionType = INC;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "dec") == 0){
         parsedLine->actionType = DEC;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "jmp") == 0){
         parsedLine->actionType = JMP;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "bne") == 0){
         parsedLine->actionType = BNE;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "red") == 0){
         parsedLine->actionType = RED;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "jsr") == 0){
         parsedLine->actionType = JSR;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
+        errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
     else if (strcmp(action, "prn") == 0){
         parsedLine->actionType = PRN;
-        errStr = checkOneOperand(rawOperandsString, parsedLine);
-        if (errStr != NULL && strcmp(errStr, ERR_ILLEGAL_DEST_ADDRESSING) == 0) /* For prn command there is no problem with destination operand*/
-            errStr = NULL;
+        errStr = checkOneOperand(rawOperandsString, parsedLine, false); /* For prn command there is no problem with destination operand addressing*/
     }
     else if (strcmp(action, "rts") == 0){
         parsedLine->actionType = RTS;
@@ -445,7 +438,7 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     }
     else { /* Command is not known */
         parsedLine->actionType = UNKNOWN;
-        errStr = ERR_UNKNOWN_CMD;
+        errStr = errMessage(ERR_UNKNOWN_CMD, action);
     }
     return errStr;
 }
@@ -476,13 +469,15 @@ char* lineValidator(FileLine* parsedLine) {
     strSize = strlen(string);
     if (string[strSize - 1] == ':') { /* Label Found */
         parsedLabel = getNewSubString(string, strSize - 1);
-        if (isLabelValid(parsedLabel)){
+        errStr = isLabelValid(parsedLabel);
+        if (errStr == NULL){
             parsedLine->label = parsedLabel;
         }
         else {
             free(lineToCheck);
+            errStr = errMessage(errStr, parsedLabel);
             free(parsedLabel);
-            return ERR_INVAILD_LABEL;
+            return errStr;
         }
         string = strtok(NULL, " \t\n\r"); /* Get action string */
     }
@@ -525,16 +520,12 @@ Status getFileContent(char *filename, FileContent *fileContent) {
     while(fgets(line, sizeof(line), fr) != NULL)   /* get a word.  done if NULL */
     {
         if(DEBUG) printf("Line is -->  %s", line);
+
         parsedLine = &fileContent->line[arrayIndex];
         memset(parsedLine, 0, sizeof(FileLine));
-        parsedLine->originalLine = (char *) malloc(sizeof(line));
-        if (parsedLine->originalLine == NULL){
-            /* TODO: allocation error */
-            exit(1);
-        }
-        memset(parsedLine->originalLine, 0, strlen(parsedLine->originalLine));
-        strcpy(parsedLine->originalLine, line);
 
+        parsedLine->lineNumber = lineCounter;
+        parsedLine->originalLine = copyString(line);
         errString = lineValidator(parsedLine);
         if (errString != NULL) {
             fileStatus = Fail;

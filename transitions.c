@@ -94,7 +94,7 @@ char* buildBinaryData(int* binData, Operand* operand, SymbolsTable* table, Symbo
         case DIRECT:
             labelPos = isLabelExistsInTable(table, operand->label);
             if (labelPos == LABEL_NOT_EXISTS) {
-                return ERR_LABEL_NOT_FOUND;
+                return errMessage(ERR_LABEL_NOT_FOUND, operand->label);
             }
             record = &table->records[labelPos];
             *binData += record->address;
@@ -110,11 +110,11 @@ char* buildBinaryData(int* binData, Operand* operand, SymbolsTable* table, Symbo
         case DYNAMIC:
             labelPos = isLabelExistsInTable(table, operand->label);
             if (labelPos == LABEL_NOT_EXISTS) {
-                return ERR_LABEL_NOT_FOUND;
+                return errMessage(ERR_LABEL_NOT_FOUND, operand->label);
             }
             record = &table->records[labelPos];
             if (record->isExternal) {
-                return ERR_DYNAM_ADDRESS_EXTERN;
+                return errMessage(ERR_DYNAM_ADDRESS_EXTERN, operand->label);
             }
             num = getBitRangeFromInt(record->byteCodeForDynamic, operand->minNum, operand->maxNum);
             num = convertCompliment2(num, OPERAND_BYTE_SIZE);
@@ -236,12 +236,12 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
             }
 
             if(isMemAllocOk == false) {
-                printCompileError(ERR_DATA_RAM_OVERFLOW, fileContent->filename, line.lineNumber);
+                printInternalError(ERR_DATA_RAM_OVERFLOW, fileContent->filename);
                 return Fail;
             }
             if (isLabelExists) {
                 if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
-                    printCompileError(ERR_LABEL_DEFINED_TWICE, line.label, line.lineNumber);
+                    printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber);
                     return Fail;
                 }
             }
@@ -250,7 +250,7 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
             /* Handle External Symbols */
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (isLabelExists) {
-                printCompileWarning(WARN_LABEL_IN_BAD_LOCATION, fileContent->filename, line.lineNumber);
+                printCompileWarning(errMessage(WARN_LABEL_IN_BAD_LOCATION, line.label), fileContent->filename, line.lineNumber);
             }
             /* Steps 9, 9.1, 10 */
             if (line.actionType == EXTERN) {
@@ -265,7 +265,7 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
                 int binCommandForDynamicAddressing = buildBinaryCommand(line);
                 if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true, false,
                                        binCommandForDynamicAddressing) == false) {
-                    printCompileError(ERR_LABEL_DEFINED_TWICE, fileContent->filename, line.lineNumber);
+                    printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber);
                     return Fail;
                 }
             }
@@ -336,7 +336,7 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
                 if (setLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern) == false) {
-                    printCompileError(ERR_LABEL_NOT_DEFINED, fileContent->filename, line.lineNumber);
+                    printCompileError(errMessage(ERR_LABEL_NOT_DEFINED, line.firstOperValue->entryOrExtern), fileContent->filename, line.lineNumber);
                     return Fail;
                 }
             }
@@ -384,7 +384,7 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
             }
 
             if(isMemAllocOk == false){
-                printCompileError(ERR_CODE_RAM_OVERFLOW, fileContent->filename, line.lineNumber);
+                printInternalError(ERR_CODE_RAM_OVERFLOW, fileContent->filename);
                 return Fail;
             }
         }
