@@ -137,9 +137,10 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
             minNumTemp = getIntFromString(minNumStr);
             if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND) {
                 errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, minNumStr);
+                free(minNumStr);
+                return errStr;
             }
             free(minNumStr);
-            return errStr;
         }
         else {
             return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
@@ -149,9 +150,10 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
             maxNumTemp = getIntFromString(maxNumStr);
             if (maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
                 errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, maxNumStr);
+                free(minNumStr);
+                return errStr;
             }
             free(maxNumStr);
-            return errStr;
         }
         else {
             return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
