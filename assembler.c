@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "assembler.h"
 
-Status free_all(AssemblyStructure** assembly, FileContent** file) {
+void free_all(AssemblyStructure** assembly, FileContent** file) {
     if (*assembly != NULL)
         freeAssemblyStructure(assembly);
     if (*file != NULL) {
