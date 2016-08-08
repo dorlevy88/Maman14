@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define DEBUG true
+#define DEBUG false
 #define PRINT_STEPS true
 
 /* Defines for General Errors */
@@ -19,9 +19,11 @@
 #define ERR_INVAILD_LABEL_FIRST "First character of a label must be a letter"
 #define ERR_INVAILD_LABEL_MAX "Label size is more than max allowed characters"
 #define ERR_INVAILD_LABEL_ILLEGAL "Label contains illegal characters"
+#define ERR_INVAILD_LABEL_START "Label must start in first row column"
 #define ERR_ILLEGAL_DEST_ADDRESSING "Illegal Destination Operand Addressing, Allowed addressing types are DIRECT(1), REGISTER(3) for command"
 #define ERR_LEA_SOURCE_ADDRESSING "Illegal Source Operand Addressing on lea command, allowed addressing type is DIRECT(1)"
 #define ERR_UNKNOWN_CMD "Unknown Command"
+#define ERR_INVALID_COMMAND_FORMAT "Invalid command format"
 #define ERR_TWO_OP_GOT_NONE "Command expected two operands, received none"
 #define ERR_TWO_OP_GOT_ONE "Command expected two operands, received one"
 #define ERR_TWO_OP_GOT_MORE "Command expected two operands, received more"

@@ -24,6 +24,17 @@
  *
  * **********************************************************************/
 
+int getNumCommas(char* string){
+    int i, counter = 0;
+
+    for (i = 0; i < strlen(string) ; ++i) {
+        if (string[i] == ','){
+            counter++;
+        }
+    }
+    return counter;
+}
+
 char* isLabelValid(char* label) {
     int i;
     if (strlen(label) <= 0) return ERR_INVAILD_LABEL_EMPTY;
@@ -237,10 +248,13 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool check
     char* secondRawOperand;
     char* errString;
 
+
     if (rawOperandsString == NULL) {
         return errMessage(ERR_TWO_OP_GOT_NONE, parsedLine->action);
     }
-
+    if (getNumCommas(rawOperandsString) != 1) {
+        return errMessage(ERR_INVALID_COMMAND_FORMAT, rawOperandsString);
+    }
     firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
     secondRawOperand = strtok(NULL, " ,\t"); /* get second operand - split by comma and/or space */
 
@@ -276,6 +290,9 @@ char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine, bool checkA
 
     if (rawOperandsString == NULL) {
         return errMessage(ERR_ONE_OP_GOT_NONE, parsedLine->action);
+    }
+    if (getNumCommas(rawOperandsString) != 0) {
+        return errMessage(ERR_INVALID_COMMAND_FORMAT, rawOperandsString);
     }
 
     firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
@@ -483,7 +500,7 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
 char* lineValidator(FileLine* parsedLine) {
     char* string;
     char* parsedLabel;
-    size_t strSize;
+    int strSize;
     char* errStr;
 
     char* lineToCheck = copyString(parsedLine->originalLine);
@@ -502,8 +519,13 @@ char* lineValidator(FileLine* parsedLine) {
     }
 
     /* Handle labels */
-    strSize = strlen(string);
+    strSize = (int)strlen(string);
     if (string[strSize - 1] == ':') { /* Label Found */
+        if (string - lineToCheck != 0){
+            errStr = errMessage(ERR_INVAILD_LABEL_START, string);
+            free(lineToCheck);
+            return errStr;
+        }
         parsedLabel = getNewSubString(string, strSize - 1);
         errStr = isLabelValid(parsedLabel);
         if (errStr == NULL){
