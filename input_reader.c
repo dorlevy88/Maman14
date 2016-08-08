@@ -135,7 +135,11 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
         minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);
         if (minNumStr != NULL) {
             minNumTemp = getIntFromString(minNumStr);
+            if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND) {
+                errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, minNumStr);
+            }
             free(minNumStr);
+            return errStr;
         }
         else {
             return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
@@ -143,17 +147,18 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
         maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);
         if (maxNumStr != NULL) {
             maxNumTemp = getIntFromString(maxNumStr);
+            if (maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
+                errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, maxNumStr);
+            }
             free(maxNumStr);
+            return errStr;
         }
         else {
             return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
         }
 
-        if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND) {
-            return errMessage(ERR_NUM_OUT_OF_BOUNDS, minNumStr);
-        }
-        if (maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
-            return errMessage(ERR_NUM_OUT_OF_BOUNDS, maxNumStr);
+        if (minNumTemp > maxNumTemp) {
+            return copyString(ERR_LEFT_RIGHT_BOUNDS);
         }
 
         *label = labelTemp;
