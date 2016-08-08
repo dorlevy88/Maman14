@@ -14,6 +14,7 @@ Status init(AssemblyStructure** assembly, FileContent** file) {
     if (initAssemblyStructure(assembly) == Fail)
         return Fail;
     if (initFileContent(file) == Fail)
+        return Fail;
     return Pass;
 }
 
