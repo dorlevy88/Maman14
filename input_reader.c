@@ -17,6 +17,9 @@
 #define INVALID_NUM_TOKEN -999999
 #define MAX_DYNAMIC_OPERAND 14 /* max exact number */
 #define MAX_DYNAMIC_RANGE 13
+#define NUM_INVALID_LABELS 24
+const char* INVALID_LABELS[NUM_INVALID_LABELS] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop",
+                                                  "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
 /* **********************************************************************
  *
@@ -37,9 +40,17 @@ int getNumCommas(char* string){
 
 char* isLabelValid(char* label) {
     int i;
+    const char** commands = INVALID_LABELS;
+
     if (strlen(label) <= 0) return ERR_INVAILD_LABEL_EMPTY;
     if (isalpha(label[0]) == false) return ERR_INVAILD_LABEL_FIRST;
     if (strlen(label) >= MAX_LABEL_SIZE) return ERR_INVAILD_LABEL_MAX;
+
+    for (i = 0; i < NUM_INVALID_LABELS ; ++i) {
+        if (strcmp(label, commands[i]) == 0){
+            return ERR_INVAILD_LABEL_ILLEGAL;
+        }
+    }
 
     for (i = 1; i < strlen(label); i++) {
         if (!isalpha(label[i]) && !isdigit(label[i])) {
@@ -339,14 +350,12 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
         return copyString(ERR_DATA_INVALID);
     }
 
-    for (i = 1; i < strlen(rawOperandsString) - 1; i++){
-        if (rawOperandsString[i] == ',') {
-            dataSize++;
-        }
-    }
+    dataSize += getNumCommas(rawOperandsString);
     data = (int*)malloc(dataSize * sizeof(int));
+    memset(data, 0, dataSize * sizeof(int));
     numString = strtok(rawOperandsString, " ,\t\n\r");
     if (numString == NULL) {
+        free(data);
         return copyString(ERR_DATA_INVALID);
     }
     for (i=0; i < dataSize; i++){
@@ -354,13 +363,19 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
         if (numberInt != INVALID_NUM_TOKEN){
             data[i] = numberInt;
             numString = strtok(NULL, " ,\t\n\r");
-            if (numString == NULL && i < dataSize) {
+            if (numString == NULL && i < dataSize - 1) {
+                free(data);
                 return copyString(ERR_DATA_INVALID);
             }
         }
         else {
+            free(data);
             return errMessage(ERR_DATA_OUT_OF_BOUNDS, numString);
         }
+    }
+    if (numString != NULL){
+        free(data);
+        return copyString(ERR_DATA_INVALID);
     }
     parsedLine->firstOperValue->data = data;
     parsedLine->firstOperValue->dataSize = dataSize;
