@@ -6,17 +6,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <inttypes.h>
+#include <math.h>
 
 #include "input_reader.h"
 
 #define MAX_FILE_LINES 1000
 #define MAX_LINE_SIZE 80
 #define MAX_LABEL_SIZE 30
-#define MIN_NUM_SIZE -16384
-#define MAX_NUM_SIZE 16384
+#define MAX_DATA_NUMBER 15
+#define MAX_CMD_NUMBER 13
 #define INVALID_NUM_TOKEN -999999
 #define MAX_DYNAMIC_OPERAND 14 /* max exact number */
-#define MAX_DYNAMIC_RANGE 13
 #define NUM_INVALID_LABELS 24
 const char* INVALID_LABELS[NUM_INVALID_LABELS] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop",
                                                   "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
@@ -60,14 +60,16 @@ char* isLabelValid(char* label) {
     return NULL; /* Valid label */
 }
 
-int getIntFromString(char *string){
+int getIntFromString(char *string, int maxBits){
     char* ptr;
     intmax_t num;
+    const int max = (int)pow(2, maxBits - 1);
+
     if (strlen(string) == 0){ /* Check string is not empty */
         return INVALID_NUM_TOKEN;
     }
     num = strtoimax(string, &ptr, 10); /* cast string to number */
-    if (num < MIN_NUM_SIZE || num > MAX_NUM_SIZE) { /* check number could be casted to 15 bits array */
+    if (num < (max * -1) || num >= max) { /* check number could be casted to 15/13 bits array */
         return INVALID_NUM_TOKEN;
     }
     if (strlen(ptr) != 0) { /* check if there was any other chars except for digits in the number */
@@ -137,7 +139,7 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
 
     char* errStr;
 
-    operandStrSize = strlen(operandStr);
+    operandStrSize = (int)strlen(operandStr);
     openBracketPosStr = strchr(operandStr, '[');
     closeBracketPosStr = strchr(operandStr, ']');
     dashPosStr = strchr(operandStr, '-');
@@ -157,7 +159,7 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
         }
         minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);
         if (minNumStr != NULL) {
-            minNumTemp = getIntFromString(minNumStr);
+            minNumTemp = getIntFromString(minNumStr, MAX_CMD_NUMBER);
             if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND) {
                 errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, minNumStr);
                 free(minNumStr);
@@ -170,7 +172,7 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
         }
         maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);
         if (maxNumStr != NULL) {
-            maxNumTemp = getIntFromString(maxNumStr);
+            maxNumTemp = getIntFromString(maxNumStr, MAX_CMD_NUMBER);
             if (maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
                 errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, maxNumStr);
                 free(minNumStr);
@@ -185,7 +187,7 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
         if (minNumTemp > maxNumTemp) {
             return copyString(ERR_LEFT_RIGHT_BOUNDS);
         }
-        if (maxNumTemp - minNumTemp >= MAX_DYNAMIC_RANGE) {
+        if (maxNumTemp - minNumTemp >= MAX_CMD_NUMBER) {
             return copyString(ERR_LEFT_RIGHT_RANGE);
         }
 
@@ -214,7 +216,7 @@ char* getOperand(char* operandStr, Operand* operand) {
 
     /* check direct addressing */
     if (operandStr[0] == '#') {
-        num = getIntFromString(++operandStr);
+        num = getIntFromString(++operandStr, MAX_CMD_NUMBER);
         if (num != INVALID_NUM_TOKEN) { /* Miyadi */
             /* string is number */
             operand->addressingType = NUMBER;
@@ -359,7 +361,7 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
         return copyString(ERR_DATA_INVALID);
     }
     for (i=0; i < dataSize; i++){
-        numberInt = getIntFromString(numString);
+        numberInt = getIntFromString(numString, MAX_DATA_NUMBER);
         if (numberInt != INVALID_NUM_TOKEN){
             data[i] = numberInt;
             numString = strtok(NULL, " ,\t\n\r");
