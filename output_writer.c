@@ -195,6 +195,16 @@ void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     return;
 }
 
+/**
+ *
+    11. save to a different file:
+    11.1 size of the program
+    11.2 size of the data
+    11.3 extern symbols table
+    11.4 symbols table with entry points marks
+ * @param assembly
+ * @param fullFilename
+ */
 void writeAllOutputFiles(AssemblyStructure *assembly, char *fullFilename) {
     writeEntOutputFile(assembly->symbolsTable, fullFilename);
     writeExtOutputFile(assembly->externs, fullFilename);

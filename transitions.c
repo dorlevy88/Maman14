@@ -68,6 +68,17 @@ int getBitRangeFromInt(int num, int minBit, int maxBit) {
     return res;
 }
 
+/**
+ * 8.1 if it a symbol find a match in the symbols table
+ * 8.2 calculate addressing & their matching codes
+ * @param binData
+ * @param operand
+ * @param table
+ * @param externs
+ * @param isDestinationOperand
+ * @param cmdAddress
+ * @return
+ */
 char* buildBinaryData(int* binData, Operand* operand, SymbolsTable* table, SymbolsTable* externs, bool isDestinationOperand, int cmdAddress) {
     int labelPos = 0;
     SymbolRecord* record;
@@ -135,74 +146,56 @@ void updateSymbolsTableDataAddresses(SymbolsTable *table, int ic) {
 }
 
 int getCommandSize(FileLine* line) {
-    int sizeInIc = 0;
-    switch (line->actionType) {
-        case MOV:
-        case CMP:
-        case ADD:
-        case SUB:
-        case LEA:
-            sizeInIc++; /* command byte */
-            if (line->firstOperValue->addressingType == REGISTER &&
-                line->secondOperValue->addressingType == REGISTER) {
-                sizeInIc++; /* if both register addressing -> share a byte */
-            }
-            else {
-                sizeInIc += 2; /* source _ destination address array */
-            }
-            break;
-        case NOT:
-        case CLR:
-        case INC:
-        case DEC:
-        case JMP:
-        case BNE:
-        case RED:
-        case PRN:
-        case JSR:
-            sizeInIc += 2; /* command byte + addresss */
-            break;
-        case RTS:
-        case STOP:
-            sizeInIc++; /* only command byte */
-            break;
-        default:
-            /* BUG in the algorithm should not go here */
-            break;
+    if (line->numOfCommandOprands == 0) {
+        return 1; /* One command byte */
     }
-    return sizeInIc;
+    else if (line->numOfCommandOprands == 1) {
+        return 2; /* One command byte + operand byte*/
+    }
+    else if (line->numOfCommandOprands == 2) {
+        if (line->firstOperValue->addressingType == REGISTER &&
+            line->secondOperValue->addressingType == REGISTER) {
+            return 2; /* One command byte + one shared operand byte*/
+        }
+        else {
+            return 3; /* One command byte + two operand bytes*/
+        }
+    }
+    else {
+        return 0;
+        /* BUG should not get here */
+    }
 }
 
 /* Public Methods */
 
 /**
  * First compiler transition mainly for searching all labels and data array building
- * @param fileContent
- * @param assembly
+ * Algorithem:
+ * 1. int ic = 0, dc = 0;
+ * 2. Read next line
+ * 3. check is label exists in the line start
+ * 4. Rise isLabelExists flag - if it exists
+ * 5. if it is .data or .string command? if not go to step 8
+ * 6. if there is a label add it to the symbols table with the value of dc counter (if it exists in the table throw error)
+ * 7. identify the data type and store it in the data AssemblyBytes
+ * 7.1. update the dc counter according to the data size return to step 2(!)
+ * 8. if the command is .extern or .entry (if not go to step 11)
+ * 9. it is .extern order add it to the symbols table with extern flag on and no value
+ * 10. return to step 2
+ * 11. if there is a label add it to the symbols table with the value of ic counter (if it exists in the table throw error)
+ * 12. Check command & operands type and calculate the command memory size
+ * 13. Add to ic the value of ic + the calculated command size value
+ * 14. go back to step 2
+ * 15. When all lines have been process check for failures and see that the RAM size doesnt exceeds the maximum allowed
+ * 16. Update the data labels (.data or .string) in the symbols table with the mathcing address (the dc location + calulated final ic)
+ * @param fileContent parsed file lines
+ * @param assembly final struct to fill with symbols and bytes, should be PARCIALLY FULL by the end of the method
  * @return Status (Pass/Fail)
  */
 Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly) {
-    /*
-        1. int ic = 0, dc = 0;
-        2. Read line
-        3. check is symbol exists in the first field
-        4. Rise isLabelExists flag - if it exists
-        5. if it is data storage order? (.data or .string) if not go to step 8
-        6. if there is a symbol add it to the symbols table with the value of dc counter (if it exists in the table throw error)
-        7. identify the data type and store it in memory
-        7.1. update the dc counter according to the data size return to step 2(!)
-        8. if the order is .extern or .entry (if not go to step 11)
-        9. is it .extern order
-        9.1 add it to the EXTERN symbols table with no value
-        10. return to step 2
-        11. if there is a label add it to the symbols table with the value of ic counter (if it exists in the table throw error)
-        12. search the commands table if not exists throw unknown command code error
-        13. Check command operand type and calculate the command memory size (L)
-        13.1 You can produce the order code here
-        14. Add to ic the value of ic + the calculated L value (ic += L)
-        15. go back to step 2
-    */
     int i, calcCommandSize;
+    Status status = Pass;
     assembly->ic = ASSEMBLY_CODE_START_ADDRESS;
     assembly->dc = 0;
 
@@ -236,12 +229,14 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
 
             if(isMemAllocOk == false) {
                 printInternalError(ERR_DATA_RAM_OVERFLOW, fileContent->filename);
-                return Fail;
+                status =  Fail;
+                continue;
             }
             if (isLabelExists) {
                 if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
                     printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber);
-                    return Fail;
+                    status =  Fail;
+                    continue;
                 }
             }
             assembly->dc += calcDataSize;
@@ -265,7 +260,8 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
                 if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true, false,
                                        binCommandForDynamicAddressing) == false) {
                     printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber);
-                    return Fail;
+                    status =  Fail;
+                    continue;
                 }
             }
 
@@ -275,6 +271,9 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
             /* Step 14 */
             assembly->ic += calcCommandSize;
         }
+    }
+    if (status == Fail) {
+        return Fail;
     }
 
     if (assembly->ic + assembly->dc >= MAX_CPU_MEMORY) {
@@ -289,30 +288,26 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
 
 /**
  * Second compiler transition is building the code array and locating the extrens/entries usages
+ * Algorithm
+ * 1. reset ic = 0
+ * 2. read next line
+ * 3. ignore label on the beginning of line
+ * 4. is it .data/.string go to step 2
+ * 5. is it .extern or .entry (if not go to step 7)
+ * 6. if it's .entry order mark is as entry in the symbols table and return to step 2
+ * 7. calculate the command code byte and the oprand/s byte/s
+ * 8. store the command & operand/s next bytes in the code AssemblyBytes
+ * 8.1 in case of 2 operands with REGISTER addressing they share the same byte in the code AssemblyBytes
+ * 9. in crease the ic by the calulated amount
+ * 10. return to step 2
+ *
+ * In case of a failure in the second transitions stop the file processing.
+ *
  * @param fileContent
- * @param assembly
+ * @param assembly final struct to fill with symbols and bytes, should be FULL by the end of the method
  * @return Status (Pass/Fail)
  */
 Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly) {
-    /* 1. ic = 0
-    2. read word if done go to step 11
-    3. ignore label on the beginning of line
-    4. is it .data/.string go to step 2 else continue
-    5. is it .extern or .entry (if not go to step 7)
-    6. identify the order
-    6.1. act accordingly
-    6.2 if it's .entry order add the entry symbols and return to step 2
-    7. estimate the operands look at the command table and switch to the correct command code
-    8. store the operands in the next byte
-    8.1 if it a symbol find a match in the symbols table
-    8.2 calculate addressing & their matching codes
-    9. ic += L
-    10. return to step 2
-    11. save to a different file:
-    11.1 size of the program
-    11.2 size of the data
-    11.3 extern symbols table
-    11.4 symbols table with entry points marks */
     int i;
     FileLine line;
     assembly->ic = ASSEMBLY_CODE_START_ADDRESS;
@@ -330,9 +325,11 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
         /* Step: 4 */
         if (line.actionType == DATA || line.actionType == STRING) {
             /* do nothing */
+            continue;
         }
+
         /* Step: 5 */
-        else if (line.actionType == EXTERN || line.actionType == ENTRY) {
+        if (line.actionType == EXTERN || line.actionType == ENTRY) {
             if (line.actionType == ENTRY) {
                 if (setLabelIsEntryInTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern) == false) {
                     printCompileError(errMessage(ERR_LABEL_NOT_DEFINED, line.firstOperValue->entryOrExtern), fileContent->filename, line.lineNumber);
@@ -341,7 +338,7 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
             }
         }
         /* handle command */
-        else{
+        else {
             /*  101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
             char* errStr;
             int binCmd = buildBinaryCommand(line);
@@ -389,6 +386,5 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
         }
 
     }
-    return Pass;
-    /* Done and ready to save! */
+    return Pass; /* Done and ready to save assembly files! */
 }
