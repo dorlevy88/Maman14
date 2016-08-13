@@ -18,6 +18,9 @@
 #define INVALID_NUM_TOKEN -999999
 #define MAX_DYNAMIC_OPERAND 14 /* max exact number */
 #define NUM_INVALID_LABELS 24
+#define MAX_REGISTER_CHARS 2
+#define MIN_REGISTER_NUM 0
+#define MAX_REGISTER_NUM 7
 const char* INVALID_LABELS[NUM_INVALID_LABELS] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop",
                                                   "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
@@ -27,9 +30,15 @@ const char* INVALID_LABELS[NUM_INVALID_LABELS] = {"mov", "cmp", "add", "sub", "n
  *
  * **********************************************************************/
 
+/**
+ * Returns amount of commas (,) in the input string
+ * @param string
+ * @return int - number of commas in string
+ */
 int getNumCommas(char* string){
     int i, counter = 0;
 
+    /* Iterate over all characters, increase counter when hit a comma */
     for (i = 0; i < strlen(string) ; ++i) {
         if (string[i] == ','){
             counter++;
@@ -38,21 +47,31 @@ int getNumCommas(char* string){
     return counter;
 }
 
+/**
+ * Returns True if a the input string is a valid label  - Qualifying the following conditions -
+ *  1. String is not empty
+ *  2. First char is an alpha numeric char
+ *  3. Total string size is smaller equal 30 chars
+ *  4. string is not a reserved word (mov, cmp ...)
+ *  5. all chars are alpha numeric or digits
+ * @param label - String to be qualified as label
+ * @return char* errMsg - Null if label is valid, error message otherwise
+ */
 char* isLabelValid(char* label) {
     int i;
     const char** commands = INVALID_LABELS;
 
-    if (strlen(label) <= 0) return ERR_INVAILD_LABEL_EMPTY;
-    if (isalpha(label[0]) == false) return ERR_INVAILD_LABEL_FIRST;
-    if (strlen(label) >= MAX_LABEL_SIZE) return ERR_INVAILD_LABEL_MAX;
+    if (strlen(label) <= 0) return ERR_INVAILD_LABEL_EMPTY; /* String is not empty */
+    if (isalpha(label[0]) == false) return ERR_INVAILD_LABEL_FIRST; /* First char is an alpha numeric char */
+    if (strlen(label) >= MAX_LABEL_SIZE) return ERR_INVAILD_LABEL_MAX; /* Total string size is smaller equal 30 chars */
 
-    for (i = 0; i < NUM_INVALID_LABELS ; ++i) {
+    for (i = 0; i < NUM_INVALID_LABELS ; ++i) { /* string is not a reserved word (mov, cmp ...) */
         if (strcmp(label, commands[i]) == 0){
             return ERR_INVAILD_LABEL_ILLEGAL;
         }
     }
 
-    for (i = 1; i < strlen(label); i++) {
+    for (i = 1; i < strlen(label); i++) { /* all chars are alpha numeric or digits */
         if (!isalpha(label[i]) && !isdigit(label[i])) {
             return ERR_INVAILD_LABEL_ILLEGAL;
         }
@@ -60,6 +79,16 @@ char* isLabelValid(char* label) {
     return NULL; /* Valid label */
 }
 
+/**
+ * Returns int number when string qualifies as a number that can be represented in MaxBits length array of bits
+ * Needs to meet the following rules -
+ *  1. String is not empty
+ *  2. Casted number could be casted again to MaxBits bit array
+ *  3. The string was consisted of only numbers with no additional alpha numeric chars
+ * @param string - char* to "cast" as a number
+ * @param maxBits - length of bit array the number would be casted into
+ * @return INVALID_NUM_TOKEN when rules are not met, integer casted from string when all rules met
+ */
 int getIntFromString(char *string, int maxBits){
     char* ptr;
     intmax_t num;
@@ -78,20 +107,38 @@ int getIntFromString(char *string, int maxBits){
     return (int)num;
 }
 
+/**
+ * Returns substring from ogirinal string
+ * @param orig - char* that contains the full string to get the substring from
+ * @param pos1 - Position for substring start
+ * @param pos2 - Position for substring end
+ * @return Substring from string from location pos1 to pos2
+ */
 char* getNewSubStringFromString(const char* orig, int pos1, int pos2) {
     size_t sizeT;
     char* res;
     const char* pos;
 
-    sizeT = (size_t)pos2 - pos1;
-    res = (char*)malloc(sizeT);
+    sizeT = (size_t)pos2 - pos1; /* Find the size of substring */
+    res = (char*)malloc(sizeT);  /* Allocate the size of substring */
     memset(res, 0, sizeT);
-    pos = &orig[pos1] + 1;
-    strncpy(res, pos, sizeT);
-    res[sizeT - 1] = '\0';
+    pos = &orig[pos1] + 1; /* pos has the pointer to the beginning of substring */
+    strncpy(res, pos, sizeT); /* copy the substring to res from string pos and the amount of chars - sizeT */
+    res[sizeT - 1] = '\0';  /* set last char in res as end of string \0 */
     return res;
 }
 
+/**
+ * Find if a substring exist in orig string between c1 and c2 with two options -
+ *  1. check end of line - will control if to ignore chars after substring ends
+ *  2. check start of line - will control if to ignore chars before substring begins
+ * @param orig - char* - original string
+ * @param c1 - char - Character which substring should begin with
+ * @param c2 - char - Character which substring should end with
+ * @param checkEndOfLine - Turn on/off whether to check for unknown chars after end of substring
+ * @param checkStartOfLine - Turn on/off whether to check for unknown chars before start of substring
+ * @return char* substring if substring exist in string and qualify with all the above checks, NULL otherwise
+ */
 char* getNewStrBetweenTwoChars(const char* orig, char c1, char c2, bool checkEndOfLine, bool checkStartOfLine) {
     int c1Pos = -1;
     int c2Pos = -1;
@@ -99,29 +146,44 @@ char* getNewStrBetweenTwoChars(const char* orig, char c1, char c2, bool checkEnd
     char* string;
 
     for (i = 0; i < strlen(orig) ; i++) {
-        if (c1Pos == -1 && c2Pos == -1 && orig[i] != c1){ /*  before word - did not find any quote yet */
+        if (c1Pos == -1 && c2Pos == -1 && orig[i] != c1){ /*  before word - did not find c1 char or c2 char in string yet - Ignore tabs, spaces or NULL (\0) */
             if (checkStartOfLine && orig[i] != '\0' && orig[i] != '\t' && orig[i] != ' '){
                 return NULL;
             }
         }
-        else if (c1Pos == -1 && c2Pos == -1 && orig[i] == c1){ /* got to first quotes */
+        else if (c1Pos == -1 && c2Pos == -1 && orig[i] == c1){ /* Starting word - found c1 char in string */
             c1Pos = i;
         }
-        else if (c1Pos > -1 && c2Pos == -1 && orig[i] == c2){ /* got second quote */
+        else if (c1Pos > -1 && c2Pos == -1 && orig[i] == c2){ /* Ending Word - Found c2 char in string */
             c2Pos = i;
         }
-        else if (checkEndOfLine && c1Pos > -1 && c2Pos > -1 && /*  after second quote */
+        else if (checkEndOfLine && c1Pos > -1 && c2Pos > -1 && /*  After word - Check no other chars exist except for spaces, tabs, end of lines chars (\n, \r) or NULL (\0) */
                  (orig[i] != '\n' && orig[i] != '\r' && orig[i] != '\0' && orig[i] != '\t' && orig[i] != ' ')){
             return NULL;
         }
     }
-    if (c2Pos > c1Pos && c1Pos > -1){
-        string = getNewSubStringFromString(orig, c1Pos, c2Pos);
+    if (c2Pos > c1Pos && c1Pos > -1){ /* Check that positions of starting char and ending char are valid - Char 2 is after char 1 and char 1 position exists */
+        string = getNewSubStringFromString(orig, c1Pos, c2Pos); /* get the substring starting with c1 and end at c2 */
         return string;
     }
     return NULL;
 }
 
+/**
+ * Function gets a dynamic addressing string, checks if it qualifies to be as such and if so, set the label, minNum and maxNum retrieved from the caller
+ * Dynamic addressing has the following structure - ValidLabel[MinNum-MaxNum]
+ * The following rules are being checked -
+ *  1. A valid label exists before '['
+ *  2. MinNum exist and is in the allowed range
+ *  3. MaxNum exist and is in the allowed range
+ *  4. MinNum should be smaller the MaxNum
+ *  5. the diff between MaxNum and MinNum should be in the allowed range
+ * @param operandStr - String to check for dynamic addressing type
+ * @param label - pointer to label to set at the end of the process, if all rules met
+ * @param minNum - pointer to minNum to set at the end of the process, if all rules met
+ * @param maxNum - pointer to maxNum to set at the end of the process, if all rules met
+ * @return ErrMsg - char* - NULL if no issues, errMsg otherwise
+ */
 char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* maxNum) {
     int operandStrSize;
     int openBracketPos;
@@ -139,66 +201,83 @@ char* checkDynamicAddressing (char* operandStr, char** label, int* minNum, int* 
 
     char* errStr;
 
-    operandStrSize = (int)strlen(operandStr);
-    openBracketPosStr = strchr(operandStr, '[');
-    closeBracketPosStr = strchr(operandStr, ']');
-    dashPosStr = strchr(operandStr, '-');
+    operandStrSize = (int)strlen(operandStr);       /* length of operantStr */
+    openBracketPosStr = strchr(operandStr, '[');    /* locate '[' string start in operandStr*/
+    closeBracketPosStr = strchr(operandStr, ']');   /* locate ']' string start in operandStr */
+    dashPosStr = strchr(operandStr, '-');           /* locate '-' string start in operandStr */
 
-    openBracketPos = (int) (openBracketPosStr - operandStr);
-    closeBracketPos = (int) (closeBracketPosStr - operandStr);
-    dashPos = (int) (dashPosStr - operandStr);
+    openBracketPos = (int) (openBracketPosStr - operandStr);    /* locate '[' position in operandStr*/
+    closeBracketPos = (int) (closeBracketPosStr - operandStr);  /* locate ']' position in operandStr */
+    dashPos = (int) (dashPosStr - operandStr);                  /* locate '-' position in operandStr */
 
-    if (closeBracketPos > dashPos && dashPos > openBracketPos && /* Check '[' then '-' then ']' */
-        openBracketPos != 0 &&         /* Has label instead of [ */
-        closeBracketPos == operandStrSize - 1) { /* ']' is at the end*/
+    if (closeBracketPos > dashPos && dashPos > openBracketPos &&    /* Check '[' then '-' then ']' */
+        openBracketPos != 0 &&                                      /* Has label instead of [ */
+        closeBracketPos == operandStrSize - 1) {                    /* ']' is at the end */
 
-        labelTemp = getNewSubString(operandStr, openBracketPos);
-        errStr = isLabelValid(labelTemp);
-        if (errStr != NULL) {
+        labelTemp = getNewSubString(operandStr, openBracketPos);    /* get string before '[' as a label candidate */
+        errStr = isLabelValid(labelTemp);                           /* check if string is a valid label */
+        if (errStr != NULL) {                                       /* If string is not valid label, return error */
             return errMessage(errStr, labelTemp);
         }
-        minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);
-        if (minNumStr != NULL) {
-            minNumTemp = getIntFromString(minNumStr, MAX_CMD_NUMBER);
-            if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND) {
-                errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, minNumStr);
+        minNumStr = getNewStrBetweenTwoChars(operandStr, '[', '-', false, false);       /* get number between '[' and '-' */
+        if (minNumStr != NULL) {                                                        /* check number is not null */
+            minNumTemp = getIntFromString(minNumStr, MAX_CMD_NUMBER);                   /* cast char* to a number */
+            if (minNumTemp == INVALID_NUM_TOKEN || minNumTemp > MAX_DYNAMIC_OPERAND) {  /* check casting was ok and number does not exceed the allowed number for dynamic operand */
+                errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, minNumStr);                  /* throw an error - out of bounds */
                 free(minNumStr);
                 return errStr;
             }
             free(minNumStr);
         }
         else {
-            return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
+            return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr); /* String is empty - throw error */
         }
-        maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);
-        if (maxNumStr != NULL) {
-            maxNumTemp = getIntFromString(maxNumStr, MAX_CMD_NUMBER);
-            if (maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {
-                errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, maxNumStr);
+        maxNumStr = getNewStrBetweenTwoChars(operandStr, '-', ']', false, false);       /* get number between '-' and ']' */
+        if (maxNumStr != NULL) {                                                        /* check number is not null */
+            maxNumTemp = getIntFromString(maxNumStr, MAX_CMD_NUMBER);                   /* cast char* to a number */
+            if (maxNumTemp == INVALID_NUM_TOKEN || maxNumTemp > MAX_DYNAMIC_OPERAND) {  /* check casting was ok and number does not exceed the allowed number for dynamic operand */
+                errStr = errMessage(ERR_NUM_OUT_OF_BOUNDS, maxNumStr);                  /* throw an error - out of bounds */
                 free(minNumStr);
                 return errStr;
             }
             free(maxNumStr);
         }
         else {
-            return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
+            return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr); /* String is empty - throw error */
         }
 
-        if (minNumTemp > maxNumTemp) {
+        if (minNumTemp > maxNumTemp) { /* check if left number is bigger than left number - throw error if so */
             return copyString(ERR_LEFT_RIGHT_BOUNDS);
         }
-        if (maxNumTemp - minNumTemp >= MAX_CMD_NUMBER) {
+        if (maxNumTemp - minNumTemp >= MAX_CMD_NUMBER) { /* check if the difference between two numbers excceed the allowed threshold - throw error if so */
             return copyString(ERR_LEFT_RIGHT_RANGE);
         }
 
-        *label = labelTemp;
-        *minNum = minNumTemp;
-        *maxNum = maxNumTemp;
-        return NULL;
+        *label = labelTemp;     /* set the label */
+        *minNum = minNumTemp;   /* set min number */
+        *maxNum = maxNumTemp;   /* set max number */
+        return NULL;            /* return no error message */
     }
     return errMessage(ERR_BAD_DYNAMIC_ADDRESSING, operandStr);
 }
 
+/**
+ * gets an operand string and set operand (Operand type) with the appropriate data
+ * Appropriate data for each addressing type -
+ *  1. Direct Adressing -       operand->addressingType = NUMBER
+ *                              operand->value = number after #
+ *  2. Register Addressing -    operand->addressingType = REGISTER
+ *                              operand->registerNum = number after 'r'
+ *  3. Dynamic -                operand->addressingType = DYNAMIC
+ *                              operand->label = label
+ *                              operand->minNum = minNum
+ *                              operand->maxNum = maxNum
+ *  4. Direct -
+ *
+ * @param operandStr - Holds one operand string
+ * @param operand    - Struct that holds all operand's metadata
+ * @return - Sets operand values according to the appropriate operand type, throws error when something goes wrong
+ */
 char* getOperand(char* operandStr, Operand* operand) {
     int num;
     char* label;
@@ -210,52 +289,61 @@ char* getOperand(char* operandStr, Operand* operand) {
     int maxNum;
     char* errStr;
 
-    openBracketPosStr = strchr(operandStr, '[');
-    closeBracketPosStr = strchr(operandStr, ']');
-    dashPosStr = strchr(operandStr, '-');
+    openBracketPosStr = strchr(operandStr, '['); /* Find pointer of '[' string start */
+    closeBracketPosStr = strchr(operandStr, ']'); /* Find pointer of ']' string start */
+    dashPosStr = strchr(operandStr, '-'); /* Find pointer of '-' string start */
 
     /* check direct addressing */
-    if (operandStr[0] == '#') {
-        num = getIntFromString(++operandStr, MAX_CMD_NUMBER);
-        if (num != INVALID_NUM_TOKEN) { /* Miyadi */
-            /* string is number */
-            operand->addressingType = NUMBER;
-            operand->value = num;
+    if (operandStr[0] == '#') { /* if operand string starts with # */
+        num = getIntFromString(++operandStr, MAX_CMD_NUMBER); /* get the number after # and check it does not exceed boundaries */
+        if (num != INVALID_NUM_TOKEN) { /* if number does not exceeds boundaries, set direct addressing operand values */
+            operand->addressingType = NUMBER;  /* set addressing type as NUMBER (Direct Addressing) */
+            operand->value = num;              /* set value of operand as number after # */
             return NULL;
         }
         else {
-            return errMessage(ERR_INVALID_NUMBER, operandStr);
+            return errMessage(ERR_INVALID_NUMBER, operandStr); /* throw error if number exceeds boundaries */
         }
     }
-    /*  Oger */
-    else if (operandStr[0] == 'r' && strlen(operandStr) == 2 && operandStr[1] >= '0' && operandStr[1] <= '7') {
-            operand->addressingType = REGISTER;
-            operand->registerNum = (int)operandStr[1] - '0';
+    /*  Register Addressing */
+    else if (operandStr[0] == 'r'                           /* operand string starts with 'r' */
+             && strlen(operandStr) == MAX_REGISTER_CHARS    /* length of operand string is 2 */
+             && operandStr[1] >= MIN_REGISTER_NUM           /* second char is equal bigger than 0 */
+             && operandStr[1] <= MAX_REGISTER_NUM) {        /* second char is equal smaller than 7 */
+            operand->addressingType = REGISTER;              /* set addressing type as register */
+            operand->registerNum = (int)operandStr[1] - '0'; /* set register value to the one found */
             return NULL;
     }
     /* Dinami Yashir */
-    else if (openBracketPosStr != NULL && closeBracketPosStr != NULL && dashPosStr != NULL) { /* Check we should be in Dinami Yashir */
-        errStr = checkDynamicAddressing(operandStr, &label, &minNum, &maxNum);
-        if (errStr == NULL) {
-            operand->addressingType = DYNAMIC;
-            operand->label = label;
-            operand->minNum = minNum;
-            operand->maxNum = maxNum;
+    else if (openBracketPosStr != NULL && closeBracketPosStr != NULL && dashPosStr != NULL) { /* Check we should be in Dinami Yashir - has '[', '-' and ']' in string */
+        errStr = checkDynamicAddressing(operandStr, &label, &minNum, &maxNum); /* Set label, minNum and maxNum with the appropriate values, get an error message if string is not in the correct structure of Dynamic addressing string  */
+        if (errStr == NULL) {                   /* If no error */
+            operand->addressingType = DYNAMIC;  /* set addressing type as Dynamic addressing */
+            operand->label = label;             /* set label as label found */
+            operand->minNum = minNum;           /* set min number for dynamic addressing as minNum */
+            operand->maxNum = maxNum;           /* set max number for dynamic addressing as maxNum */
             return NULL;
         }
         else {
-            return errStr;
+            return errStr; /* Throw error */
         }
     }
     /* Yashir */
-    else if (isLabelValid(operandStr) == NULL) {
-        operand->addressingType = DIRECT;
-        operand->label = copyString(operandStr);
+    else if (isLabelValid(operandStr) == NULL) { /* check if we are in direct addressing by checking if label is valid */
+        operand->addressingType = DIRECT;           /* set addressing type as Direct */
+        operand->label = copyString(operandStr);    /* set label for direct as the label found */
         return NULL;
     }
-    return errMessage(ERR_UNKNOWN_ADDRESSING, operandStr);
+    return errMessage(ERR_UNKNOWN_ADDRESSING, operandStr); /* throw error - addressing does not correspond to any known addressing type */
 }
 
+/**
+ *
+ * @param rawOperandsString
+ * @param parsedLine
+ * @param checkAddressing
+ * @return
+ */
 char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool checkAddressing){
     char* firstRawOperand;
     char* secondRawOperand;
@@ -297,6 +385,13 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool check
     return NULL;
 }
 
+/**
+ *
+ * @param rawOperandsString
+ * @param parsedLine
+ * @param checkAddressing
+ * @return
+ */
 char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine, bool checkAddressing){
     char* firstRawOperand;
     char* errString;
@@ -329,6 +424,12 @@ char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine, bool checkA
     return NULL;
 }
 
+/**
+ *
+ * @param rawOperandsString
+ * @param parsedLine
+ * @return
+ */
 char* checkNoOperand(char* rawOperandsString, FileLine* parsedLine){
     char* firstRawOperand;
     firstRawOperand = strtok(rawOperandsString, " ,\t");
@@ -339,6 +440,12 @@ char* checkNoOperand(char* rawOperandsString, FileLine* parsedLine){
     return NULL;
 }
 
+/**
+ *
+ * @param rawOperandsString
+ * @param parsedLine
+ * @return
+ */
 char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     int dataSize = 1;
     int i;
@@ -384,6 +491,12 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     return NULL;
 }
 
+/**
+ *
+ * @param rawOperandString
+ * @param parsedLine
+ * @return
+ */
 char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     char* string;
 
@@ -402,6 +515,12 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     return NULL;
 }
 
+/**
+ *
+ * @param rawOperandString
+ * @param parsedLine
+ * @return
+ */
 char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
     char* label;
     char* errStr;
@@ -421,6 +540,12 @@ char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
     return errMessage(errStr, label);
 }
 
+/**
+ *
+ * @param rawOperandsString
+ * @param parsedLine
+ * @return
+ */
 char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     char* errStr = NULL;
     char* action = parsedLine->action;
@@ -430,7 +555,7 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     }
     else if (strcmp(action, "cmp") == 0){
         parsedLine->actionType = CMP;
-        errStr = checkTwoOperands(rawOperandsString, parsedLine, false); /* For cmp command there is no problem with destination operand addressing*/
+        errStr = checkTwoOperands(rawOperandsString, parsedLine, false); /* For cmp command there is no problem with destination operand addressing */
     }
     else if (strcmp(action, "add") == 0){
         parsedLine->actionType = ADD;
@@ -481,7 +606,7 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     }
     else if (strcmp(action, "prn") == 0){
         parsedLine->actionType = PRN;
-        errStr = checkOneOperand(rawOperandsString, parsedLine, false); /* For prn command there is no problem with destination operand addressing*/
+        errStr = checkOneOperand(rawOperandsString, parsedLine, false); /* For prn command there is no problem with destination operand addressing */
     }
     else if (strcmp(action, "rts") == 0){
         parsedLine->actionType = RTS;
@@ -514,6 +639,11 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     return errStr;
 }
 
+/**
+ *
+ * @param parsedLine
+ * @return
+ */
 char* lineValidator(FileLine* parsedLine) {
     char* string;
     char* parsedLabel;
