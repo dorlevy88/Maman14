@@ -338,11 +338,12 @@ char* getOperand(char* operandStr, Operand* operand) {
 }
 
 /**
- *
- * @param rawOperandsString
- * @param parsedLine
- * @param checkAddressing
- * @return
+ * Gets remaining string after the command (mov, cmp..), expecting 2 operands,
+ * parses it according to the operands in it and sets both operands of the line
+ * @param rawOperandsString - String after command string
+ * @param parsedLine - FileLine struct related to the line working on now
+ * @param checkAddressing - Set to True when command has a restriction on destination opernd (all cmd except for cmp and prn)
+ * @return NULL if everything ok, error string if there was any issue
  */
 char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool checkAddressing){
     char* firstRawOperand;
@@ -350,35 +351,35 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool check
     char* errString;
 
 
-    if (rawOperandsString == NULL) {
+    if (rawOperandsString == NULL) { /* check at least one operand */
         return errMessage(ERR_TWO_OP_GOT_NONE, parsedLine->action);
     }
-    if (getNumCommas(rawOperandsString) != 1) {
+    if (getNumCommas(rawOperandsString) != 1) { /* check that there is only one comma (,) in command */
         return errMessage(ERR_INVALID_COMMAND_FORMAT, rawOperandsString);
     }
     firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
     secondRawOperand = strtok(NULL, " ,\t"); /* get second operand - split by comma and/or space */
 
-    if (secondRawOperand == NULL){
+    if (secondRawOperand == NULL){ /* check at least two operand */
         return errMessage(ERR_TWO_OP_GOT_ONE, rawOperandsString);
     }
-    if (strtok(NULL, " ,\t") != NULL){
+    if (strtok(NULL, " ,\t") != NULL){ /* check no more than 2 operands */
         return errMessage(ERR_TWO_OP_GOT_MORE, rawOperandsString);
     }
 
-    parsedLine->numOfCommandOprands = 2;
+    parsedLine->numOfCommandOprands = 2; /* set line number of operands = 2 */
 
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
-    errString = getOperand(firstRawOperand, parsedLine->firstOperValue);
-    if (errString != NULL) return errString;
+    errString = getOperand(firstRawOperand, parsedLine->firstOperValue); /* Parse first operand and set it as parsedline-> firstOperValue */
+    if (errString != NULL) return errString; /* Throw error if parsing failed */
 
     parsedLine->secondOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->secondOperValue, 0, sizeof(Operand));
-    errString = getOperand(secondRawOperand, parsedLine->secondOperValue);
-    if (errString != NULL) return errString;
+    errString = getOperand(secondRawOperand, parsedLine->secondOperValue); /* Parse second operand and set it as parsedline-> secondOperValue  */
+    if (errString != NULL) return errString; /* Throw error if parsing failed */
 
-    if (checkAddressing && (parsedLine->secondOperValue->addressingType == NUMBER ||
+    if (checkAddressing && (parsedLine->secondOperValue->addressingType == NUMBER || /* If checkAdressing true (any cmd that is not cmp or prn) ,check if the destination operand is 0,2 and if so throw and error */
             parsedLine->secondOperValue->addressingType == DYNAMIC))
         return errMessage(ERR_ILLEGAL_DEST_ADDRESSING, parsedLine->action);
 
@@ -386,38 +387,39 @@ char* checkTwoOperands(char* rawOperandsString, FileLine* parsedLine, bool check
 }
 
 /**
- *
- * @param rawOperandsString
- * @param parsedLine
- * @param checkAddressing
- * @return
+ * Gets remaining string after the command (mov, cmp..), expecting 1 operand,
+ * parses it according to the operand in it and sets operand in line
+ * @param rawOperandsString - String after command string
+ * @param parsedLine - FileLine struct related to the line working on now
+ * @param checkAddressing - Set to True when command has a restriction on destination opernd (all cmd except for cmp and prn)
+ * @return NULL if everything ok, error string if there was any issue
  */
 char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine, bool checkAddressing){
     char* firstRawOperand;
     char* errString;
 
-    if (rawOperandsString == NULL) {
+    if (rawOperandsString == NULL) { /* Check at least one operand */
         return errMessage(ERR_ONE_OP_GOT_NONE, parsedLine->action);
     }
-    if (getNumCommas(rawOperandsString) != 0) {
+    if (getNumCommas(rawOperandsString) != 0) { /* Check string formatting (no commas) */
         return errMessage(ERR_INVALID_COMMAND_FORMAT, rawOperandsString);
     }
 
     firstRawOperand = strtok(rawOperandsString, " ,\t"); /* get first operand - split by comma and/or space */
-    if (strtok(NULL, " ,\t") != NULL){ /* Operand 2 is not empty */
+    if (strtok(NULL, " ,\t") != NULL){ /* if rest of string is not empty, throw error */
         return errMessage(ERR_ONE_OP_GOT_MORE, rawOperandsString);
     }
-    else if (firstRawOperand == NULL){ /* Operand 1 is empty */
+    else if (firstRawOperand == NULL){ /* if operand 1 is empty, throw error */
         return errMessage(ERR_ONE_OP_GOT_NONE, parsedLine->action);
     }
 
-    parsedLine->numOfCommandOprands = 1;
+    parsedLine->numOfCommandOprands = 1; /* set line number of operands = 1 */
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
-    errString = getOperand(firstRawOperand, parsedLine->firstOperValue);
-    if (errString != NULL) return errString;
+    errString = getOperand(firstRawOperand, parsedLine->firstOperValue); /* Parse operand string and set parsedLine->firstOperValue with it if no error */
+    if (errString != NULL) return errString; /* If error in parsing, throw error */
 
-    if (checkAddressing && (parsedLine->firstOperValue->addressingType == NUMBER ||
+    if (checkAddressing && (parsedLine->firstOperValue->addressingType == NUMBER || /* If checkAdressing true (any cmd that is not cmp or prn) ,check if the destination operand is 0,2 and if so throw and error */
             parsedLine->firstOperValue->addressingType == DYNAMIC))
        return errMessage(ERR_ILLEGAL_DEST_ADDRESSING, parsedLine->action);
 
@@ -425,26 +427,26 @@ char* checkOneOperand(char* rawOperandsString, FileLine* parsedLine, bool checkA
 }
 
 /**
- *
- * @param rawOperandsString
- * @param parsedLine
- * @return
+ * Gets operands string, check that it is empty
+ * @param rawOperandsString - Rest of string after command
+ * @param parsedLine - FileLine struct to update num of operands in
+ * @return NULL if no error, error message otherwise
  */
 char* checkNoOperand(char* rawOperandsString, FileLine* parsedLine){
     char* firstRawOperand;
-    firstRawOperand = strtok(rawOperandsString, " ,\t");
+    firstRawOperand = strtok(rawOperandsString, " \t");
     if (firstRawOperand != NULL){ /* Operand 1 is not empty */
         return errMessage(ERR_NO_OP_GOT_MORE, rawOperandsString);
     }
-    parsedLine->numOfCommandOprands = 0;
+    parsedLine->numOfCommandOprands = 0; /* set line number of operands = 0 */
     return NULL;
 }
 
 /**
- *
- * @param rawOperandsString
- * @param parsedLine
- * @return
+ * gets string after .data command, check for validity and store in parsedLine
+ * @param rawOperandsString - Rest of string after command
+ * @param parsedLine - FileLine struct to update num of operands in
+ * @return NULL if no error, error message otherwise
  */
 char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     int dataSize = 1;
@@ -452,50 +454,51 @@ char* checkDataOperand(char* rawOperandsString, FileLine* parsedLine) {
     int* data;
     char* numString;
     int numberInt;
+
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
-    if (rawOperandsString == NULL) {
+    if (rawOperandsString == NULL) { /* Check the existence of data, if not exist, throw error */
         return copyString(ERR_DATA_INVALID);
     }
 
-    dataSize += getNumCommas(rawOperandsString);
+    dataSize += getNumCommas(rawOperandsString); /* Amount of data objects is number of commas plus 1 (initiated with 1) */
     data = (int*)malloc(dataSize * sizeof(int));
     memset(data, 0, dataSize * sizeof(int));
-    numString = strtok(rawOperandsString, " ,\t\n\r");
-    if (numString == NULL) {
+    numString = strtok(rawOperandsString, " ,\t\n\r"); /* get first data object - number */
+    if (numString == NULL) { /* if first data object is empty, throw error */
         free(data);
         return copyString(ERR_DATA_INVALID);
     }
-    for (i=0; i < dataSize; i++){
-        numberInt = getIntFromString(numString, MAX_DATA_NUMBER);
-        if (numberInt != INVALID_NUM_TOKEN){
-            data[i] = numberInt;
-            numString = strtok(NULL, " ,\t\n\r");
-            if (numString == NULL && i < dataSize - 1) {
+    for (i=0; i < dataSize; i++){ /* for each of the data objects, parse the data, check for boundaries and save it in an array */
+        numberInt = getIntFromString(numString, MAX_DATA_NUMBER); /* get integer from string */
+        if (numberInt != INVALID_NUM_TOKEN){ /* if no error parsing string */
+            data[i] = numberInt; /* save number in data array */
+            numString = strtok(NULL, " ,\t\n\r"); /* get next data object */
+            if (numString == NULL && i < dataSize - 1) { /* check next iteration (except for last) has valid data object, throw error if not */
                 free(data);
                 return copyString(ERR_DATA_INVALID);
             }
         }
-        else {
+        else { /* Throw error if data string is not valid as a number or out of boundaries */
             free(data);
             return errMessage(ERR_DATA_OUT_OF_BOUNDS, numString);
         }
     }
-    if (numString != NULL){
+    if (numString != NULL){ /* if there are more data objects then number of commas + 1, throw error */
         free(data);
         return copyString(ERR_DATA_INVALID);
     }
-    parsedLine->firstOperValue->data = data;
-    parsedLine->firstOperValue->dataSize = dataSize;
+    parsedLine->firstOperValue->data = data; /* set data array under operand in parsedLine */
+    parsedLine->firstOperValue->dataSize = dataSize; /* set data array size under operand in parsedLine */
     return NULL;
 }
 
 /**
- *
- * @param rawOperandString
- * @param parsedLine
- * @return
+ * gets string after .string command, check for validity and store in parsedLine
+ * @param rawOperandString - Rest of string after command
+ * @param parsedLine - FileLine struct to update num of operands in
+ * @return NULL if no error, error message otherwise
  */
 char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     char* string;
@@ -503,136 +506,137 @@ char* checkStringOperand(char* rawOperandString, FileLine* parsedLine) {
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
-    if (rawOperandString == NULL) {
+    if (rawOperandString == NULL) { /* if string is empty, throw error */
         return copyString(ERR_DATA_INVALID);
     }
 
-    string = getNewStrBetweenTwoChars(rawOperandString, '"', '"', true, true);
-    if (string == NULL)
+    string = getNewStrBetweenTwoChars(rawOperandString, '"', '"', true, true); /* get string between double quotes, throw error if there are characters before first double quotes or after second double quotes */
+    if (string == NULL) /* if any error parsing string, throw error */
         return errMessage(ERR_STRING_INVALID, rawOperandString);
 
-    parsedLine->firstOperValue->string = string;
+    parsedLine->firstOperValue->string = string; /* save string in parsedLine, under first operand */
     return NULL;
 }
 
 /**
- *
- * @param rawOperandString
- * @param parsedLine
- * @return
+ * gets string after .extern/.entry command, check for validity and store in parsedLine
+ * @param rawOperandString - Rest of string after command
+ * @param parsedLine - FileLine struct to update num of operands in
+ * @return NULL if no error, error message otherwise
  */
 char* checkExternOrEntryOperand(char* rawOperandString, FileLine* parsedLine) {
     char* label;
     char* errStr;
+
     parsedLine->firstOperValue = (Operand*) malloc(sizeof(Operand));
     memset(parsedLine->firstOperValue, 0, sizeof(Operand));
 
-    if (rawOperandString == NULL) {
+    if (rawOperandString == NULL) { /* check string is not empty, if so, throw error */
         return errMessage(ERR_ONE_OP_GOT_NONE, parsedLine->action);
     }
 
     label = strtok(rawOperandString, " \t\n\r");
-    errStr = isLabelValid(label);
-    if (errStr == NULL){
-        parsedLine->firstOperValue->entryOrExtern = copyString(label);
+    errStr = isLabelValid(label); /* check that string has a valid label */
+    if (errStr == NULL){ /* if label is not valid, throw error */
+        parsedLine->firstOperValue->entryOrExtern = copyString(label); /* set entry/extern label under first operand in parsedLine */
         return NULL;
     }
     return errMessage(errStr, label);
 }
 
 /**
- *
+ * Check that action string is valid, has the right amount of operands after and checks
  * @param rawOperandsString
- * @param parsedLine
- * @return
+ * @param parsedLine - FileLine struct to update num of operands in
+ * @return NULL if line is ok, else error message
  */
 char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
     char* errStr = NULL;
     char* action = parsedLine->action;
-    if (strcmp(action, "mov") == 0) {
+    if (strcmp(action, "mov") == 0) { /* if action is mov, set action and parse the two operands */
         parsedLine->actionType = MOV;
         errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "cmp") == 0){
+    else if (strcmp(action, "cmp") == 0){ /* if action is cmp, set action and parse the two operands */
         parsedLine->actionType = CMP;
-        errStr = checkTwoOperands(rawOperandsString, parsedLine, false); /* For cmp command there is no problem with destination operand addressing */
+        errStr = checkTwoOperands(rawOperandsString, parsedLine, false); /* false as no need to check destination operand addressing */
     }
-    else if (strcmp(action, "add") == 0){
+    else if (strcmp(action, "add") == 0){ /* if action is add, set action and parse the two operands */
         parsedLine->actionType = ADD;
         errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "sub") == 0){
+    else if (strcmp(action, "sub") == 0){ /* if action is sub, set action and parse the two operands */
         parsedLine->actionType = SUB;
         errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "lea") == 0){
+    else if (strcmp(action, "lea") == 0){ /* if action is lea, set action, parse the two operands and check that source operand is Direct */
         parsedLine->actionType = LEA;
         errStr = checkTwoOperands(rawOperandsString, parsedLine, true);
-        if (errStr == NULL && parsedLine->firstOperValue != NULL &&
+        if (errStr == NULL && parsedLine->firstOperValue != NULL && /* check first operand exist and is Direct */
                 parsedLine->firstOperValue->addressingType != DIRECT)
             errStr = copyString(ERR_LEA_SOURCE_ADDRESSING);
     }
-    else if (strcmp(action, "clr") == 0){
+    else if (strcmp(action, "clr") == 0){ /* if action is clr, set action and parse the operand */
         parsedLine->actionType = CLR;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "not") == 0){
+    else if (strcmp(action, "not") == 0){ /* if action is not, set action and parse the operand */
         parsedLine->actionType = NOT;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "inc") == 0){
+    else if (strcmp(action, "inc") == 0){ /* if action is inc, set action and parse the operand */
         parsedLine->actionType = INC;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "dec") == 0){
+    else if (strcmp(action, "dec") == 0){ /* if action is dec, set action and parse the operand */
         parsedLine->actionType = DEC;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "jmp") == 0){
+    else if (strcmp(action, "jmp") == 0){ /* if action is jmp, set action and parse the operand */
         parsedLine->actionType = JMP;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "bne") == 0){
+    else if (strcmp(action, "bne") == 0){ /* if action is bne, set action and parse the operand */
         parsedLine->actionType = BNE;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "red") == 0){
+    else if (strcmp(action, "red") == 0){ /* if action is red, set action and parse the operand */
         parsedLine->actionType = RED;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "jsr") == 0){
+    else if (strcmp(action, "jsr") == 0){ /* if action is jsr, set action and parse the operand */
         parsedLine->actionType = JSR;
         errStr = checkOneOperand(rawOperandsString, parsedLine, true);
     }
-    else if (strcmp(action, "prn") == 0){
+    else if (strcmp(action, "prn") == 0){ /* if action is prn, set action and parse the operand */
         parsedLine->actionType = PRN;
-        errStr = checkOneOperand(rawOperandsString, parsedLine, false); /* For prn command there is no problem with destination operand addressing */
+        errStr = checkOneOperand(rawOperandsString, parsedLine, false); /* false as no need to check destination operand addressing */
     }
-    else if (strcmp(action, "rts") == 0){
+    else if (strcmp(action, "rts") == 0){ /* if action is rts, set action and check no operand */
         parsedLine->actionType = RTS;
         checkNoOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(action, "stop") == 0){
+    else if (strcmp(action, "stop") == 0){ /* if action is stop, set action and check no operand */
         parsedLine->actionType = STOP;
         errStr = checkNoOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(action, ".data") == 0){
+    else if (strcmp(action, ".data") == 0){ /* if action is .data, set action and parse data */
         parsedLine->actionType = DATA;
         errStr = checkDataOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(action, ".string") == 0){
+    else if (strcmp(action, ".string") == 0){ /* if action is .string, set action and parse string */
         parsedLine->actionType = STRING;
         errStr = checkStringOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(action, ".entry") == 0){
+    else if (strcmp(action, ".entry") == 0){ /* if action is .entry, set action and save label */
         parsedLine->actionType = ENTRY;
         errStr = checkExternOrEntryOperand(rawOperandsString, parsedLine);
     }
-    else if (strcmp(action, ".extern") == 0){
+    else if (strcmp(action, ".extern") == 0){ /* if action is .extern, set action and save label */
         parsedLine->actionType = EXTERN;
         errStr = checkExternOrEntryOperand(rawOperandsString, parsedLine);
     }
-    else { /* Command is not known */
+    else { /* Command is not known, throw error */
         parsedLine->actionType = UNKNOWN;
         errStr = errMessage(ERR_UNKNOWN_CMD, action);
     }
@@ -640,9 +644,9 @@ char* validateActionAndOperands(char* rawOperandsString, FileLine* parsedLine) {
 }
 
 /**
- *
- * @param parsedLine
- * @return
+ * check line for label, command and operands validity
+ * @param parsedLine - FileLine struct to update num of operands in
+ * @return NULL if line is ok, else error message
  */
 char* lineValidator(FileLine* parsedLine) {
     char* string;
@@ -651,14 +655,15 @@ char* lineValidator(FileLine* parsedLine) {
     char* errStr;
 
     char* lineToCheck = copyString(parsedLine->originalLine);
-    string = strtok(lineToCheck, " \t\n\r"); /* Get first string */
+    string = strtok(lineToCheck, " \t\n\r"); /* Get first string in line */
 
     /* Handle empty lines */
     if (string == NULL){
         parsedLine->isEmptyOrComment = true;
         free(lineToCheck);
         return NULL;
-    }/* Handle Comment Lines */
+
+    }/* Handle Comment Lines - if line starts with ';' */
     else if (strlen(string) >= 1 && string[0] == ';'){
         parsedLine->isEmptyOrComment = true;
         free(lineToCheck);
@@ -667,18 +672,18 @@ char* lineValidator(FileLine* parsedLine) {
 
     /* Handle labels */
     strSize = (int)strlen(string);
-    if (string[strSize - 1] == ':') { /* Label Found */
-        if (string - lineToCheck != 0){
+    if (string[strSize - 1] == ':') { /* Label Found if last char is ':' */
+        if (string - lineToCheck != 0){ /* check that label starts in first line column */
             errStr = errMessage(ERR_INVAILD_LABEL_START, string);
             free(lineToCheck);
             return errStr;
         }
-        parsedLabel = getNewSubString(string, strSize - 1);
-        errStr = isLabelValid(parsedLabel);
-        if (errStr == NULL){
-            parsedLine->label = parsedLabel;
+        parsedLabel = getNewSubString(string, strSize - 1); /* get string without ':' */
+        errStr = isLabelValid(parsedLabel); /* check label is valid */
+        if (errStr == NULL){ /* if label is valid, set it as line label */
+            parsedLine->label = parsedLabel; /* set line label */
         }
-        else {
+        else {  /* if label is not valid, throw error */
             free(lineToCheck);
             errStr = errMessage(errStr, parsedLabel);
             free(parsedLabel);
@@ -689,7 +694,7 @@ char* lineValidator(FileLine* parsedLine) {
 
     parsedLine->action = copyString(string);      /* get the action */
     string = strtok(NULL, "\n\r"); /*  get remaining of line */
-    errStr = validateActionAndOperands(string, parsedLine);
+    errStr = validateActionAndOperands(string, parsedLine); /* check operands by the command recieved */
     free(lineToCheck);
     return errStr;
 }
@@ -717,52 +722,61 @@ Status getFileContent(char *filename, FileContent *fileContent) {
     FileLine* parsedLine;
 
     fr = fopen (filename, "r"); /*  Open the file for reading */
-    if (fr == NULL) {
+    if (fr == NULL) { /* if file does not exist, throw error and return Fail */
         printInternalError(ERR_FILE_NOT_FOUND, filename);
         return Fail;
     }
-    fileContent->filename = copyString(filename);
-    while(fgets(line, sizeof(line), fr) != NULL)   /* get a word.  done if NULL */
+    fileContent->filename = copyString(filename); /* save file name on line */
+    while(fgets(line, sizeof(line), fr) != NULL)   /* get a next line, done if NULL */
     {
         if(DEBUG) printf("Line is -->  %s", line);
 
-        parsedLine = &fileContent->line[arrayIndex];
+        parsedLine = &fileContent->line[arrayIndex]; /* save line object in file content lines array */
         memset(parsedLine, 0, sizeof(FileLine));
 
-        parsedLine->lineNumber = lineCounter;
-        parsedLine->originalLine = copyString(line);
-        errString = lineValidator(parsedLine);
-        if (errString != NULL) {
+        parsedLine->lineNumber = lineCounter; /* set line number of line in line object */
+        parsedLine->originalLine = copyString(line); /* set original line string in line object */
+        errString = lineValidator(parsedLine); /* verify line label, command and operands validity */
+        if (errString != NULL) { /* if line not valid, return fail and write the error */
             fileStatus = Fail;
             printSyntaxError(errString, filename, lineCounter);
         }
-        if (parsedLine->isEmptyOrComment == false) {
+        if (parsedLine->isEmptyOrComment == false) { /* only if line is not empty or comment, increase line counter for file content */
             arrayIndex++;
         }
         lineCounter++;
     }
-    fileContent->size = arrayIndex;
+    fileContent->size = arrayIndex; /* save amount of lines that are not comment or empty */
     fclose(fr);  /* close the file prior to exiting the routine */
     return fileStatus;
 }
 
+/**
+ * Allocate space for file lines
+ * @param fileContent - pointer to filecontent struct
+ * @return Pass if no issues allocating memory, Fail otherwise
+ */
 Status initFileContent(FileContent** fileContent) {
     *fileContent = (FileContent*)malloc(sizeof(FileContent));
     memset(*fileContent, 0, sizeof(FileContent));
-    if (*fileContent == NULL)
+    if (*fileContent == NULL) /* if memory allocation for file content failed, return Fail */
         return Fail;
 
     (*fileContent)->line = (FileLine*)malloc(sizeof(FileLine)*MAX_FILE_LINES);
-    if ((*fileContent)->line == NULL)
+    if ((*fileContent)->line == NULL) /* if memory allocation for line array failed, return Fail */
         return Fail;
     return Pass;
 }
 
+/**
+ * gets a pointer to filecontent and cleans its memory
+ * @param fileContent - Object to clean memory for
+ */
 void freeFileContent(FileContent** fileContent) {
     int i;
     if ((*fileContent)->size > 0){
         if(DEBUG) printf("Clears file line\n");
-        for (i = 0; i < (*fileContent)->size; ++i) {
+        for (i = 0; i < (*fileContent)->size; ++i) { /* clears memory of all lines in file content line array */
             free((*fileContent)->line[i].label);
             free((*fileContent)->line[i].originalLine);
             free((*fileContent)->line[i].action);
@@ -790,7 +804,7 @@ void freeFileContent(FileContent** fileContent) {
             free((*fileContent)->line[i].secondOperValue);
         }
     }
-    free((*fileContent)->line);
+    free((*fileContent)->line); /* after cleaning the inside of the fileContent object, we clear its memory too */
     if ((*fileContent)->filename != NULL)
         free((*fileContent)->filename);
     free(*fileContent);

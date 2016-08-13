@@ -53,11 +53,11 @@ char* getNewSubString(const char* pos, int size) {
 }
 
 char* copyString(const char* pos) {
-    return getNewSubString(pos, strlen(pos));
+    return getNewSubString(pos, (int)strlen(pos));
 }
 
 char* errMessage(const char *err, const char *param) {
-    char* errMsg = getNewString(strlen(err) + 1 + strlen(param));
+    char* errMsg = getNewString((int)strlen(err) + 1 + (int)strlen(param));
     strcpy(errMsg, err);
     strcat(errMsg, " ");
     strcat(errMsg, param);

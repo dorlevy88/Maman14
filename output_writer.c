@@ -18,7 +18,7 @@ char* getFilenameNewExtension(char *filename, const char* extension) {
     if(dot == NULL || dot == filename) return NULL;
     /*  terminate string at the . (dot) location */
     dotPos = (int) (dot - filename);
-    newFileName = getNewString(dotPos + strlen(extension));
+    newFileName = getNewString(dotPos + (int)strlen(extension));
     strncpy(newFileName, filename, dotPos);
     strcat(newFileName, extension);
     return newFileName;
