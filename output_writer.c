@@ -9,21 +9,31 @@
 #define NUM_OF_CHARS_IN_ADDRESS 3
 #define NUM_OF_CHARS_IN_COUNTERS 2
 
+/**
+ * replace the extension on filename from what it was to extension
+ * @param filename - full filename (*.*)
+ * @param extension - New extension for file name
+ * @return string of new file name
+ */
 char* getFilenameNewExtension(char *filename, const char* extension) {
     int dotPos;
     char* newFileName;
     char *dot;
 
-    dot = strrchr(filename, '.');
-    if(dot == NULL || dot == filename) return NULL;
-    /*  terminate string at the . (dot) location */
-    dotPos = (int) (dot - filename);
-    newFileName = getNewString(dotPos + (int)strlen(extension));
-    strncpy(newFileName, filename, dotPos);
-    strcat(newFileName, extension);
+    dot = strrchr(filename, '.'); /* find the dot in the string */
+    if(dot == NULL || dot == filename) return NULL; /* if couldn't find a dot or file starts with a dot */
+    dotPos = (int) (dot - filename);  /* terminate string at the . (dot) location */
+    newFileName = getNewString(dotPos + (int)strlen(extension)); /* Get a memory allocation for new filename */
+    strncpy(newFileName, filename, dotPos); /* get file name base */
+    strcat(newFileName, extension); /* concatenate to file base the new extension */
     return newFileName;
 }
 
+/**
+ * switch integer in base 8 to char in base 8 special
+ * @param base8 - int represented in base 8
+ * @return base 8 special char
+ */
 char translateToSpecial8Base(int base8) {
     switch (base8) {
         case 0:
@@ -48,6 +58,11 @@ char translateToSpecial8Base(int base8) {
     }
 }
 
+/**
+ * Converts base 10 integer to base 8 integer
+ * @param base10 - base 10 integer
+ * @return base 8 integer
+ */
 int convertNumFromBase10toBase8(int base10) {
     int index = 0;
     int res = 0;
@@ -62,17 +77,28 @@ int convertNumFromBase10toBase8(int base10) {
     return res;
 }
 
+/**
+ * translates an integer that represents a 15 bits command into special 8 base
+ * @param byte - integer representss a 15 bits command
+ * @return 5 char string represnting the byte in special 8 base
+ */
 char* translateCommandToSpecial8Base(int byte) {
     char* response = getNewString(NUM_OF_CHARS_IN_CMD);
     int i,num;
     for (i = 0; i < NUM_OF_CHARS_IN_CMD; ++i) {
         num = byte & THREE_BITS_MASK; /* Get 3 right most bits */
-        byte >>=3;
-        response[(NUM_OF_CHARS_IN_CMD - 1)-i] = translateToSpecial8Base(num);
+        byte >>=3; /* remove 3 rightmost bits */
+        response[(NUM_OF_CHARS_IN_CMD - 1)-i] = translateToSpecial8Base(num); /* insert into response, starting from the inner most object in array (4,3,2,1,0) the base 8 char */
     }
     return response;
 }
 
+/**
+ * translates an adress (100,102 ...) into special 8 base string
+ * @param address - integer represnting address in base 10
+ * @param size -
+ * @return
+ */
 char* translateAddressToSpecial8Base(int address, int size) {
     int base8 = convertNumFromBase10toBase8(address);
     char* response = getNewString(size);
@@ -85,6 +111,11 @@ char* translateAddressToSpecial8Base(int address, int size) {
     return response;
 }
 
+/**
+ *
+ * @param table
+ * @param filename
+ */
 void writeEntOutputFile(SymbolsTable *table, char* filename) {
     FILE *fp;
     int i;
@@ -123,6 +154,11 @@ void writeEntOutputFile(SymbolsTable *table, char* filename) {
     return;
 }
 
+/**
+ *
+ * @param externs
+ * @param filename
+ */
 void writeExtOutputFile(SymbolsTable* externs, char* filename) {
     FILE *fp;
     int i;
@@ -151,6 +187,11 @@ void writeExtOutputFile(SymbolsTable* externs, char* filename) {
     return;
 }
 
+/**
+ *
+ * @param assembly
+ * @param filename
+ */
 void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     FILE *fp;
     int i;
@@ -196,14 +237,9 @@ void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
 }
 
 /**
- *
-    11. save to a different file:
-    11.1 size of the program
-    11.2 size of the data
-    11.3 extern symbols table
-    11.4 symbols table with entry points marks
- * @param assembly
- * @param fullFilename
+ * write all files - .ob / .ent / .ext
+ * @param assembly - AssemblyStructure to write
+ * @param fullFilename - Base file name to write (same as the original .as file)
  */
 void writeAllOutputFiles(AssemblyStructure *assembly, char *fullFilename) {
     writeEntOutputFile(assembly->symbolsTable, fullFilename);
