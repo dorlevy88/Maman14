@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include "assembler.h"
 
+/**
+ * decommission assembly structure and file content
+ * @param assembly - pointer to AssemblyStructure
+ * @param file - pointer to FileContent
+ */
 void free_all(AssemblyStructure** assembly, FileContent** file) {
     if (*assembly != NULL)
         freeAssemblyStructure(assembly);
@@ -9,6 +14,12 @@ void free_all(AssemblyStructure** assembly, FileContent** file) {
     }
 }
 
+/**
+ * init new assembly structure and file content
+ * @param assembly - pointer to AssemblyStructure
+ * @param file - pointer to FileContent
+ * @return Fail/Pass
+ */
 Status init(AssemblyStructure** assembly, FileContent** file) {
     free_all(assembly, file);
     if (initAssemblyStructure(assembly) == Fail)

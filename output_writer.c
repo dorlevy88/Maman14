@@ -96,14 +96,15 @@ char* translateCommandToSpecial8Base(int byte) {
 /**
  * translates an adress (100,102 ...) into special 8 base string
  * @param address - integer represnting address in base 10
- * @param size -
- * @return
+ * @param size - number of digits to write
+ * @return string of command in special base 8
  */
 char* translateAddressToSpecial8Base(int address, int size) {
     int base8 = convertNumFromBase10toBase8(address);
     char* response = getNewString(size);
     int i, num;
-    for (i = 1; i <= size ; ++i) {
+
+    for (i = 1; i <= size ; ++i) { /* for each digit, translate it to special 8 and add it to response */
         num = base8 % 10;
         response[size-i] = translateToSpecial8Base(num);
         base8 /= 10;
@@ -112,9 +113,9 @@ char* translateAddressToSpecial8Base(int address, int size) {
 }
 
 /**
- *
- * @param table
- * @param filename
+ * writes an ent file for each entry label in symbols table
+ * @param table - SymbolsTable
+ * @param filename - File to write entry label to
  */
 void writeEntOutputFile(SymbolsTable *table, char* filename) {
     FILE *fp;
@@ -123,26 +124,26 @@ void writeEntOutputFile(SymbolsTable *table, char* filename) {
     char* newFileName;
     bool tableHasEntry = false;
 
-    /* check for entry records */
+    /* check for at least one entry record */
     for (i = 0; i < table->recordSize; ++i) {
         if (table->records[i].isEntry == true) {
             tableHasEntry = true;
             break;
         }
     }
-    if (tableHasEntry == false)
+    if (tableHasEntry == false) /* if no entry record, break */
         return;
 
-    newFileName = getFilenameNewExtension(filename, ".ent");
-    fp = fopen(newFileName, "w");
+    newFileName = getFilenameNewExtension(filename, ".ent"); /* get a new file name with .ext extension */
+    fp = fopen(newFileName, "w"); /* Open file for writing */
     printProcessStep("Start writing file", newFileName);
-    if (fp == NULL) {
+    if (fp == NULL) { /* If file could not be opened, throw error */
         printInternalError(EER_NEW_FILE_FAILURE, newFileName);
         free(newFileName);
         return;
     }
 
-    for (i = 0; i < table->recordSize; ++i) {
+    for (i = 0; i < table->recordSize; ++i) { /* for each entry record, write it to the file in special base 8 */
         if (table->records[i].isEntry == true) {
             address = translateAddressToSpecial8Base(table->records[i].address, NUM_OF_CHARS_IN_ADDRESS); /* 3 because it could be up to 1000 */
             fprintf(fp, FILE_OUTPUT_FORMAT, table->records[i].label, address);
@@ -155,9 +156,9 @@ void writeEntOutputFile(SymbolsTable *table, char* filename) {
 }
 
 /**
- *
- * @param externs
- * @param filename
+ * writes an ext file for each entry label in entry symbols table
+ * @param table - SymbolsTable
+ * @param filename - File to write external label to
  */
 void writeExtOutputFile(SymbolsTable* externs, char* filename) {
     FILE *fp;
@@ -165,19 +166,19 @@ void writeExtOutputFile(SymbolsTable* externs, char* filename) {
     char* address;
     char* newFileName;
 
-    if(externs->recordSize == 0)
+    if(externs->recordSize == 0) /* if no externs to write, break */
         return;
 
-    newFileName = getFilenameNewExtension(filename, ".ext");
+    newFileName = getFilenameNewExtension(filename, ".ext"); /* get new file name with .ext extension */
     fp = fopen(newFileName, "w");
     printProcessStep("Start writing file", newFileName);
-    if (fp == NULL) {
+    if (fp == NULL) { /* If couldn't open file, break */
         printInternalError(EER_NEW_FILE_FAILURE, newFileName);
         free(newFileName);
         return;
     }
 
-    for (i = 0; i < externs->recordSize; ++i) {
+    for (i = 0; i < externs->recordSize; ++i) { /* for eaach extern record, translate it to special base 8 and write it to file */
         address = translateAddressToSpecial8Base(externs->records[i].address, NUM_OF_CHARS_IN_ADDRESS); /* 3 because it could be up to 1000 */
         fprintf(fp, FILE_OUTPUT_FORMAT, externs->records[i].label, address);
         free(address);
@@ -188,9 +189,9 @@ void writeExtOutputFile(SymbolsTable* externs, char* filename) {
 }
 
 /**
- *
- * @param assembly
- * @param filename
+ * writes an ob file for each command in symbols table
+ * @param assembly - Assembly Structure
+ * @param filename - File to write external label to
  */
 void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     FILE *fp;
@@ -202,27 +203,27 @@ void writeObOutputFile(AssemblyStructure* assembly, char* filename) {
     int addressCounter;
     char* newFileName;
 
-    newFileName = getFilenameNewExtension(filename, ".ob");
+    newFileName = getFilenameNewExtension(filename, ".ob"); /* Get new file name with .ob extension */
     fp = fopen(newFileName, "w");
     printProcessStep("Start writing file", newFileName);
-    if (fp == NULL) {
+    if (fp == NULL) { /* If couldn't open file for writing, throw error */
         printInternalError(EER_NEW_FILE_FAILURE, newFileName);
         free(newFileName);
         return;
     }
 
-    translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2); /* TODO: should be also 3? */
-    translatedDataArraySize = translateAddressToSpecial8Base(assembly->dataArray->size, 2);
-    fprintf(fp, FILE_OUTPUT_FORMAT, translatedCodeArraySize, translatedDataArraySize);
+    translatedCodeArraySize = translateAddressToSpecial8Base(assembly->codeArray->size, 2);  /* translate amount of codes to special 8 */
+    translatedDataArraySize = translateAddressToSpecial8Base(assembly->dataArray->size, 2);  /* translate amount of data to special 8 */
+    fprintf(fp, FILE_OUTPUT_FORMAT, translatedCodeArraySize, translatedDataArraySize); /* write the first line of .ob file with the size of cmd and data arrays */
     addressCounter = ASSEMBLY_CODE_START_ADDRESS;
-    for (i = 0; i < assembly->codeArray->size; ++i) {
+    for (i = 0; i < assembly->codeArray->size; ++i) { /* write each cmd in code array in special base 8 in the following format XXX\tYYYYY */
         address = translateAddressToSpecial8Base(addressCounter++, NUM_OF_CHARS_IN_ADDRESS);
         command = translateCommandToSpecial8Base(assembly->codeArray->array[i]);
         fprintf(fp, FILE_OUTPUT_FORMAT, address, command);
         free(address);
         free(command);
     }
-    for (i = 0; i < assembly->dataArray->size; ++i) {
+    for (i = 0; i < assembly->dataArray->size; ++i) { /* write each data object in data array in special base 8 in the following format XXX\tYYYYY */
         address = translateAddressToSpecial8Base(addressCounter++, NUM_OF_CHARS_IN_ADDRESS);
         command = translateCommandToSpecial8Base(assembly->dataArray->array[i]);
         fprintf(fp, FILE_OUTPUT_FORMAT, address, command);

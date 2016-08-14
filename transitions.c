@@ -9,6 +9,11 @@
 #define OPERAND_BYTE_SIZE 13
 #define MAX_CPU_MEMORY 1000
 
+/**
+ * Create a 15 bit array from a command line depends on the internal line specifications
+ * @param cmdLine - Line to translate to 15 bits
+ * @return int represnting a 15 bit array
+ */
 int buildBinaryCommand(FileLine cmdLine) {
     /*  101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
     int binCmd = 0;
@@ -50,20 +55,28 @@ int buildBinaryCommand(FileLine cmdLine) {
     return binCmd;
 }
 
+/**
+ * Parses a range of bits out of a bit array
+ * @param num - Int representing a 15 bits array
+ * @param minBit - Bit to start taking data from
+ * @param maxBit - Bit to End taking data from
+ * @return int represnting the sub bit array
+ */
 int getBitRangeFromInt(int num, int minBit, int maxBit) {
     int res = 0;
     int i, mask, byteSize;
     bool isNegative = false;
+
     for (i = minBit; i <= maxBit; ++i) {
-        mask = ((1 << i) & num);
-        res += mask >> minBit;
-        if(i == maxBit && mask != 0) {
+        mask = ((1 << i) & num); /* create a bit in the place of i and get therefore get the bit in the i place from num */
+        res += mask >> minBit; /* move the bit found to be start from 0 and not from minBit */
+        if(i == maxBit && mask != 0) { /* check if last bit is 0 or 1 (+/-) to know if needed to move it with complement's two */
             isNegative = true;
         }
     }
-    byteSize = maxBit - minBit + 1;
+    byteSize = maxBit - minBit + 1; /* amount of bits in sub bit array */
     if (isNegative){
-        res = res - (int)pow(2, byteSize);
+        res = res - (int)pow(2, byteSize);  /* translate to unsigned int from signed int - complement's two */
     }
     return res;
 }
@@ -136,15 +149,25 @@ char* buildBinaryData(int* binData, Operand* operand, SymbolsTable* table, Symbo
     return NULL;
 }
 
+/**
+ * update data tablee to start from ic + 1 after finishing building command array
+ * @param table - SymbolsTable
+ * @param ic - size of command array
+ */
 void updateSymbolsTableDataAddresses(SymbolsTable *table, int ic) {
     int i;
-    for (i = 0; i < table->recordSize; ++i) {
+    for (i = 0; i < table->recordSize; ++i) { /* for each .data/.string add ic to its address */
         if (table->records[i].isCommand == false && table->records[i].isExternal == false) { /* update only .data\.string types */
             table->records[i].address += ic;
         }
     }
 }
 
+/**
+ * gets a line and returns number of objects in memory to save for it
+ * @param line - FileLine to check
+ * @return amount of lines needed to be saved
+ */
 int getCommandSize(FileLine* line) {
     if (line->numOfCommandOprands == 0) {
         return 1; /* One command byte */
@@ -216,50 +239,50 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
             int firstByte = 0;
             bool isMemAllocOk;
             if (line.actionType == DATA ) {
-                calcDataSize = line.firstOperValue->dataSize;
+                calcDataSize = line.firstOperValue->dataSize; /* check how much space to save in data array */
                 firstByte = line.firstOperValue->data[0];
-                isMemAllocOk = pushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data,
+                isMemAllocOk = pushBytesFromIntArray(assembly->dataArray, line.firstOperValue->data,  /* push data into data array */
                                                      line.firstOperValue->dataSize);
             }
             else {
-                calcDataSize = (int)strlen(line.firstOperValue->string) + 1;
+                calcDataSize = (int)strlen(line.firstOperValue->string) + 1; /* calculate how much space needed to save for string - +1 for /0 at the end of string */
                 firstByte = line.firstOperValue->string[0];
-                isMemAllocOk = pushBytesFromString(assembly->dataArray, line.firstOperValue->string);
+                isMemAllocOk = pushBytesFromString(assembly->dataArray, line.firstOperValue->string);  /* Push string into data array */
             }
 
-            if(isMemAllocOk == false) {
+            if(isMemAllocOk == false) { /* if any error in memory allocation, throw error */
                 printInternalError(ERR_DATA_RAM_OVERFLOW, fileContent->filename);
                 status =  Fail;
                 continue;
             }
-            if (isLabelExists) {
+            if (isLabelExists) { /* if .data/.string has label then add it to symbols table and check that it does not already exist */
                 if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->dc, false, false, false, firstByte) == false) {
-                    printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber);
+                    printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber); /* throw error if label exist twice */
                     status =  Fail;
                     continue;
                 }
             }
-            assembly->dc += calcDataSize;
+            assembly->dc += calcDataSize; /* increase dc size */
         }
             /* Handle External Symbols */
         else if (line.actionType == EXTERN || line.actionType == ENTRY) {
-            if (isLabelExists) {
+            if (isLabelExists) { /* Throw warning if .extern/.entry has label */
                 printCompileWarning(errMessage(WARN_LABEL_IN_BAD_LOCATION, line.label), fileContent->filename, line.lineNumber);
             }
             /* Steps 9, 9.1, 10 */
-            if (line.actionType == EXTERN) {
+            if (line.actionType == EXTERN) { /* add extern label to symbols table */
                 addNewLabelToTable(assembly->symbolsTable, line.firstOperValue->entryOrExtern, 0, true, false, false, 0);
             }
         }
         else {/*  handle command line */
 
             /* Handle Command labels */
-            if (isLabelExists) {
+            if (isLabelExists) {  /* if there is label, add it to symbols table and calculate its binary bits (if needed by another dynamic cmd) */
                 /* Step 11 */
-                int binCommandForDynamicAddressing = buildBinaryCommand(line);
-                if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true, false,
+                int binCommandForDynamicAddressing = buildBinaryCommand(line); /* calculate dynamic binary bits */
+                if (addNewLabelToTable(assembly->symbolsTable, line.label, assembly->ic, false, true, false, /* add to sybolsTable and check no duplication */
                                        binCommandForDynamicAddressing) == false) {
-                    printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber);
+                    printCompileError(errMessage(ERR_LABEL_DEFINED_TWICE, line.label), fileContent->filename, line.lineNumber); /* Throw error if label is duplicated */
                     status =  Fail;
                     continue;
                 }
@@ -276,7 +299,7 @@ Status runFirstTransition(FileContent *fileContent, AssemblyStructure *assembly)
         return Fail;
     }
 
-    if (assembly->ic + assembly->dc >= MAX_CPU_MEMORY) {
+    if (assembly->ic + assembly->dc >= MAX_CPU_MEMORY) { /* If more than 1000 commands, throw error */
         printInternalError(ERR_RAM_OVERFLOW, fileContent->filename);
         return Fail;
     }
@@ -339,36 +362,36 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
         }
         /* handle command */
         else {
-            /*  101 - num od command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
+            /*  101 - num of command operands (2b) - command opcode (4b) - src addressing type (2b) - dest addressing type (2b) - E,R,A (2b) */
             char* errStr;
             int binCmd = buildBinaryCommand(line);
-            bool isMemAllocOk = pushByteFromInt(assembly->codeArray, binCmd);
+            bool isMemAllocOk = pushByteFromInt(assembly->codeArray, binCmd); /* add cmd to code array */
             assembly->ic++;
             /*  0000000000000-00 (data 13b - E,R,A (2b)) */
             /* Building Code Array */
-            if (line.numOfCommandOprands == 1){
+            if (line.numOfCommandOprands == 1){ /* if one operand */
                 int binData = 0;
                 errStr = buildBinaryData(&binData, line.firstOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic);
-                if (errStr != NULL) {
+                if (errStr != NULL) { /* if there was an issue in building binary data of first operand, throw error */
                     printCompileError(errStr, fileContent->filename, line.lineNumber);
                     return Fail;
                 }
-                isMemAllocOk &= pushByteFromInt(assembly->codeArray, binData);
+                isMemAllocOk &= pushByteFromInt(assembly->codeArray, binData); /* add first operand byte array to code array */
                 assembly->ic++;
             }
-            else if (line.numOfCommandOprands == 2) {
+            else if (line.numOfCommandOprands == 2) { /* if 2 operands */
                 int firstBinData = 0, secondBinData = 0;
-                errStr = buildBinaryData(&firstBinData, line.firstOperValue, assembly->symbolsTable, assembly->externs, false, assembly->ic);
-                if (errStr != NULL) {
+                errStr = buildBinaryData(&firstBinData, line.firstOperValue, assembly->symbolsTable, assembly->externs, false, assembly->ic); /* calculate first operand byte array */
+                if (errStr != NULL) { /* if there was an issue in building binary data of first operand, throw error */
                     printCompileError(errStr, fileContent->filename, line.lineNumber);
                     return Fail;
                 }
-                errStr = buildBinaryData(&secondBinData, line.secondOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic+1);
-                if (errStr != NULL) {
+                errStr = buildBinaryData(&secondBinData, line.secondOperValue, assembly->symbolsTable, assembly->externs, true, assembly->ic+1); /* calculate second operand byte array */
+                if (errStr != NULL) { /* if there was an issue in building binary data of first operand, throw error */
                     printCompileError(errStr, fileContent->filename, line.lineNumber);
                     return Fail;
                 }
-                if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){
+                if (line.firstOperValue->addressingType == REGISTER && line.secondOperValue->addressingType == REGISTER){ /* if both operands are registers, they share a byte array */
                     isMemAllocOk &= pushByteFromInt(assembly->codeArray, firstBinData + secondBinData);
                     assembly->ic++;
                 }
@@ -379,7 +402,7 @@ Status runSecondTransition(FileContent *fileContent, AssemblyStructure *assembly
                 }
             }
 
-            if(isMemAllocOk == false){
+            if(isMemAllocOk == false){ /* if there is an issue with memory allocation, throw error */
                 printInternalError(ERR_CODE_RAM_OVERFLOW, fileContent->filename);
                 return Fail;
             }

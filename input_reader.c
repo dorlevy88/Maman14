@@ -19,8 +19,8 @@
 #define MAX_DYNAMIC_OPERAND 14 /* max exact number */
 #define NUM_INVALID_LABELS 24
 #define MAX_REGISTER_CHARS 2
-#define MIN_REGISTER_NUM 0
-#define MAX_REGISTER_NUM 7
+#define MIN_REGISTER_NUM '0'
+#define MAX_REGISTER_NUM '7'
 const char* INVALID_LABELS[NUM_INVALID_LABELS] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop",
                                                   "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
