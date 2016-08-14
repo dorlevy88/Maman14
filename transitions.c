@@ -9,6 +9,12 @@
 #define OPERAND_BYTE_SIZE 13
 #define MAX_CPU_MEMORY 1000
 
+/*
+ * Maman 14 for the following students -
+ * 1. Or Zamir - 301222063
+ * 2. Dor Levy - 301641098
+ */
+
 /**
  * Create a 15 bit array from a command line depends on the internal line specifications
  * @param cmdLine - Line to translate to 15 bits

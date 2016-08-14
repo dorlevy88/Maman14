@@ -6,6 +6,12 @@
 
 #include "data_structures.h"
 
+/*
+ * Maman 14 for the following students -
+ * 1. Or Zamir - 301222063
+ * 2. Dor Levy - 301641098
+ */
+
 #define DATA_BYTE_SIZE 15
 
 /* **********************************************************************

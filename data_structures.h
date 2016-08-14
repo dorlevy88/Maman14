@@ -4,6 +4,12 @@
 #include <stdbool.h>
 #include "definitions.h"
 
+/*
+ * Maman 14 for the following students -
+ * 1. Or Zamir - 301222063
+ * 2. Dor Levy - 301641098
+ */
+
 #define MAX_ASSEMBLY_BYTES 1000
 #define LABEL_NOT_EXISTS -1
 #define ASSEMBLY_CODE_START_ADDRESS 100

@@ -6,4 +6,10 @@
 #include "transitions.h"
 #include "utils.h"
 
+/*
+ * Maman 14 for the following students -
+ * 1. Or Zamir - 301222063
+ * 2. Dor Levy - 301641098
+ */
+
 #endif /* MAMAN14_ASSEMBLER_H */

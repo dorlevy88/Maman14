@@ -9,6 +9,12 @@
 #define NUM_OF_CHARS_IN_ADDRESS 3
 #define NUM_OF_CHARS_IN_COUNTERS 2
 
+/*
+ * Maman 14 for the following students -
+ * 1. Or Zamir - 301222063
+ * 2. Dor Levy - 301641098
+ */
+
 /**
  * replace the extension on filename from what it was to extension
  * @param filename - full filename (*.*)

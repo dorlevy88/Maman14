@@ -10,6 +10,12 @@
 
 #include "input_reader.h"
 
+/*
+ * Maman 14 for the following students -
+ * 1. Or Zamir - 301222063
+ * 2. Dor Levy - 301641098
+ */
+
 #define MAX_FILE_LINES 1000
 #define MAX_LINE_SIZE 80
 #define MAX_LABEL_SIZE 30
